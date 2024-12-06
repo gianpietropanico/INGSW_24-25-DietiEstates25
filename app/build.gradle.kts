@@ -50,7 +50,19 @@ android {
 }
 
 dependencies {
+    // Dipendenze di Ktor
+    implementation(libs.ktor.client.core) // Aggiungi la versione corretta
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.kotlinx.coroutines.core) // Coroutines
+    implementation(libs.ktor.client.core.v234)
+    implementation(libs.ktor.client.cio.v234) // Motore CIO per Ktor Client
+    implementation(libs.ktor.client.content.negotiation) // Per gestire JSON
+    implementation(libs.ktor.serialization.kotlinx.json) // Serializzazione JSON
+    implementation(libs.kotlinx.coroutines.core.v173) // Coroutines
+    implementation(libs.ktor.client.logging)
 
+    // Dipendenze del progetto
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -59,7 +71,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.volley)
+    implementation(libs.transport.runtime)
+
+    // Dipendenze per i test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -67,4 +82,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //NUOVE DIPENDENZE
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.hilt.navigation.fragment)
 }
