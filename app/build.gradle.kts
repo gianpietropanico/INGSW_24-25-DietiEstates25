@@ -84,6 +84,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //NUOVE DIPENDENZE
+    //1.
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.hilt.navigation.fragment)
+    //2.
+    implementation(libs.androidx.navigation.compose)
+
 }

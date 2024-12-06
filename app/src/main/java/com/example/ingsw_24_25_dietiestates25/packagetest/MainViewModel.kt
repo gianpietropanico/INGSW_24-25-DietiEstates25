@@ -5,20 +5,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.Navigation
+import androidx.navigation.Navigator
 import com.example.ingsw_24_25_dietiestates25.AuthState
 import com.example.ingsw_24_25_dietiestates25.AuthUiEvent
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthResult
-import dagger.hilt.android.lifecycle.HiltViewModel
+
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 
-@HiltViewModel
-class MainViewModel2 @Inject constructor(
-    private val repository: AuthRepository
+
+class MainViewModel (
+    private val repository: AuthRepository,
+    private val navigator : Navigation
 ): ViewModel() {
 
     var state by mutableStateOf(AuthState())
