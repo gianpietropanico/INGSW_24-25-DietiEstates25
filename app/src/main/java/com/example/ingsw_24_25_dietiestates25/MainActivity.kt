@@ -5,9 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 
-import androidx.compose.runtime.Composable
+import com.example.ingsw_24_25_dietiestates25.ui.theme.MainScreen
 
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.ingsw_24_25_dietiestates25.ui.theme.ComposeLoginScreenInitTheme
 
 
@@ -16,20 +15,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeLoginScreenInitTheme {
-            LoginScreen()
+                MainScreen()
 
             }
         }
     }
 }
 
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ComposeLoginScreenInitTheme {
-        LoginScreen()
-    }
-}
