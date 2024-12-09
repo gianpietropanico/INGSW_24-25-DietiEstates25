@@ -5,8 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 
-import com.example.ingsw_24_25_dietiestates25.ui.theme.MainScreen
-
 import com.example.ingsw_24_25_dietiestates25.ui.theme.ComposeLoginScreenInitTheme
 
 
@@ -16,7 +14,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             ComposeLoginScreenInitTheme {
                 MainScreen()
-
             }
         }
     }

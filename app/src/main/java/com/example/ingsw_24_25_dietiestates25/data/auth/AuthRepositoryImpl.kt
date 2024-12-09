@@ -76,5 +76,22 @@ class AuthRepositoryImpl(
             AuthResult.UnknownError()
         }
     }
+    override suspend fun logout() {
+        try {
+            // Rimuovi il token JWT dalle SharedPreferences
+            prefs.edit()
+                .remove("jwt")
+                .apply()
+
+            // (Facoltativo) Chiamata al server per invalidare il token, se supportata
+            // api.logout()
+
+            Log.d("AuthRepository", "Logout completato con successo")
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "Errore durante il logout", e)
+        }
+    }
+
+
 
 }

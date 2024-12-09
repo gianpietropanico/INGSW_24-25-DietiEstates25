@@ -12,13 +12,9 @@ import android.util.Log
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
-import io.ktor.client.request.post
 import io.ktor.http.contentType
-import io.ktor.http.*
-import io.ktor.client.plugins.*
 import io.ktor.client.request.accept
-import io.ktor.http.contentType
-import io.ktor.client.request.url
+
 
 class AuthApiImpl(private val httpClient: HttpClient) : AuthApi {
 

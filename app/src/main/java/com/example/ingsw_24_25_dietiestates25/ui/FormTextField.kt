@@ -15,7 +15,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 //STATELESS
 
 @Composable
-fun LoginTextField(
+fun FormTextField(
     value: String, // Il valore attuale del campo
     onValueChange: (String) -> Unit, // Callback per gestire l'input
     label: String, // Etichetta del campo

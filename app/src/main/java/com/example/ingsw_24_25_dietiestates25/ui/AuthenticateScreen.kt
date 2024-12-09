@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthUiEvent
 
 @Composable
-fun LoginScreen(viewModel: AuthViewModel) {
+fun AuthenticateApp(
+    viewModel: AuthViewModel,
+    onAuthenticateClicked: () -> Unit
+) {
     val authState by viewModel.authState.collectAsState()
     val context = LocalContext.current
 
@@ -47,7 +50,10 @@ fun LoginScreen(viewModel: AuthViewModel) {
             password = authState.signInPassword,
             onEmailChange = { viewModel.onEvent(AuthUiEvent.SignInEmailChanged(it)) },
             onPasswordChange = { viewModel.onEvent(AuthUiEvent.SignInPasswordChanged(it)) },
-            onClick = { viewModel.onEvent(AuthUiEvent.SignIn) },
+            onClick = {
+                viewModel.onEvent(AuthUiEvent.SignIn)
+                onAuthenticateClicked() // Naviga o esegui altre azioni
+            },
             textButton = "LOG IN"
         )
     }
@@ -68,7 +74,7 @@ private fun Form(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-        LoginTextField(
+        FormTextField(
             value = email,
             onValueChange = onEmailChange,
             label = "Email Address",
@@ -76,7 +82,7 @@ private fun Form(
             keyboardType = KeyboardType.Email
         )
 
-        LoginTextField(
+        FormTextField(
             value = password,
             onValueChange = onPasswordChange,
             label = "Password",

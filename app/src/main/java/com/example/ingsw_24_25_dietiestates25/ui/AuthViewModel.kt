@@ -18,9 +18,16 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState
 
+    // Stato per verificare se l'utente è loggato
+    private val _isLoggedIn = MutableStateFlow(false) // Stato iniziale non loggato
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
+
     // Espone un evento per notificare il successo del login
     private val _toastMessage = MutableSharedFlow<String>()
     val toastMessage: SharedFlow<String> = _toastMessage
+
+    private val _authSuccess = MutableSharedFlow<Unit>() // Evento per notificare il successo
+    val authSuccess: SharedFlow<Unit> = _authSuccess
 
     fun onEvent(event: AuthUiEvent) {
         Log.d("AuthViewModel", "Evento ricevuto: $event")
@@ -73,6 +80,8 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
             is AuthResult.Authorized -> {
                 _authState.value = _authState.value.copy(isLoading = false)
                 _toastMessage.emit("Sei stato loggato con successo!") // Notifica per il Toast
+                _authSuccess.emit(Unit) // Notifica il successo
+                _isLoggedIn.value = true
             }
             is AuthResult.Unauthorized -> {
                 _authState.value = _authState.value.copy(
@@ -85,6 +94,19 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
                     isLoading = false,
                     errorMessage = result.message
                 )
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                authRepository.logout()
+                _isLoggedIn.value = false // Aggiorna lo stato di login
+                _toastMessage.emit("Sei stato disconnesso.")
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Errore durante il logout", e)
+                _toastMessage.emit("Errore durante il logout.")
             }
         }
     }
