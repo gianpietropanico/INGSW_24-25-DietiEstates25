@@ -13,8 +13,9 @@ import com.example.ingsw_24_25_dietiestates25.data.auth.AuthRepositoryImpl
 import com.example.ingsw_24_25_dietiestates25.data.network.NetworkClient
 import com.example.ingsw_24_25_dietiestates25.ui.AuthViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.AuthViewModelFactory
-import com.example.ingsw_24_25_dietiestates25.ui.AuthenticateApp
+
 import com.example.ingsw_24_25_dietiestates25.ui.HomeApp
+import com.example.ingsw_24_25_dietiestates25.ui.LoginAppTest
 
 
 enum class AuthScreen(){
@@ -45,7 +46,7 @@ fun MainScreen(
     ) {
         // Schermata di Login
         composable(route = AuthScreen.Authenticate.name) {
-            AuthenticateApp(
+            LoginAppTest(
                 /* TODO LEVARE IL VIEWMODEL E PASSARE SOLO IL TOKEN DI VERIFICA CON LE NECESSARIE CREDENZIALI*/
                 viewModel = viewModel,
                 onAuthenticateClicked = {
@@ -69,4 +70,3 @@ fun MainScreen(
         }
     }
 }
-

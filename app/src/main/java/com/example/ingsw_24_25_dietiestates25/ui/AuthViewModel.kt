@@ -52,16 +52,30 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
                 Log.d("AuthViewModel", "Inizio login: ${_authState.value.signInEmail}")
                 signInUser(_authState.value.signInEmail, _authState.value.signInPassword)
             }
+            is AuthUiEvent.SignUpConfirmPasswordChanged -> {
+                _authState.value = _authState.value.copy(signUpConfirmPassword = event.value)
+            }
         }
     }
 
 
     private fun signUpUser(email: String, password: String) {
-        viewModelScope.launch {
-            _authState.value = _authState.value.copy(isLoading = true)
-            val result = authRepository.signUp(email, password)
-            handleResult(result)
+
+        if (_authState.value.signUpPassword == _authState.value.signUpConfirmPassword) {
+
+            viewModelScope.launch {
+                _authState.value = _authState.value.copy(isLoading = true)
+                val result = authRepository.signUp(email, password)
+                handleResult(result)
+            }
+
+        }else{
+            _authState.value = _authState.value.copy(
+                isLoading = false,
+                errorMessage = "Le password non combaciano"
+            )
         }
+
     }
 
     private fun signInUser(email: String, password: String) {

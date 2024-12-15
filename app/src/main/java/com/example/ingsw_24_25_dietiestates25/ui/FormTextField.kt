@@ -23,6 +23,7 @@ fun FormTextField(
     keyboardType: KeyboardType, // Tipo di tastiera
     isPassword: Boolean = false // Se il campo è per password
 ) {
+
     OutlinedTextField(
         value = value, // Usa il valore passato
         onValueChange = onValueChange, // Usa la callback passata

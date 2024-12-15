@@ -30,4 +30,3 @@ class AuthViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
