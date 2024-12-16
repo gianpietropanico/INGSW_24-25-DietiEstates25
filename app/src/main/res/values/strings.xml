@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">INGSW_24-25-DietiEstates25</string>
 
-    <string name="facebook_app_id">1899598567561312</string>
-    <string name="fb_login_protocol_scheme">fb1899598567561312</string>
-    <string name="facebook_client_token">c251dcab9edbc7d90d40e3586e2b9c05</string>
+    <string name="facebook_app_id">27780764778234544</string>
+    <string name="fb_login_protocol_scheme">fb27780764778234544</string>
+    <string name="facebook_client_token">b7a35b6fe70117baa0a3ab1a7b5eda7b</string>
 </resources>

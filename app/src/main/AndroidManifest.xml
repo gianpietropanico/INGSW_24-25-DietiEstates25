@@ -3,6 +3,7 @@
 
     <!-- Permesso di rete -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Query per visibilità dei pacchetti -->
     <queries>
