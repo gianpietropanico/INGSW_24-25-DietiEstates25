@@ -16,6 +16,7 @@ import androidx.compose.runtime.* // Per remember, mutableStateOf e delega by
 import androidx.compose.ui.platform.LocalContext
 
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthUiEvent
+import com.example.ingsw_24_25_dietiestates25.ui.social.FacebookButton
 
 import com.example.ingsw_24_25_dietiestates25.ui.social.GoogleSignInButton
 
@@ -141,7 +142,7 @@ private fun SocialLoginSection(context: Context = LocalContext.current) {
             verticalAlignment = Alignment.CenterVertically // Allinea verticalmente i pulsanti
         ) {
             GoogleSignInButton( context )
-            SocialButton("Facebook") // Pulsante per Facebook
+            FacebookButton()
             SocialButton("GitHub") // Pulsante per GitHub
         }
     }

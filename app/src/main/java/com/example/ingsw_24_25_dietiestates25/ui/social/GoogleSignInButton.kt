@@ -27,7 +27,9 @@ import java.util.UUID
 
 
 @Composable
-fun GoogleSignInButton(context: Context = LocalContext.current) {
+fun GoogleSignInButton(
+    context: Context = LocalContext.current
+) {
     val coroutineScope = rememberCoroutineScope()
     val TAG = "GoogleSignIn"
 
