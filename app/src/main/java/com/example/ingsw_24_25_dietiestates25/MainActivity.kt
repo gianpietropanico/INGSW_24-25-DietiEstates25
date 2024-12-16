@@ -33,68 +33,12 @@ class MainActivity : ComponentActivity() {
         // Mostra il FacebookButton
         setContent {
             ComposeLoginScreenInitTheme {
-                FacebookLoginButton()
+                MainScreen()
             }
         }
     }
 }
 
-@Composable
-fun FacebookButton(
-    context: Context = LocalContext.current
-) {
 
-    val loginManager = LoginManager.getInstance()
-    val callbackManager = remember { CallbackManager.Factory.create() }
-    val launcher = rememberLauncherForActivityResult(
-        loginManager.createLogInActivityResultContract(callbackManager, null)
-    ) {
-        Log.d("FacebookButton", "ActivityResult ricevuto, il flusso è stato completato")
-    }
-
-    DisposableEffect(Unit) {
-        loginManager.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
-            override fun onCancel() {
-                Log.d("FacebookButton", "Login annullato dall'utente")
-            }
-
-            override fun onSuccess(result: LoginResult) {
-                val accessToken = result.accessToken
-                Log.d("FacebookAuth", "Token di accesso: ${accessToken.token}")
-                Log.d("FacebookAuth", "UserID: ${accessToken.userId}")
-                Log.d("FacebookAuth", "Permessi: ${accessToken.permissions}")
-
-            }
-
-            override fun onError(error: FacebookException) {
-                Log.e("FacebookAuth", "Errore durante il login: ${error.message}")
-                error.printStackTrace()
-
-            }
-
-        })
-
-        onDispose {
-            loginManager.unregisterCallback(callbackManager)
-            Log.d("FacebookButton", "Callback di Facebook unregistrato")
-        }
-    }
-
-    OutlinedButton(
-        onClick = {
-            Log.d("FacebookButton", "Bottone premuto, avvio del flusso di login")
-            launcher.launch(listOf("email", "public_profile"))
-        },
-        modifier = Modifier
-            .height(40.dp) // Altezza del pulsante
-
-    ) {
-        Text(
-            text = "Facebook", // Nome della piattaforma
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold) // Stile del testo
-        )
-    }
-
-}
 
 
