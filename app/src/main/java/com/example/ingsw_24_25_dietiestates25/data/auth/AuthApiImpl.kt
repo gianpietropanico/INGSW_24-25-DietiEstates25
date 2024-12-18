@@ -25,6 +25,7 @@ class AuthApiImpl(private val httpClient: HttpClient) : AuthApi {
         }
     }
 
+
     override suspend fun signIn(request: AuthRequest): TokenResponse {
         Log.d("AuthApiImpl", "Invio richiesta SignIn con email: ${request.email}")
         return try {

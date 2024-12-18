@@ -1,6 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.data.auth
 import android.content.SharedPreferences
-import android.net.http.HttpException
 import android.util.Log
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
