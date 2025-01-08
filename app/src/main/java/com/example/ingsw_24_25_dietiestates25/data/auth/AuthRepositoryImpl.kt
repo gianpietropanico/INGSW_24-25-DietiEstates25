@@ -1,6 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.data.auth
 import android.content.SharedPreferences
-import android.net.http.HttpException
 import android.util.Log
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
@@ -89,6 +88,25 @@ class AuthRepositoryImpl(
             Log.d("AuthRepository", "Logout completato con successo")
         } catch (e: Exception) {
             Log.e("AuthRepository", "Errore durante il logout", e)
+        }
+    }
+
+    override suspend fun fetchGitHubAccessToken(code: String): AuthResult<String> {
+        return try {
+            val response = api.getGitHubAccessToken(code) // Passa il codice
+            Log.d("AuthRepository", "Token GitHub ricevuto: ${response.token}")
+
+            prefs.edit()
+                .putString("github_token", response.token)
+                .apply()
+
+            AuthResult.Authorized(response.token)
+        } catch (e: ResponseException) {
+            Log.e("AuthRepository", "Errore HTTP durante la richiesta del token GitHub", e)
+            AuthResult.UnknownError()
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "Errore generale durante la richiesta del token GitHub", e)
+            AuthResult.UnknownError()
         }
     }
 

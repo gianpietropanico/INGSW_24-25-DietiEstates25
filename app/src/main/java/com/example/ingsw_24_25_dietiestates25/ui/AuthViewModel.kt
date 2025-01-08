@@ -55,6 +55,12 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
             is AuthUiEvent.SignUpConfirmPasswordChanged -> {
                 _authState.value = _authState.value.copy(signUpConfirmPassword = event.value)
             }
+            is AuthUiEvent.GitHubLogin -> {
+                Log.d("AuthViewModel", "Ricevuto codice GitHub: ${event.code}")
+                fetchGitHubTokenWithCode(event.code)
+            }
+
+            is AuthUiEvent.GitHubTokenReceived -> TODO()
         }
     }
 
@@ -124,4 +130,29 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
             }
         }
     }
+
+    fun fetchGitHubTokenWithCode(code: String) {
+        viewModelScope.launch {
+            _authState.value = _authState.value.copy(isLoading = true)
+            try {
+                val result = authRepository.fetchGitHubAccessToken(code)
+                _authState.value = _authState.value.copy(isLoading = false)
+                when (result) {
+                    is AuthResult.Authorized -> {
+                        Log.d("AuthViewModel", "Access Token GitHub: ${result.data}")
+                        _toastMessage.emit("Login con GitHub riuscito!")
+                    }
+                    else -> {
+                        _toastMessage.emit("Errore durante il login con GitHub")
+                    }
+                }
+            } catch (e: Exception) {
+                _authState.value = _authState.value.copy(isLoading = false)
+                _toastMessage.emit("Errore generale durante il login con GitHub")
+            }
+        }
+    }
+
+
+
 }

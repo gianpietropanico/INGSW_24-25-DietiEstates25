@@ -59,4 +59,25 @@ class AuthApiImpl(private val httpClient: HttpClient) : AuthApi {
         }
     }
 
+    override suspend fun getGitHubAccessToken(code: String): TokenResponse {
+        Log.d("AuthApiImpl", "Richiesta per ottenere l'access token da GitHub con il codice: $code")
+        return try {
+            val response: TokenResponse = httpClient.post("http://10.0.2.2:8080/github/token") {
+                contentType(ContentType.Application.Json)
+                setBody(mapOf("code" to code)) // Passa il codice come corpo della richiesta
+            }.body()
+
+            Log.d("AuthApiImpl", "Access token ricevuto: ${response.token}")
+            response
+        } catch (e: ResponseException) {
+            Log.e("AuthApiImpl", "Errore HTTP durante la richiesta: ${e.response.status}", e)
+            throw e
+        } catch (e: Exception) {
+            Log.e("AuthApiImpl", "Errore generico durante la richiesta del token", e)
+            throw e
+        }
+    }
+
+
+
 }

@@ -52,9 +52,22 @@ android {
     }
 }
 dependencies {
+
+    //webview
+    implementation ("androidx.compose.ui:ui:1.5.4")
+    implementation ("androidx.compose.ui:ui-tooling:1.5.4")
+    implementation ("androidx.compose.material:material:1.5.4")
+    implementation ("androidx.activity:activity-compose:1.7.2")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+
+    //github oauth
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation ("com.squareup.okhttp3:okhttp:4.11.0")
+
     // Facebook SDK (Versione aggiornata)
     implementation (libs.facebook.android.sdk)
     implementation ("com.facebook.android:facebook-android-sdk:latest.release")
+
     // Jetpack Compose
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.compose.ui:ui:1.5.3")

@@ -6,7 +6,6 @@ import android.content.Context
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.facebook.FacebookCallback
@@ -14,7 +13,6 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.facebook.CallbackManager
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -29,23 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 
-import androidx.compose.ui.Alignment
-
-/*
-    OutlinedButton(
-        onClick = {
-            Log.d("FacebookButton", "Bottone premuto, avvio del flusso di login")
-            LoginManager.getInstance()
-                .logInWithReadPermissions(context as Activity, listOf("email", "public_profile"))
-        },
-        modifier = Modifier.height(40.dp)
-    ) {
-        Text(
-            text = "Facebook",
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-        )
-    }
- */
 @Composable
 fun FacebookLoginButton(
     context: Context = LocalContext.current,
@@ -113,43 +94,3 @@ fun FacebookLoginButton(
             )
         }
     }
-/*
- fun onSuccess(result: LoginResult) {
-    val accessToken = result.accessToken
-    loginResult = "Login riuscito: ${accessToken.userId}"
-
-    Log.d("FacebookAuth", "Token: ${accessToken.token}")
-    Log.d("FacebookAuth", "UserID: ${accessToken.userId}")
-    Log.d("FacebookAuth", "Permessi: ${accessToken.permissions}")
-
-    // Ottenere i dati dell'utente tramite API Graph
-    val request = GraphRequest.newMeRequest(accessToken) { jsonObject, response ->
-        try {
-            val name = jsonObject.getString("name")
-            val email = jsonObject.optString("email", "Email non disponibile")
-            val profilePicUrl = jsonObject.getJSONObject("picture")
-                .getJSONObject("data")
-                .getString("url")
-
-            Log.d("FacebookUserData", "Nome: $name")
-            Log.d("FacebookUserData", "Email: $email")
-            Log.d("FacebookUserData", "Foto Profilo: $profilePicUrl")
-
-            // Aggiorna lo stato per mostrare i dati
-            loginResult = "Login riuscito: $name ($email)"
-        } catch (e: Exception) {
-            Log.e("FacebookUserData", "Errore nel parsing dei dati dell'utente", e)
-        }
-    }
-
-    val parameters = Bundle()
-    parameters.putString("fields", "id,name,email,picture.type(large)")
-    request.parameters = parameters
-    request.executeAsync()
-
-    if (autoLogout) {
-        LoginManager.getInstance().logOut()
-        Log.d("FacebookAuth", "Logout immediato dopo il login")
-    }
-}
-*/

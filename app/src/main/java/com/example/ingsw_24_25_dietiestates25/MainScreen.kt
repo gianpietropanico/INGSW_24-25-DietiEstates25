@@ -46,6 +46,7 @@ fun MainScreen(
     ) {
         // Schermata di Login
         composable(route = AuthScreen.Authenticate.name) {
+
             LoginAppTest(
                 /* TODO LEVARE IL VIEWMODEL E PASSARE SOLO IL TOKEN DI VERIFICA CON LE NECESSARIE CREDENZIALI*/
                 viewModel = viewModel,

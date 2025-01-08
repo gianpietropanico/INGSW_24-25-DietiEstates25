@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthUiEvent
 import com.example.ingsw_24_25_dietiestates25.ui.social.FacebookLoginButton
+import com.example.ingsw_24_25_dietiestates25.ui.social.GitHubButton
+
 
 import com.example.ingsw_24_25_dietiestates25.ui.social.GoogleSignInButton
 
@@ -89,7 +91,11 @@ fun LoginAppTest(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            SocialLoginSection()
+            SocialLoginSection(
+                onGitHubLogin = { code ->
+                    viewModel.onEvent(AuthUiEvent.GitHubLogin(code))
+                }
+            )
             Spacer(modifier = Modifier.height(24.dp))
 
             // Link per cambiare schermata
@@ -127,7 +133,10 @@ private fun TopSection() {
 
 // Sezione per il login tramite piattaforme social
 @Composable
-private fun SocialLoginSection(context: Context = LocalContext.current) {
+private fun SocialLoginSection(
+    onGitHubLogin: (String) -> Unit,
+    context: Context = LocalContext.current
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp), // Spazio tra gli elementi
         horizontalAlignment = Alignment.CenterHorizontally // Allinea gli elementi al centro
@@ -143,7 +152,7 @@ private fun SocialLoginSection(context: Context = LocalContext.current) {
         ) {
             GoogleSignInButton( context )
             FacebookLoginButton()
-            SocialButton("GitHub") // Pulsante per GitHub
+            GitHubButton()
         }
     }
 }

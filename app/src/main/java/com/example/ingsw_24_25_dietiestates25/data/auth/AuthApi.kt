@@ -10,5 +10,7 @@ interface AuthApi {
 
     suspend fun authenticate(token: String): HttpResponse
 
+    suspend fun getGitHubAccessToken(code: String): TokenResponse
+
 
 }

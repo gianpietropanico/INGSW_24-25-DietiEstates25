@@ -5,4 +5,5 @@ interface AuthRepository {
     suspend fun signIn(email:String, password: String):AuthResult<Unit>
     suspend fun authenticate():AuthResult<Unit>
     suspend fun logout()
+    suspend fun fetchGitHubAccessToken(code :String ): AuthResult<String>
 }
