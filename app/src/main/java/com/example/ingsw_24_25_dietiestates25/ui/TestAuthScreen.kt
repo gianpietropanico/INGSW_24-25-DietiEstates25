@@ -9,11 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.painterResource
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.* // Per remember, mutableStateOf e delega by
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.ingsw_24_25_dietiestates25.R
 
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthUiEvent
 import com.example.ingsw_24_25_dietiestates25.ui.social.FacebookLoginButton
@@ -62,7 +65,7 @@ fun LoginAppTest(
                     password = authState.signInPassword,
                     onEmailChange = { viewModel.onEvent(AuthUiEvent.SignInEmailChanged(it)) },
                     onPasswordChange = { viewModel.onEvent(AuthUiEvent.SignInPasswordChanged(it)) },
-                    linkText = "Hai dimenticato la password? Resettala",
+                    linkText = "Did you forget your password? ",
                     onClickText = {}, // TODO: Naviga a ResetPasswordScreen
                     onClickButton = {
                         viewModel.onEvent(AuthUiEvent.SignIn)
@@ -100,7 +103,7 @@ fun LoginAppTest(
 
             // Link per cambiare schermata
             LinkText(
-                linkText = if (isLoginScreen) "Non hai un account? Registrati ora!" else "Hai già un account? Accedi",
+                linkText = if (isLoginScreen) "Not a member? Register now!" else "Hai già un account? Accedi",
                 onClick = { isLoginScreen = !isLoginScreen } // Cambia schermata
             )
         }
@@ -114,7 +117,7 @@ fun LoginAppTest(
 private fun TopSection() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally // Allinea i contenuti al centro
-    ) {
+    ) {/*
         Text(
             text = "DIETIESTATES25", // Testo del titolo principale
             color = MaterialTheme.colorScheme.primary, // Colore primario del tema
@@ -127,11 +130,17 @@ private fun TopSection() {
             thickness = 1.dp, // Spessore della linea
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
         )
+        */Spacer(modifier = Modifier.height(50.dp))
+
+        Icon(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Icona personalizzata",
+            tint = Color.Unspecified
+        )
     }
 }
 
 
-// Sezione per il login tramite piattaforme social
 @Composable
 private fun SocialLoginSection(
     onGitHubLogin: (String) -> Unit,
@@ -141,21 +150,45 @@ private fun SocialLoginSection(
         verticalArrangement = Arrangement.spacedBy(12.dp), // Spazio tra gli elementi
         horizontalAlignment = Alignment.CenterHorizontally // Allinea gli elementi al centro
     ) {
-        Text(
-            text = "OR USE", // Testo divisorio
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp), // Stile del testo
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f) // Colore semi-trasparente
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically, // Allinea verticalmente il testo e i divider
+            horizontalArrangement = Arrangement.Center // Centra il contenuto orizzontalmente
+        ) {
+            Divider(
+                modifier = Modifier
+                    .weight(1f) // Occupa spazio in modo proporzionale a sinistra
+                    .height(1.dp), // Spessore del divider
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
+            )
+            Text(
+                text = "OR USE", // Testo divisorio
+                modifier = Modifier.padding(horizontal = 8.dp), // Spazio orizzontale intorno al testo
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp), // Stile del testo
+                color = Color.Black // Colore semi-trasparente
+
+
+            )
+            Divider(
+                modifier = Modifier
+                    .weight(1f) // Occupa spazio in modo proporzionale a destra
+                    .height(1.dp), // Spessore del divider
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
+            )
+        }
+
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp), // Spazio tra i pulsanti
             verticalAlignment = Alignment.CenterVertically // Allinea verticalmente i pulsanti
         ) {
-            GoogleSignInButton( context )
+            GoogleSignInButton(context)
             FacebookLoginButton()
             GitHubButton()
         }
     }
 }
+
 
 // Pulsante generico per social login
 @Composable

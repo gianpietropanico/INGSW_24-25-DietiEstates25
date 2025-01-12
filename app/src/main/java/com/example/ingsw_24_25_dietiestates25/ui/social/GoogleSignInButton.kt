@@ -6,17 +6,22 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import com.example.ingsw_24_25_dietiestates25.R
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -89,12 +94,14 @@ fun GoogleSignInButton(
             }
         },
         modifier = Modifier
-            .height(40.dp) // Altezza del pulsante
+            .height(60.dp) // Altezza del pulsante
 
     ) {
-        Text(
-            text = "Google", // Nome della piattaforma
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold) // Stile del testo
+        Icon(
+            painter = painterResource(id = R.drawable.google_icon), // Sostituisci con il nome del tuo file
+            contentDescription = "Google Icon", // Descrizione per l'accessibilità
+            modifier = Modifier.size(60.dp), // Dimensione dell'icona
+            tint = Color.Unspecified // Mantieni i colori originali dell'icona
         )
     }
 }

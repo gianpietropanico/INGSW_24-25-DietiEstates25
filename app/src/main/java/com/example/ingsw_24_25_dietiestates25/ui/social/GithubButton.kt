@@ -17,6 +17,7 @@ import androidx.compose.material.MaterialTheme
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.*
 
@@ -24,10 +25,13 @@ import androidx.compose.material3.Text
 
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
+import com.example.ingsw_24_25_dietiestates25.R
 import com.facebook.login.LoginManager
 
 @Composable
@@ -56,9 +60,11 @@ fun GitHubButton() {
         modifier = Modifier.padding(8.dp)
     ) {
 
-        Text(
-            text = "GitHub",
-            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+        Icon(
+            painter = painterResource(id = R.drawable.github), // Sostituisci con il nome del tuo file
+            contentDescription = "GitHub Icon", // Descrizione per l'accessibilità
+            modifier = Modifier.size(60.dp), // Dimensione dell'icona
+            tint = Color.Unspecified // Mantieni i colori originali dell'icona
         )
 
     }

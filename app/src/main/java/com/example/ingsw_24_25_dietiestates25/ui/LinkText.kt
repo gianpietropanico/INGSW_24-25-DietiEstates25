@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
+import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 
 @Composable
 fun LinkText(
@@ -22,11 +23,11 @@ fun LinkText(
     Text(
         text = linkText, // Testo del link
         style = MaterialTheme.typography.bodySmall.copy(
-            fontSize = 14.sp, // Stile e dimensione del testo
+            fontSize = 24.sp, // Stile e dimensione del testo
             textDecoration = TextDecoration.Underline // Sottolineatura per il link
         ),
         textAlign = TextAlign.Center, // Allineamento centrale
-        color = MaterialTheme.colorScheme.primary, // Colore del testo
+        color = primaryBlu, // Colore del testo
         modifier = Modifier
             .fillMaxWidth() // Larghezza massima
             .clickable {

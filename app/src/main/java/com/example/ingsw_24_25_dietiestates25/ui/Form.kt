@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -15,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
-
+import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 
 
 @Composable
@@ -121,15 +122,16 @@ fun MyButton(
         onClick = onClick, // Callback per il click
         modifier = Modifier
             .fillMaxWidth() // Larghezza massima
-            .height(48.dp), // Altezza del pulsante
+            .height(60.dp), // Altezza del pulsante
+
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary, // Colore del contenitore
-            contentColor = Color.White // Colore del testo
-        )
+            containerColor = primaryBlu
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Text(
             text = text, // Testo visualizzato sul pulsante
-            fontSize = 16.sp, // Dimensione del testo
+            fontSize = 25.sp, // Dimensione del testo
             style = MaterialTheme.typography.labelLarge // Stile del testo
         )
     }

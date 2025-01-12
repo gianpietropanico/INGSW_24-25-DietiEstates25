@@ -18,7 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.ingsw_24_25_dietiestates25.ui.LoginAppTest
 import com.example.ingsw_24_25_dietiestates25.ui.social.GitHubButton
+import com.facebook.login.Login
 
 
 class MainActivity : ComponentActivity() {
@@ -29,6 +32,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 /*
     override fun onNewIntent(intent: Intent?) {
