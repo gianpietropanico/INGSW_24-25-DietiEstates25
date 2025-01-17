@@ -151,24 +151,27 @@ private fun SocialLoginSection(
     context: Context = LocalContext.current
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp), // Spazio tra gli elementi
+        verticalArrangement = Arrangement.spacedBy(24.dp), // Spazio tra gli elementi
         horizontalAlignment = Alignment.CenterHorizontally // Allinea gli elementi al centro
+
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically, // Allinea verticalmente il testo e i divider
             horizontalArrangement = Arrangement.Center // Centra il contenuto orizzontalmente
         ) {
+            Spacer(modifier = Modifier.height(44.dp))
             Divider(
                 modifier = Modifier
                     .weight(1f) // Occupa spazio in modo proporzionale a sinistra
                     .height(1.dp), // Spessore del divider
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
+                //color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
+                color = Color.Black //Colore semi-trasparente
             )
             Text(
                 text = "OR USE", // Testo divisorio
                 modifier = Modifier.padding(horizontal = 8.dp), // Spazio orizzontale intorno al testo
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp), // Stile del testo
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 24.sp), // Stile del testo
                 color = Color.Black // Colore semi-trasparente
 
 
@@ -177,20 +180,23 @@ private fun SocialLoginSection(
                 modifier = Modifier
                     .weight(1f) // Occupa spazio in modo proporzionale a destra
                     .height(1.dp), // Spessore del divider
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
+                color = Color.Black
             )
         }
 
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp), // Spazio tra i pulsanti
+            horizontalArrangement = Arrangement.spacedBy(44.dp), // Spazio tra i pulsanti
             verticalAlignment = Alignment.CenterVertically // Allinea verticalmente i pulsanti
-                
         ) {
+
             GoogleSignInButton(context)
             FacebookLoginButton()
             GitHubButton()
+
+
         }
+        Spacer(modifier = Modifier.width(16.dp))
     }
 }
 

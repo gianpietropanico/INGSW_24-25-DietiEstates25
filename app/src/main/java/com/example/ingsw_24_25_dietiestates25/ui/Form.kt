@@ -3,6 +3,7 @@ package com.example.ingsw_24_25_dietiestates25.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -81,6 +82,8 @@ fun Form(
             text = textButton,
             onClick = onClickButton
         )
+
+        Spacer(modifier = Modifier.height(4.dp))
     }
 }
 
