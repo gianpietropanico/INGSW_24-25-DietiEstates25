@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.* // Per remember, mutableStateOf e delega by
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import com.example.ingsw_24_25_dietiestates25.R
 
@@ -103,9 +104,12 @@ fun LoginAppTest(
 
             // Link per cambiare schermata
             LinkText(
-                linkText = if (isLoginScreen) "Not a member? Register now!" else "Hai già un account? Accedi",
+                linkText = if (isLoginScreen) "Not a member? Register now!" else "Already a member ? Login ",
+                fontSize = 24.sp,
                 onClick = { isLoginScreen = !isLoginScreen } // Cambia schermata
+
             )
+
         }
     }
 }
@@ -181,6 +185,7 @@ private fun SocialLoginSection(
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp), // Spazio tra i pulsanti
             verticalAlignment = Alignment.CenterVertically // Allinea verticalmente i pulsanti
+                
         ) {
             GoogleSignInButton(context)
             FacebookLoginButton()

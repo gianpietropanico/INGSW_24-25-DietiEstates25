@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.clickable
 import androidx.compose.material.MaterialTheme
 
 
@@ -41,33 +42,34 @@ fun GitHubButton() {
     var resultMessage by remember { mutableStateOf<String?>(null) }
     // Pulsante di login
 
-    OutlinedButton(
-        onClick = {
-            isLoading = true
-            openGitHubOAuth(context) { code ->
-                if (code != null) {
-                    // Invia il codice al server
-                    authenticateWithServer(code) { result ->
+    Box(
+        modifier = Modifier
+            .padding(8.dp) // Margine esterno
+            .size(60.dp) // Dimensione totale del pulsante
+            .clickable {
+                isLoading = true
+                openGitHubOAuth(context) { code ->
+                    if (code != null) {
+                        // Invia il codice al server
+                        authenticateWithServer(code) { result ->
+                            isLoading = false
+                            resultMessage = result
+                        }
+                    } else {
                         isLoading = false
-                        resultMessage = result
+                        resultMessage = "Errore: Codice non trovato nel redirect."
                     }
-                } else {
-                    isLoading = false
-                    resultMessage = "Errore: Codice non trovato nel redirect."
                 }
             }
-        },
-        modifier = Modifier.padding(8.dp)
     ) {
-
         Icon(
-            painter = painterResource(id = R.drawable.github), // Sostituisci con il nome del tuo file
+            painter = painterResource(id = R.drawable.github), // Icona di GitHub
             contentDescription = "GitHub Icon", // Descrizione per l'accessibilità
-            modifier = Modifier.size(60.dp), // Dimensione dell'icona
+            modifier = Modifier.fillMaxSize(), // L'icona occupa tutto lo spazio disponibile
             tint = Color.Unspecified // Mantieni i colori originali dell'icona
         )
-
     }
+
 
     resultMessage?.let {
         Spacer(modifier = Modifier.height(16.dp))

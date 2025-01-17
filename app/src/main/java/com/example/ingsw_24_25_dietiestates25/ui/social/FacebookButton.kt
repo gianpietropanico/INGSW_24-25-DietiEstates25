@@ -25,7 +25,9 @@ import androidx.compose.runtime.remember
 
 
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -82,21 +84,23 @@ fun FacebookLoginButton(
     }
 
         // Pulsante di login
-        OutlinedButton(
-            onClick = {
+    Box(
+        modifier = Modifier
+            .padding(8.dp)
+            .size(60.dp) // Dimensione totale del pulsante
+            .clickable {
                 Log.d("FacebookAuth", "Bottone premuto: Avvio login")
                 LoginManager.getInstance().logInWithReadPermissions(
                     context as Activity,
                     listOf("public_profile", "email")
                 )
-            },
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.facebook_icon), // Sostituisci con il nome del tuo file
-                contentDescription = "Facebook Icon", // Descrizione per l'accessibilità
-                modifier = Modifier.size(60.dp), // Dimensione dell'icona
-                tint = Color.Unspecified // Mantieni i colori originali dell'icona
-            )
-        }
+            }
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.facebook_icon), // Icona di Facebook
+            contentDescription = "Facebook Icon", // Descrizione per l'accessibilità
+            modifier = Modifier.fillMaxSize(), // L'icona occupa tutto lo spazio disponibile
+            tint = Color.Unspecified // Mantieni i colori originali dell'icona
+        )
+    }
     }

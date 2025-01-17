@@ -4,6 +4,8 @@ package com.example.ingsw_24_25_dietiestates25.ui.social
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -38,72 +40,72 @@ fun GoogleSignInButton(
     val coroutineScope = rememberCoroutineScope()
     val TAG = "GoogleSignIn"
 
-    OutlinedButton(
-        onClick = {
-            val credentialManager = CredentialManager.create(context)
-
-            val rawNonce = UUID.randomUUID().toString()
-            val bytes = rawNonce.toByteArray()
-            val md = MessageDigest.getInstance("SHA-256")
-            val digest = md.digest(bytes)
-            val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
-
-            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId("747472826480-gu5faa67ev4uocejm52tscmo1bjecq0h.apps.googleusercontent.com")
-                .setNonce(hashedNonce)
-                .build()
-
-            val request: GetCredentialRequest = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
-
-            coroutineScope.launch {
-                try {
-                    val result = credentialManager.getCredential(
-                        context = context,
-                        request = request
-                    )
-
-                    val credential = result.credential
-
-                    val googleIdTokenCredential = GoogleIdTokenCredential
-                        .createFrom(credential.data)
-
-                    val googleIdToken = googleIdTokenCredential.idToken
-
-                    Log.i(TAG, googleIdToken)
-
-                    val idToken = googleIdTokenCredential.idToken
-                    val segments = idToken.split(".")
-                    val payloadAsByteArray =
-                        android.util.Base64.decode(segments[1], android.util.Base64.NO_PADDING)
-                    val payloadInJson = JSONObject(String(payloadAsByteArray, Charsets.UTF_8))
-                    val uniqueIdentifier = payloadInJson.getString("email")
-
-                    Toast.makeText(
-                        context,
-                        payloadInJson.getString("email") + " " + payloadInJson.getString("name"),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } catch (e: androidx.credentials.exceptions.GetCredentialException) {
-                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                } catch (e: GoogleIdTokenParsingException) {
-                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        },
+    Box(
         modifier = Modifier
             .height(60.dp) // Altezza del pulsante
+            .clickable {
+                val credentialManager = CredentialManager.create(context)
 
+                val rawNonce = UUID.randomUUID().toString()
+                val bytes = rawNonce.toByteArray()
+                val md = MessageDigest.getInstance("SHA-256")
+                val digest = md.digest(bytes)
+                val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
+
+                val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                    .setFilterByAuthorizedAccounts(false)
+                    .setServerClientId("747472826480-gu5faa67ev4uocejm52tscmo1bjecq0h.apps.googleusercontent.com")
+                    .setNonce(hashedNonce)
+                    .build()
+
+                val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                    .addCredentialOption(googleIdOption)
+                    .build()
+
+                coroutineScope.launch {
+                    try {
+                        val result = credentialManager.getCredential(
+                            context = context,
+                            request = request
+                        )
+
+                        val credential = result.credential
+
+                        val googleIdTokenCredential = GoogleIdTokenCredential
+                            .createFrom(credential.data)
+
+                        val googleIdToken = googleIdTokenCredential.idToken
+
+                        Log.i(TAG, googleIdToken)
+
+                        val idToken = googleIdTokenCredential.idToken
+                        val segments = idToken.split(".")
+                        val payloadAsByteArray =
+                            android.util.Base64.decode(segments[1], android.util.Base64.NO_PADDING)
+                        val payloadInJson = JSONObject(String(payloadAsByteArray, Charsets.UTF_8))
+                        val uniqueIdentifier = payloadInJson.getString("email")
+
+                        Toast.makeText(
+                            context,
+                            payloadInJson.getString("email") + " " + payloadInJson.getString("name"),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: androidx.credentials.exceptions.GetCredentialException) {
+                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                    } catch (e: GoogleIdTokenParsingException) {
+                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.google_icon), // Sostituisci con il nome del tuo file
+            painter = painterResource(id = R.drawable.google_icon), // Icona di Google
             contentDescription = "Google Icon", // Descrizione per l'accessibilità
             modifier = Modifier.size(60.dp), // Dimensione dell'icona
             tint = Color.Unspecified // Mantieni i colori originali dell'icona
         )
     }
+
 }
 
 
