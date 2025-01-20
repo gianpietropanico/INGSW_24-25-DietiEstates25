@@ -101,22 +101,21 @@ fun GoogleSignInButton(
 
 
 
-    /*
-      PAYLOAD GOOGLE{
-          "iss": "https://accounts.google.com",
-          "azp": "YOUR_CLIENT_ID",
-          "aud": "YOUR_CLIENT_ID",
-          "sub": "123456789012345678901",
-          "email": "user@example.com",
-          "email_verified": true,
-          "name": "John Doe",
-          "picture": "https://lh3.googleusercontent.com/a-/AOh14Gj...",
-          "given_name": "John",
-          "family_name": "Doe",
-          "locale": "en",
-          "iat": 1614036036,
-          "exp": 1614039636
-      }
-     */
-
+/*
+  PAYLOAD GOOGLE{
+      "iss": "https://accounts.google.com",
+      "azp": "YOUR_CLIENT_ID",
+      "aud": "YOUR_CLIENT_ID",
+      "sub": "123456789012345678901",
+      "email": "user@example.com",
+      "email_verified": true,
+      "name": "John Doe",
+      "picture": "https://lh3.googleusercontent.com/a-/AOh14Gj...",
+      "given_name": "John",
+      "family_name": "Doe",
+      "locale": "en",
+      "iat": 1614036036,
+      "exp": 1614039636
+  }
+ */
 

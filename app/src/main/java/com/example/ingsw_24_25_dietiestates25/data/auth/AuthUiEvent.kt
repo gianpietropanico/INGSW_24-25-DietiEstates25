@@ -10,6 +10,6 @@ sealed class AuthUiEvent {
     data class SignUpConfirmPasswordChanged(val value: String) : AuthUiEvent()
     object SignIn : AuthUiEvent()
 
-    data class GitHubLogin(val code: String) : AuthUiEvent() // Aggiungi il codice
-    object GitHubTokenReceived : AuthUiEvent()
+
+
 }

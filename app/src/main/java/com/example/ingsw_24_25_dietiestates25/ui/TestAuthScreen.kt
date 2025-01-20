@@ -92,9 +92,9 @@ fun LoginAppTest(
 
             Spacer(modifier = Modifier.height(16.dp))
             SocialLoginSection(
-                onGitHubLogin = { code ->
-                    viewModel.onEvent(AuthUiEvent.GitHubLogin(code))
-                }
+                viewModel = viewModel,
+                onSuccess = onAuthenticateClicked,
+                context = context
             )
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -134,8 +134,9 @@ private fun TopSection() {
 // Sezione per il login tramite piattaforme social
 @Composable
 private fun SocialLoginSection(
-    onGitHubLogin: (String) -> Unit,
-    context: Context = LocalContext.current
+    viewModel: AuthViewModel,
+    onSuccess: () -> Unit,
+    context: Context
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp), // Spazio tra gli elementi
@@ -152,24 +153,16 @@ private fun SocialLoginSection(
         ) {
             GoogleSignInButton( context )
             FacebookLoginButton()
-            GitHubButton()
+            GitHubButton(
+                fetchState = {
+                    viewModel.fetchState() // Chiamata diretta alla funzione suspend
+                },
+                notifyServer = { code, state ->
+                    viewModel.notifyServer(code, state) // Chiamata diretta alla funzione suspend per scambiare il codice
+                },
+                onSucces = onSuccess
+            )
         }
-    }
-}
-
-// Pulsante generico per social login
-@Composable
-private fun SocialButton(platform: String) {
-    OutlinedButton(
-        onClick = { /* Aggiungi logica per il social login */ }, // Callback per il click
-        modifier = Modifier
-            .height(40.dp) // Altezza del pulsante
-
-    ) {
-        Text(
-            text = platform, // Nome della piattaforma
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold) // Stile del testo
-        )
     }
 }
 

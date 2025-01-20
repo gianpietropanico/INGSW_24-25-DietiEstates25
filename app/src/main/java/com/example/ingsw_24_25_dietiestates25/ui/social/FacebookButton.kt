@@ -32,6 +32,8 @@ fun FacebookLoginButton(
     context: Context = LocalContext.current,
     autoLogout: Boolean = false // Parametro per abilitare/disabilitare il logout immediato
 ) {
+
+    /*
     val callbackManager = remember { CallbackManager.Factory.create() }
     var loginResult by remember { mutableStateOf("Non autenticato") }
 
@@ -77,20 +79,20 @@ fun FacebookLoginButton(
         }
     }
 
-        // Pulsante di login
-        OutlinedButton(
-            onClick = {
-                Log.d("FacebookAuth", "Bottone premuto: Avvio login")
-                LoginManager.getInstance().logInWithReadPermissions(
-                    context as Activity,
-                    listOf("public_profile", "email")
-                )
-            },
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text(
-                text = "Facebook",
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+    // Pulsante di login
+    OutlinedButton(
+        onClick = {
+            Log.d("FacebookAuth", "Bottone premuto: Avvio login")
+            LoginManager.getInstance().logInWithReadPermissions(
+                context as Activity,
+                listOf("public_profile", "email")
             )
-        }
-    }
+        },
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Text(
+            text = "Facebook",
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+        )
+    }*/
+}

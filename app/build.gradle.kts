@@ -52,6 +52,8 @@ android {
     }
 }
 dependencies {
+    //jwt
+    implementation ("com.auth0.android:jwtdecode:2.0.0")
 
     //webview
     implementation ("androidx.compose.ui:ui:1.5.4")

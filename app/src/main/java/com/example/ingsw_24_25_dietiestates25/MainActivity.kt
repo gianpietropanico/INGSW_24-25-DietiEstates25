@@ -1,34 +1,34 @@
 package com.example.ingsw_24_25_dietiestates25
 
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
+
 import android.os.Bundle
+import android.util.Log
 
 import androidx.activity.ComponentActivity
 
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.ui.Alignment
-import com.example.ingsw_24_25_dietiestates25.ui.social.GitHubButton
-
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.ingsw_24_25_dietiestates25.ui.AgencyRegistrationScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MainScreen()
-        }
+        setContent { MainScreen() }
+    }
+
+}
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    MaterialTheme {
+        AgencyRegistrationScreen()
     }
 }
+
+
 
 /*
     override fun onNewIntent(intent: Intent?) {
