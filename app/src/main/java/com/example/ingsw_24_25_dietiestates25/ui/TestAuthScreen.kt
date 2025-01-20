@@ -9,11 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.painterResource
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.* // Per remember, mutableStateOf e delega by
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import com.example.ingsw_24_25_dietiestates25.R
 
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthUiEvent
 import com.example.ingsw_24_25_dietiestates25.ui.social.FacebookLoginButton
@@ -62,7 +66,7 @@ fun LoginAppTest(
                     password = authState.signInPassword,
                     onEmailChange = { viewModel.onEvent(AuthUiEvent.SignInEmailChanged(it)) },
                     onPasswordChange = { viewModel.onEvent(AuthUiEvent.SignInPasswordChanged(it)) },
-                    linkText = "Hai dimenticato la password? Resettala",
+                    linkText = "Did you forget your password? ",
                     onClickText = {}, // TODO: Naviga a ResetPasswordScreen
                     onClickButton = {
                         viewModel.onEvent(AuthUiEvent.SignIn)
@@ -92,17 +96,20 @@ fun LoginAppTest(
 
             Spacer(modifier = Modifier.height(16.dp))
             SocialLoginSection(
-                viewModel = viewModel,
-                onSuccess = onAuthenticateClicked,
-                context = context
+                onGitHubLogin = { code ->
+                    viewModel.onEvent(AuthUiEvent.GitHubLogin(code))
+                }
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             // Link per cambiare schermata
             LinkText(
-                linkText = if (isLoginScreen) "Non hai un account? Registrati ora!" else "Hai già un account? Accedi",
+                linkText = if (isLoginScreen) "Not a member? Register now!" else "Already a member ? Login ",
+                fontSize = 24.sp,
                 onClick = { isLoginScreen = !isLoginScreen } // Cambia schermata
+
             )
+
         }
     }
 }
@@ -114,7 +121,7 @@ fun LoginAppTest(
 private fun TopSection() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally // Allinea i contenuti al centro
-    ) {
+    ) {/*
         Text(
             text = "DIETIESTATES25", // Testo del titolo principale
             color = MaterialTheme.colorScheme.primary, // Colore primario del tema
@@ -127,42 +134,86 @@ private fun TopSection() {
             thickness = 1.dp, // Spessore della linea
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
         )
+        */Spacer(modifier = Modifier.height(50.dp))
+
+        Icon(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Icona personalizzata",
+            tint = Color.Unspecified
+        )
     }
 }
 
 
-// Sezione per il login tramite piattaforme social
 @Composable
 private fun SocialLoginSection(
-    viewModel: AuthViewModel,
-    onSuccess: () -> Unit,
-    context: Context
+    onGitHubLogin: (String) -> Unit,
+    context: Context = LocalContext.current
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp), // Spazio tra gli elementi
+        verticalArrangement = Arrangement.spacedBy(24.dp), // Spazio tra gli elementi
         horizontalAlignment = Alignment.CenterHorizontally // Allinea gli elementi al centro
+
     ) {
-        Text(
-            text = "OR USE", // Testo divisorio
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp), // Stile del testo
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f) // Colore semi-trasparente
-        )
         Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp), // Spazio tra i pulsanti
-            verticalAlignment = Alignment.CenterVertically // Allinea verticalmente i pulsanti
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically, // Allinea verticalmente il testo e i divider
+            horizontalArrangement = Arrangement.Center // Centra il contenuto orizzontalmente
         ) {
-            GoogleSignInButton( context )
-            FacebookLoginButton()
-            GitHubButton(
-                fetchState = {
-                    viewModel.fetchState() // Chiamata diretta alla funzione suspend
-                },
-                notifyServer = { code, state ->
-                    viewModel.notifyServer(code, state) // Chiamata diretta alla funzione suspend per scambiare il codice
-                },
-                onSucces = onSuccess
+            Spacer(modifier = Modifier.height(44.dp))
+            Divider(
+                modifier = Modifier
+                    .weight(1f) // Occupa spazio in modo proporzionale a sinistra
+                    .height(1.dp), // Spessore del divider
+                //color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
+                color = Color.Black //Colore semi-trasparente
+            )
+            Text(
+                text = "OR USE", // Testo divisorio
+                modifier = Modifier.padding(horizontal = 8.dp), // Spazio orizzontale intorno al testo
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 24.sp), // Stile del testo
+                color = Color.Black // Colore semi-trasparente
+
+
+            )
+            Divider(
+                modifier = Modifier
+                    .weight(1f) // Occupa spazio in modo proporzionale a destra
+                    .height(1.dp), // Spessore del divider
+                color = Color.Black
             )
         }
+
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(44.dp), // Spazio tra i pulsanti
+            verticalAlignment = Alignment.CenterVertically // Allinea verticalmente i pulsanti
+        ) {
+
+            GoogleSignInButton(context)
+            FacebookLoginButton()
+            GitHubButton()
+
+
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+    }
+}
+
+
+// Pulsante generico per social login
+@Composable
+private fun SocialButton(platform: String) {
+    OutlinedButton(
+        onClick = { /* Aggiungi logica per il social login */ }, // Callback per il click
+        modifier = Modifier
+            .height(40.dp) // Altezza del pulsante
+
+    ) {
+        Text(
+            text = platform, // Nome della piattaforma
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold) // Stile del testo
+        )
     }
 }
 

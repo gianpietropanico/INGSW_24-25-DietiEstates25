@@ -2,8 +2,12 @@ package com.example.ingsw_24_25_dietiestates25.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -15,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
-
+import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 
 
 @Composable
@@ -34,7 +38,7 @@ fun Form(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        //horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
         // Campo Email
@@ -42,7 +46,7 @@ fun Form(
             value = email,
             onValueChange = onEmailChange,
             label = "Email Address",
-            placeholder = "Inserisci la tua email",
+            placeholder = "Insert your email",
             keyboardType = KeyboardType.Email
         )
 
@@ -55,14 +59,31 @@ fun Form(
             valueSignIn = isSignUpMode
         )
 
-        // Link per azioni aggiuntive
-        LinkText(linkText, onClickText)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth() // Riempi tutta la larghezza
+                .padding(horizontal = 16.dp) // Aggiungi margini laterali
+        ) {
+        // Link per azioni aggiuntive, allineato a sinistra
+        LinkText(
+            linkText = linkText,
+            onClick = onClickText,
+            fontSize = 18.sp,
+            modifier = Modifier
+                .fillMaxWidth() // Occupa l'intera larghezza
+                .padding(start = 16.dp) // Aggiungi un margine a sinistra
+                //.align(Alignment.CenterHorizontally)
+            // horizontalAlignment = Alignment.CenterHorizontally
+        )
+    }
 
         // Pulsante principale
         MyButton(
             text = textButton,
             onClick = onClickButton
         )
+
+        Spacer(modifier = Modifier.height(4.dp))
     }
 }
 
@@ -80,7 +101,7 @@ fun PasswordFields(
         value = password,
         onValueChange = onPasswordChange,
         label = "Password",
-        placeholder = "Inserisci la tua password",
+        placeholder = "Insert your password",
         keyboardType = KeyboardType.Password,
         isPassword = true
     )
@@ -92,7 +113,7 @@ fun PasswordFields(
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
             label = "Conferma Password",
-            placeholder = "Inserisci nuovamente la tua password",
+            placeholder = "Insert again your password",
             keyboardType = KeyboardType.Password,
             isPassword = true
         )
@@ -121,15 +142,16 @@ fun MyButton(
         onClick = onClick, // Callback per il click
         modifier = Modifier
             .fillMaxWidth() // Larghezza massima
-            .height(48.dp), // Altezza del pulsante
+            .height(60.dp), // Altezza del pulsante
+
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary, // Colore del contenitore
-            contentColor = Color.White // Colore del testo
-        )
+            containerColor = primaryBlu
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Text(
             text = text, // Testo visualizzato sul pulsante
-            fontSize = 16.sp, // Dimensione del testo
+            fontSize = 25.sp, // Dimensione del testo
             style = MaterialTheme.typography.labelLarge // Stile del testo
         )
     }
