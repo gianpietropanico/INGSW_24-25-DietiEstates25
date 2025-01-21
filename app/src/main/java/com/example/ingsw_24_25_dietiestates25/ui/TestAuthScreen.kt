@@ -17,6 +17,7 @@ import androidx.compose.runtime.* // Per remember, mutableStateOf e delega by
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ingsw_24_25_dietiestates25.R
 
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthUiEvent
@@ -96,9 +97,17 @@ fun LoginAppTest(
 
             Spacer(modifier = Modifier.height(16.dp))
             SocialLoginSection(
+                onAuthenticateClicked = onAuthenticateClicked,
+                authViewModel = viewModel,
+                context = context
+                /*TODO
+                   QUESTA FUNZIONE DOVREBBE SALVARE L'USER NEL VIEWMODEL
+                   IL VIEWMODEL VIENE USATO COME "MULO" PER TRASPORTARE
+                   DATI DA UNO SCREEN AD UN ALTRO
+
                 onGitHubLogin = { code ->
                     viewModel.onEvent(AuthUiEvent.GitHubLogin(code))
-                }
+                }*/
             )
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -147,7 +156,8 @@ private fun TopSection() {
 
 @Composable
 private fun SocialLoginSection(
-    onGitHubLogin: (String) -> Unit,
+    authViewModel: AuthViewModel,
+    onAuthenticateClicked: () -> Unit,
     context: Context = LocalContext.current
 ) {
     Column(
@@ -161,7 +171,7 @@ private fun SocialLoginSection(
             horizontalArrangement = Arrangement.Center // Centra il contenuto orizzontalmente
         ) {
             Spacer(modifier = Modifier.height(44.dp))
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .weight(1f) // Occupa spazio in modo proporzionale a sinistra
                     .height(1.dp), // Spessore del divider
@@ -176,7 +186,7 @@ private fun SocialLoginSection(
 
 
             )
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .weight(1f) // Occupa spazio in modo proporzionale a destra
                     .height(1.dp), // Spessore del divider
@@ -192,7 +202,15 @@ private fun SocialLoginSection(
 
             GoogleSignInButton(context)
             FacebookLoginButton()
-            GitHubButton()
+            GitHubButton(
+                fetchState = {
+                    authViewModel.fetchState() // Chiamata diretta alla funzione suspend
+                },
+                notifyServer = { code, state ->
+                    authViewModel.notifyServer(code, state) // Chiamata diretta alla funzione suspend per scambiare il codice
+                },
+                onSucces = onAuthenticateClicked
+            )
 
 
         }
