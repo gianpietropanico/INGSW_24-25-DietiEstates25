@@ -1,5 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.ui
-import AgencyViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.viewmodels.AgencyViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*

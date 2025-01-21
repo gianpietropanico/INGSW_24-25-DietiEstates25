@@ -11,8 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthApiImpl
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthRepositoryImpl
 import com.example.ingsw_24_25_dietiestates25.data.network.NetworkClient
-import com.example.ingsw_24_25_dietiestates25.ui.AuthViewModel
-import com.example.ingsw_24_25_dietiestates25.ui.AuthViewModelFactory
+import com.example.ingsw_24_25_dietiestates25.ui.viewmodels.AuthViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.viewmodels.AuthViewModelFactory
 
 import com.example.ingsw_24_25_dietiestates25.ui.HomeApp
 import com.example.ingsw_24_25_dietiestates25.ui.LoginAppTest

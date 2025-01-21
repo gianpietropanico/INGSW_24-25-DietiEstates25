@@ -1,3 +1,5 @@
+package com.example.ingsw_24_25_dietiestates25.ui.viewmodels
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.auth.AgencyRepository

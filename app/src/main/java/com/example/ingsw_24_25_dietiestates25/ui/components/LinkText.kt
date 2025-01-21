@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui
+package com.example.ingsw_24_25_dietiestates25.ui.components
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable

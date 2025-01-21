@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui
+package com.example.ingsw_24_25_dietiestates25.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

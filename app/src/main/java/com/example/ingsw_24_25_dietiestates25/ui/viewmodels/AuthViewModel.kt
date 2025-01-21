@@ -1,15 +1,13 @@
-package com.example.ingsw_24_25_dietiestates25.ui
+package com.example.ingsw_24_25_dietiestates25.ui.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthRepository
-import com.example.ingsw_24_25_dietiestates25.data.auth.AuthResponse
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthResult
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthState
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthUiEvent
 import com.example.ingsw_24_25_dietiestates25.data.model.User
-import com.example.ingsw_24_25_dietiestates25.data.model.UserPayload
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

@@ -15,9 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.* // Per remember, mutableStateOf e delega by
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ingsw_24_25_dietiestates25.R
 
 import com.example.ingsw_24_25_dietiestates25.data.auth.AuthUiEvent
@@ -26,6 +24,9 @@ import com.example.ingsw_24_25_dietiestates25.ui.social.GitHubButton
 
 
 import com.example.ingsw_24_25_dietiestates25.ui.social.GoogleSignInButton
+import com.example.ingsw_24_25_dietiestates25.ui.components.Form
+import com.example.ingsw_24_25_dietiestates25.ui.components.LinkText
+import com.example.ingsw_24_25_dietiestates25.ui.viewmodels.AuthViewModel
 
 @Composable
 fun LoginAppTest(
