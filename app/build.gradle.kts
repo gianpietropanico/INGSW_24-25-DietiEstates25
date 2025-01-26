@@ -52,8 +52,7 @@ android {
     }
 }
 dependencies {
-    //jwt
-    implementation ("com.auth0.android:jwtdecode:2.0.0")
+
 
     //webview
     implementation ("androidx.compose.ui:ui:1.5.4")
@@ -67,8 +66,12 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:4.11.0")
 
     // Facebook SDK (Versione aggiornata)
-    implementation (libs.facebook.android.sdk)
-    implementation ("com.facebook.android:facebook-android-sdk:latest.release")
+    implementation ("com.facebook.android:facebook-android-sdk:[8,9)")
+    implementation ("com.auth0.android:jwtdecode:2.0.0")
+    implementation ("com.facebook.android:facebook-core:latest.release")
+    implementation ("com.facebook.android:facebook-login:latest.release")
+    implementation ("com.facebook.android:facebook-share:latest.release")
+    implementation ("com.facebook.android:facebook-applinks:latest.release")
 
     // Jetpack Compose
     implementation("androidx.activity:activity-compose:1.7.2")

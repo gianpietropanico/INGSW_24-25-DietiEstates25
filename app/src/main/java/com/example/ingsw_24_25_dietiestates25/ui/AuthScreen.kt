@@ -202,7 +202,9 @@ private fun SocialLoginSection(
         ) {
 
             GoogleSignInButton(context)
-            FacebookLoginButton()
+            FacebookLoginButton(
+
+            )
             GitHubButton(
                 fetchState = {
                     authViewModel.fetchState() // Chiamata diretta alla funzione suspend

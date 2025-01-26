@@ -9,12 +9,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -24,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.components.myToastMessage
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -37,13 +43,19 @@ import java.util.UUID
 fun GoogleSignInButton(
     context: Context = LocalContext.current
 ) {
+    var isLoading by remember { mutableStateOf(false) }
+    var resultMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    val TAG = "GoogleSignIn"
+    val tag = "GoogleSignIn"
 
     Box(
         modifier = Modifier
             .height(60.dp) // Altezza del pulsante
-            .clickable {
+            .clickable(
+                enabled = !isLoading
+            ) {
+                isLoading = true
+                resultMessage = null // Reset error messages
                 val credentialManager = CredentialManager.create(context)
 
                 val rawNonce = UUID.randomUUID().toString()
@@ -76,7 +88,7 @@ fun GoogleSignInButton(
 
                         val googleIdToken = googleIdTokenCredential.idToken
 
-                        Log.i(TAG, googleIdToken)
+                        Log.i(tag, googleIdToken)
 
                         val idToken = googleIdTokenCredential.idToken
                         val segments = idToken.split(".")
@@ -85,29 +97,35 @@ fun GoogleSignInButton(
                         val payloadInJson = JSONObject(String(payloadAsByteArray, Charsets.UTF_8))
                         val uniqueIdentifier = payloadInJson.getString("email")
 
-                        Toast.makeText(
-                            context,
-                            payloadInJson.getString("email") + " " + payloadInJson.getString("name"),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        resultMessage = "Authentication successful! " + payloadInJson.getString("email") + " " + payloadInJson.getString("name")
+
                     } catch (e: androidx.credentials.exceptions.GetCredentialException) {
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                        Log.d("GOGGLE COROUTINE","${e.message}")
+                        resultMessage = e.message
                     } catch (e: GoogleIdTokenParsingException) {
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                        Log.d("GOGGLE COROUTINE","${e.message}")
+                    }finally {
+                        isLoading = false
+                        myToastMessage(context, resultMessage)
                     }
                 }
             }
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.google_icon), // Icona di Google
-            contentDescription = "Google Icon", // Descrizione per l'accessibilità
-            modifier = Modifier.size(60.dp), // Dimensione dell'icona
-            tint = Color.Unspecified // Mantieni i colori originali dell'icona
-        )
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.size(16.dp))
+        } else {
+            Icon(
+                painter = painterResource(id = R.drawable.google_icon), // Icona di Google
+                contentDescription = "Google Icon", // Descrizione per l'accessibilità
+                modifier = Modifier.size(60.dp), // Dimensione dell'icona
+                tint = Color.Unspecified // Mantieni i colori originali dell'icona
+            )
+        }
     }
 
 }
-
 
 
 /*
