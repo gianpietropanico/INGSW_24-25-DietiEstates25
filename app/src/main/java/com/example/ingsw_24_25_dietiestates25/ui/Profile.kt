@@ -25,67 +25,84 @@ import com.example.ingsw_24_25_dietiestates25.R
 
 @Composable
 fun ProfileScreen() {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color.White) // Sfondo bianco per l'intero schermo
     ) {
-        Spacer(modifier = Modifier.height(30.dp))
-
-        // Top Section
-        ProfileTopSection(
-            name = "Gianpietro Panico",
-            email = "gianpietro.panico@gmail.com"
-        )
-
-        // Divider sotto la top section
-        Divider(
-            color = Color.Gray,
-            thickness = 0.5.dp,
+        // Immagine di sfondo
+        Image(
+            painter = painterResource(id = R.drawable.rectangleblu),
+            contentDescription = "Background Image",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp) // Divider con larghezza personalizzata
+                .height(200.dp) // Altezza personalizzata dell'immagine di sfondo
+                .align(Alignment.TopCenter), // Posizionata in alto al centro
+            contentScale = ContentScale.Crop // Ritaglia l'immagine per adattarla alla larghezza
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        // Contenuto principale
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Spacer(modifier = Modifier.height(50.dp)) // Spazio per lasciare l'immagine visibile sopra
 
-        // Campi statici senza navigazione
-        ProfileOptionItem(
-            icon = R.drawable.icon_person,
-            title = "Personal details",
-            onClick = { /* Implementa l'azione */ }
-        )
+            // Top Section
+            ProfileTopSection(
+                name = "Gianpietro Panico",
+                email = "gianpietro.panico@gmail.com"
+            )
 
-        ProfileOptionItem(
-            icon = R.drawable.calendar,
-            title = "Show calendar",
-            onClick = { /* Implementa l'azione */ }
-        )
+            // Divider sotto la top section
+            Divider(
+                color = Color.Gray,
+                thickness = 0.5.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp) // Divider con larghezza personalizzata
+            )
 
-        ProfileOptionItem(
-            icon = R.drawable.changepass,
-            title = "Change your password",
-            onClick = { /* Implementa l'azione */ }
-        )
+            Spacer(modifier = Modifier.height(20.dp))
 
+            // Campi statici senza navigazione
+            ProfileOptionItem(
+                icon = R.drawable.icon_person,
+                title = "Personal details",
+                onClick = { /* Implementa l'azione */ }
+            )
 
-        ProfileOptionItem(
-            icon = R.drawable.activities,
-            title = "Your activities",
-            onClick = { /* Implementa l'azione */ }
-        )
+            ProfileOptionItem(
+                icon = R.drawable.calendar,
+                title = "Show calendar",
+                onClick = { /* Implementa l'azione */ }
+            )
 
-        ProfileOptionItem(
-            icon = R.drawable.logout,
-            title = "Logout",
-            onClick = { /* Implementa l'azione */ }
-        )
+            ProfileOptionItem(
+                icon = R.drawable.changepass,
+                title = "Change your password",
+                onClick = { /* Implementa l'azione */ }
+            )
+
+            ProfileOptionItem(
+                icon = R.drawable.activities,
+                title = "Your activities",
+                onClick = { /* Implementa l'azione */ }
+            )
+
+            ProfileOptionItem(
+                icon = R.drawable.logout,
+                title = "Logout",
+                onClick = { /* Implementa l'azione */ }
+            )
+        }
     }
-
 }
+
 
 @Composable
 fun ProfileTopSection(name: String, email: String) {
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -97,7 +114,7 @@ fun ProfileTopSection(name: String, email: String) {
             painter = painterResource(id = R.drawable.test),
             contentDescription = "Profile Picture",
             modifier = Modifier
-                .size(120.dp) // Garantisce che l'immagine abbia larghezza e altezza uguali
+                .size(130.dp) // Garantisce che l'immagine abbia larghezza e altezza uguali
                 .clip(CircleShape) // Ritaglia l'immagine in una forma circolare
                 .background(Color.Transparent), // Sfondo trasparente dietro l'immagine
             contentScale = ContentScale.Crop // Ritaglia l'immagine per riempire il cerchio
@@ -165,8 +182,8 @@ fun ProfileOptionItem(icon: Int, title: String, onClick: () -> Unit) {
             )
 
              //freccia
-            Icon(
-                imageVector = Icons.Default.ArrowForward,
+            Image(
+                painter = painterResource(id = R.drawable.frecciaprofilo),
                 contentDescription = null,
                 modifier = Modifier.size(25.dp)
             )
