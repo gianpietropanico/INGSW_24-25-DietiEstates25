@@ -157,7 +157,7 @@ fun ChangePasswordScreen() {
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = primaryBlu,
                 ),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp)
@@ -215,7 +215,7 @@ fun PasswordField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(24.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 backgroundColor = primaryBlueWithOpacity,
                 focusedBorderColor = Color(0xFF5B6067),
