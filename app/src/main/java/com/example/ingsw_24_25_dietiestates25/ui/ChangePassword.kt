@@ -14,12 +14,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,19 +34,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 
+
 @Composable
 fun ChangePasswordScreen() {
-
-//    var currentPassword by remember { mutableStateOf("") }
-//    var newPassword by remember { mutableStateOf("") }
-//    var confirmPassword by remember { mutableStateOf("") }
-
+    // Stati per le password
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -64,28 +71,26 @@ fun ChangePasswordScreen() {
                 .fillMaxSize()
                 .padding(horizontal = 16.dp) // Padding orizzontale per il contenuto
         ) {
-            // Spacer per spostare gli elementi più in basso
-            Spacer(modifier = Modifier.height(50.dp)) // Altezza regolabile
+            Spacer(modifier = Modifier.height(50.dp)) // Spazio per spostare gli elementi in basso
 
             // Contenitore per l'icona e il testo
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp), // Padding aggiuntivo dall'alto
-                verticalAlignment = Alignment.CenterVertically // Allinea verticalmente l'icona e il testo
+                    .padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Icona frecciaback
                 Icon(
                     painter = painterResource(id = R.drawable.frecciaback),
                     contentDescription = "Back Icon",
                     tint = primaryBlu, // Colore dell'icona
-                    modifier = Modifier.size(34.dp) // Dimensione dell'icona
+                    modifier = Modifier.size(34.dp)
                 )
 
-                // Spazio tra icona e testo
                 Spacer(modifier = Modifier.width(26.dp))
 
-                // Testo Change Password
+                // Testo "Change Password"
                 Text(
                     text = "Change password",
                     fontWeight = FontWeight.SemiBold,
@@ -94,48 +99,95 @@ fun ChangePasswordScreen() {
                 )
             }
 
-            Spacer(modifier = Modifier.height(50.dp)) // spazio tra change pass e pass
+            Spacer(modifier = Modifier.height(130.dp)) // Spazio tra il titolo e i campi password
 
             // Campo 1: Current Password
             PasswordField(
                 label = "Current Password",
-                placeholder = "Enter your current password"
+                placeholder = "Enter your current password",
+                value = currentPassword,
+                onValueChange = { currentPassword = it }
             )
+
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Campo 2: New Password
             PasswordField(
                 label = "New Password",
-                placeholder = "Enter your new password"
+                placeholder = "Enter your new password",
+                value = newPassword,
+                onValueChange = { newPassword = it }
             )
+
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Campo 3: Confirm Password
             PasswordField(
                 label = "Confirm Password",
-                placeholder = "Re-enter your new password"
+                placeholder = "Re-enter your new password",
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it }
             )
 
+            Spacer(modifier = Modifier.height(160.dp)) // Spazio tra i campi e il pulsante
+
+            // Pulsante Save Changes
+            Button(
+                onClick = {
+                    // Controlli sulle password
+                    when {
+                        currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty() -> {
+                            println("Errore: Tutti i campi devono essere compilati.")
+                        }
+                        currentPassword != "password_salvata_db" -> {
+                            println("Errore: La password corrente non è corretta.")
+                        }
+                        newPassword != confirmPassword -> {
+                            println("Errore: Le nuove password non corrispondono.")
+                        }
+                        newPassword.length < 8 -> {
+                            println("Errore: La nuova password deve essere lunga almeno 8 caratteri.")
+                        }
+                        else -> {
+                            println("Successo: La password è stata cambiata con successo.")
+                            // TODO: Effettua la chiamata al server per salvare la nuova password
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = primaryBlu,
+                ),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp)
+            ) {
+                Text(
+                    text = "Save changes",
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 30.sp,
+                    color = Color.White
+                )
+            }
         }
     }
 }
 
-
-
-
 @Composable
 fun PasswordField(
-    label: String, // Testo sopra la TextField
-    placeholder: String // Testo placeholder dentro la TextField
-
-
-
+    label: String,
+    placeholder: String,
+    value: String,
+    onValueChange: (String) -> Unit
 ) {
+    // Stato per controllare se la password è visibile
+    var passwordVisible by remember { mutableStateOf(false) }
 
-  var  primaryBlueWithOpacity: Color = primaryBlu.copy(alpha = 0.1f)
+    val primaryBlueWithOpacity: Color = primaryBlu.copy(alpha = 0.1f)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp) // Padding laterale per il contenitore
     ) {
         // Testo sopra la TextField
         Text(
@@ -143,36 +195,55 @@ fun PasswordField(
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
             color = Color.Black,
-            modifier = Modifier.padding(bottom = 8.dp) // Spazio tra il testo e la TextField
+            modifier = Modifier.padding(bottom = 8.dp)
         )
 
         // TextField personalizzata
         OutlinedTextField(
-            value = "", // Valore vuoto (solo grafica)
-            onValueChange = {}, // Nessuna logica per ora
+            value = value, // Stato dinamico
+            onValueChange = onValueChange, // Aggiorna il valore della password
             placeholder = {
                 Text(
-                    text = placeholder, // Placeholder dinamico
-                    color = Color.Gray
+                    text = placeholder,
+                    color = Color.Gray,
+                    fontSize = 20.sp // Dimensione del placeholder
                 )
             },
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 20.sp // Stessa dimensione del placeholder
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp), // Altezza della TextField
-            shape = RoundedCornerShape(8.dp), // Bordo arrotondato
+                .height(56.dp),
+            shape = RoundedCornerShape(8.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = primaryBlueWithOpacity, // Colore interno: primaryblue
-                focusedBorderColor = Color(0xFF5B6067), // Colore bordo quando in focus
-                unfocusedBorderColor = Color(0xFF5B6067), // Colore bordo quando non in focus
-                textColor = Color.Black // Colore del testo
+                backgroundColor = primaryBlueWithOpacity,
+                focusedBorderColor = Color(0xFF5B6067),
+                unfocusedBorderColor = Color(0xFF5B6067),
+                textColor = Color.Black
             ),
-            visualTransformation = PasswordVisualTransformation(), // Nasconde il testo inserito
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password // Tipo di tastiera per password
-            )
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                // Icona per alternare la visibilità della password
+                val icon = if (passwordVisible) R.drawable.eyeoff else R.drawable.eyeon
+                val description = if (passwordVisible) "Hide password" else "Show password"
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        painter = painterResource(id = icon),
+                        contentDescription = description
+                    )
+                }
+            }
         )
     }
 }
+
+
+
+
+
+
 
 
 

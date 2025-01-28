@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultRegistryOwner
+import com.example.ingsw_24_25_dietiestates25.ui.ChangePasswordScreen
 import com.facebook.GraphRequest
 import com.facebook.Profile
 
@@ -52,7 +53,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MainScreen()
+            ChangePasswordScreen()
         }
     }
 }
