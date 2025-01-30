@@ -68,7 +68,7 @@ fun ProfileScreen() {
             // Campi statici senza navigazione
             ProfileOptionItem(
                 icon = R.drawable.icon_person,
-                title = "Personal details",
+                title = "Edit personal details",
                 onClick = { /* Implementa l'azione */ }
             )
 

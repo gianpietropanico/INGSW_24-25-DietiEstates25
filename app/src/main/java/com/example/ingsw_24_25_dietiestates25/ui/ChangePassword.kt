@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
+import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlueWithOpacity
 
 
 @Composable
@@ -183,7 +184,7 @@ fun PasswordField(
     // Stato per controllare se la password è visibile
     var passwordVisible by remember { mutableStateOf(false) }
 
-    val primaryBlueWithOpacity: Color = primaryBlu.copy(alpha = 0.1f)
+
 
     Column(
         modifier = Modifier
@@ -195,7 +196,9 @@ fun PasswordField(
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
             color = Color.Black,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .padding(start = 8.dp)
         )
 
         // TextField personalizzata
