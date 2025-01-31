@@ -1,39 +1,18 @@
 package com.example.ingsw_24_25_dietiestates25.ui
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,13 +26,16 @@ import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
+import com.example.ingsw_24_25_dietiestates25.utils.loadProfileImage
+import com.example.ingsw_24_25_dietiestates25.utils.rememberImagePicker
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import kotlinx.coroutines.launch
 
 
+@OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun EditProfileScreen(onBackPress: () -> Unit = {}) {
 
@@ -63,7 +45,12 @@ fun EditProfileScreen(onBackPress: () -> Unit = {}) {
     var username by remember { mutableStateOf("") }
     var isEditing by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
     val scope = rememberCoroutineScope()
+
+
+    // Ottieni la funzione per aprire la galleria
+    val openGallery = rememberImagePicker { uri -> profileImageUri = uri }
 
     Box(
         modifier = Modifier
@@ -88,7 +75,7 @@ fun EditProfileScreen(onBackPress: () -> Unit = {}) {
         ) {
             Spacer(modifier = Modifier.height(50.dp))
 
-            // Header con freccia e icona matita/spunta
+            // Header con freccia indietro e pulsante di modifica con animazione
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,9 +85,9 @@ fun EditProfileScreen(onBackPress: () -> Unit = {}) {
                 IconButton(
                     onClick = {
                         if (isEditing) {
-                            saveUserData(name, surname, email, username) // Chiamata alla funzione di salvataggio
+                            saveUserData(name, surname, email, username)
                         }
-                        onBackPress() // Torna indietro
+                        onBackPress()
                     }
                 ) {
                     Icon(
@@ -113,23 +100,41 @@ fun EditProfileScreen(onBackPress: () -> Unit = {}) {
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                IconButton(
-                    onClick = {
-                        isEditing = !isEditing
-                        scope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = if (isEditing) "Modalità modifica attivata" else "Modifiche salvate",
-                                duration = SnackbarDuration.Short
+                // **Animazione tra matita e "Done"**
+                AnimatedContent(
+                    targetState = isEditing,
+                    transitionSpec = {
+                        fadeIn(animationSpec = tween(300)) with fadeOut(animationSpec = tween(300))
+                    },
+                    label = "Edit to Done Animation"
+                ) { editing ->
+                    if (editing) {
+                        Text(
+                            text = "Done",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp,
+                            color = primaryBlu,
+                            modifier = Modifier
+                                .clickable {
+                                    isEditing = false
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Modifiche salvate", duration = SnackbarDuration.Short)
+                                    }
+                                }
+                                .padding(8.dp)
+                        )
+                    } else {
+                        IconButton(
+                            onClick = { isEditing = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Modifica",
+                                tint = primaryBlu,
+                                modifier = Modifier.size(34.dp)
                             )
                         }
                     }
-                ) {
-                    Icon(
-                        imageVector = if (isEditing) Icons.Default.Check else Icons.Default.Edit,
-                        contentDescription = "Modifica",
-                        tint = primaryBlu,
-                        modifier = Modifier.size(34.dp)
-                    )
                 }
             }
 
@@ -141,39 +146,35 @@ fun EditProfileScreen(onBackPress: () -> Unit = {}) {
                     .size(170.dp) // Dimensione dell'immagine del profilo
                     .align(Alignment.CenterHorizontally) // Centra la Box nella Column
             ) {
-                // Immagine del profilo
+                // Mostra l'immagine selezionata o l'immagine di default
                 Image(
-                    painter = painterResource(id = R.drawable.adolfo),
+                    painter = loadProfileImage(profileImageUri, R.drawable.adolfo),
                     contentDescription = "Profile Picture",
                     modifier = Modifier
                         .size(170.dp)
-                        .clip(CircleShape) // Ritaglia l'immagine in forma circolare
-                        .background(Color.Transparent), // Sfondo trasparente
+                        .clip(CircleShape)
+                        .background(Color.Transparent),
                     contentScale = ContentScale.Crop
                 )
 
-                // Icona "changephoto" sovrapposta in basso a destra e cliccabile
+
                 Image(
                     painter = painterResource(id = R.drawable.changephoto),
                     contentDescription = "Change Photo",
                     modifier = Modifier
-                        .size(60.dp) // Dimensione dell'icona
-                        .align(Alignment.BottomEnd) // Posizionata in basso a destra
-                        .offset(x = 20.dp, y = 10.dp) // Leggero spostamento per migliore visibilità
-                        .clickable {
-                            // TODO: Implementare la logica per cambiare la foto del profilo
-                            println("Cambio foto premuto")
-                        }
+                        .size(50.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 8.dp, y = 8.dp)
+                        .clickable { openGallery() } // Apre la galleria
                 )
-
             }
 
             Spacer(modifier = Modifier.height(30.dp))
 
             // Campi dell'utente
-            FieldName(label = "Nome", value = name, isEditing = isEditing, onValueChange = { name = it })
+            FieldName(label = "Name", value = name, isEditing = isEditing, onValueChange = { name = it })
 
-            FieldName(label = "Cognome", value = surname, isEditing = isEditing, onValueChange = { surname = it })
+            FieldName(label = "Surname", value = surname, isEditing = isEditing, onValueChange = { surname = it })
 
             FieldName(label = "Email", value = email, isEditing = isEditing, onValueChange = { email = it })
 

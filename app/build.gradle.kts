@@ -105,6 +105,7 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation(libs.androidx.material3.android)
+    implementation("io.coil-kt:coil-compose:2.2.2")
 
     // Google Play Services
     implementation("com.google.android.gms:play-services-auth:20.7.0")
