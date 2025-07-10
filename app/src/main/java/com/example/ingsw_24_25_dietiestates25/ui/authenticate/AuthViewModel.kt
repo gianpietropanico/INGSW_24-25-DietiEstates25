@@ -1,0 +1,215 @@
+package com.example.ingsw_24_25_dietiestates25.ui.authenticate
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.dieti_estate.ui.authenticate.AuthEvent
+import com.example.dieti_estate.ui.authenticate.AuthState
+import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
+import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
+import com.example.ingsw_24_25_dietiestates25.model.authenticate.AuthResult
+import com.example.ingsw_24_25_dietiestates25.model.authenticate.User
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+
+class AuthViewModel @Inject constructor (
+    private val authRepository: AuthRepository,
+    userSessionManager: UserSessionManager
+) : ViewModel() {
+
+    val user = userSessionManager.currentUser
+
+    private val _authState = MutableStateFlow(AuthState())
+    val authState: StateFlow<AuthState> = _authState
+
+    // Stato per verificare se l'utente è loggato
+    private val _isLoggedIn = MutableStateFlow(false) // Stato iniziale non loggato
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
+
+    // Espone un evento per notificare il successo del login
+    private val _toastMessage = MutableSharedFlow<String>()
+    val toastMessage: SharedFlow<String> = _toastMessage
+
+    private val _authSuccess = MutableSharedFlow<Unit>() // Evento per notificare il successo
+    val authSuccess: SharedFlow<Unit> = _authSuccess
+
+    fun onEvent(event: AuthEvent) {
+        Log.d("AuthViewModel", "Evento ricevuto: $event")
+        when (event) {
+            is AuthEvent.SignUpEmailChanged -> {
+                _authState.value = _authState.value.copy(signUpEmail = event.value)
+            }
+
+            is AuthEvent.SignUpPasswordChanged -> {
+                _authState.value = _authState.value.copy(signUpPassword = event.value)
+            }
+
+            is AuthEvent.SignUp -> {
+                signUpUser(_authState.value.signUpEmail, _authState.value.signUpPassword)
+            }
+
+            is AuthEvent.SignInEmailChanged -> {
+                _authState.value = _authState.value.copy(signInEmail = event.value)
+            }
+
+            is AuthEvent.SignInPasswordChanged -> {
+                _authState.value = _authState.value.copy(signInPassword = event.value)
+            }
+
+            is AuthEvent.SignIn -> {
+                signInUser(_authState.value.signInEmail, _authState.value.signInPassword)
+            }
+
+            is AuthEvent.SignUpConfirmPasswordChanged -> {
+                _authState.value = _authState.value.copy(signUpConfirmPassword = event.value)
+            }
+
+        }
+    }
+
+    private fun signUpUser(email: String, password: String) {
+        if (_authState.value.signUpPassword == _authState.value.signUpConfirmPassword) {
+            viewModelScope.launch {
+                _authState.value = _authState.value.copy(isLoading = true)
+                val result = authRepository.signUp(email, password)
+                handleResult(result)
+            }
+        } else {
+            _authState.value = _authState.value.copy(
+                isLoading = false,
+                errorMessage = "Le password non combaciano"
+            )
+        }
+    }
+
+    private fun signInUser(email: String, password: String) {
+        viewModelScope.launch {
+            _authState.value = _authState.value.copy(isLoading = true)
+            val result = authRepository.signIn(email, password)
+            handleResult(result)
+        }
+    }
+
+    private suspend fun handleResult(result: AuthResult<Unit>) {
+        when (result) {
+            is AuthResult.Authorized -> {
+                _authState.value = _authState.value.copy(
+                    isLoading = false,
+                    isAuthenticated = true
+                )
+                _toastMessage.emit("Sei stato loggato con successo!")
+                _authSuccess.emit(Unit)
+            }
+
+            is AuthResult.Unauthorized -> {
+                _authState.value = _authState.value.copy(
+                    isLoading = false,
+                    isAuthenticated = false,
+                    errorMessage = result.message
+                )
+            }
+
+            is AuthResult.UnknownError -> {
+                _authState.value = _authState.value.copy(
+                    isLoading = false,
+                    isAuthenticated = false,
+                    errorMessage = result.message
+                )
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                authRepository.logout()
+                _isLoggedIn.value = false
+                _toastMessage.emit("Sei stato disconnesso.")
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Errore durante il logout", e)
+                _toastMessage.emit("Errore durante il logout.")
+            }
+        }
+    }
+
+    suspend fun notifyServer(code: String?, state: String?): User? {
+        return try {
+            // Aggiorna lo stato per indicare che è in corso un'operazione
+            _authState.value = _authState.value.copy(isLoading = true)
+
+            // Chiama il repository per scambiare il codice
+            val notify = authRepository.notifyServer(code, state)
+
+            // Controlla se l'utente è stato recuperato correttamente
+            if (notify is AuthResult.Authorized && notify.data != null) {
+                val user = notify.data
+                Log.d("AuthViewModel", "Utente ricevuto: $user")
+
+                // Aggiorna lo stato dell'app
+                _authState.value = _authState.value.copy(isLoading = false)
+                user // Restituisce l'oggetto User
+            } else {
+                // Se non è stato possibile recuperare l'utente
+                _authState.value = _authState.value.copy(
+                    isLoading = false,
+                    errorMessage = "Errore sconosciuto durante il recupero dell'utente."
+                )
+                Log.e("AuthViewModel", "Errore sconosciuto durante il recupero dell'utente.")
+                null
+            }
+        } catch (e: Exception) {
+            // Gestione degli errori
+            _authState.value = _authState.value.copy(
+                isLoading = false,
+                errorMessage = e.message ?: "Errore durante il recupero dell'utente."
+            )
+            Log.e("AuthViewModel", "Errore durante il recupero dell'utente", e)
+            null
+        }
+    }
+
+
+    suspend fun fetchState(): String? {
+
+       return try {
+           // Aggiorna lo stato per indicare che è in corso un'operazione
+           _authState.value = _authState.value.copy(isLoading = true)
+
+           // Chiama il repository per ottenere lo stato dal server
+           val stateResult = authRepository.fetchState()
+
+           // Controlla se lo stato è stato recuperato correttamente
+           if (stateResult is AuthResult.Authorized && !stateResult.data.isNullOrEmpty()) {
+               val state = stateResult.data
+               Log.d("AuthViewModel", "Stato recuperato: $state")
+
+               // Aggiorna lo stato dell'app
+               _authState.value = _authState.value.copy(isLoading = false)
+               state // Restituisce lo stato recuperato
+           } else {
+               // Se non è stato possibile recuperare lo stato
+               _authState.value = _authState.value.copy(
+                   isLoading = false,
+                   errorMessage = "Errore sconosciuto durante il recupero dello stato."
+               )
+               Log.e("AuthViewModel", "Errore sconosciuto durante il recupero dello stato.")
+               null
+           }
+       } catch (e: Exception) {
+           // Gestione degli errori
+           _authState.value = _authState.value.copy(
+               isLoading = false,
+               errorMessage = e.message ?: "Errore durante il recupero dello stato."
+           )
+           Log.e("AuthViewModel", "Errore durante il fetch dello stato", e)
+           null
+       }
+
+    }
+
+}

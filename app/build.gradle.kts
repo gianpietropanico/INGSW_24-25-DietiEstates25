@@ -4,6 +4,8 @@ plugins {
     id("com.android.application")
     kotlin("android") version "1.9.0"
     kotlin("plugin.serialization") version "1.9.10"
+    kotlin("kapt")                            // org.jetbrains.kotlin.kapt
+    alias(libs.plugins.dagger.hilt)          // com.google.dagger.hilt.android
 }
 
 android {
@@ -120,5 +122,13 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.3")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.3")
 
+    // Hilt per Dependency Injection
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Kotlinx Serialization
+    implementation(libs.kotlinx.serialization.json)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
 }

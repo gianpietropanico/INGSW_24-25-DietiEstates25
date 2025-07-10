@@ -14,16 +14,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.ingsw_24_25_dietiestates25.ui.viewmodels.AuthViewModel
+import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
+import com.example.ingsw_24_25_dietiestates25.ui.authenticate.AuthViewModel
 
 
 @Composable
-fun HomeApp(
-    viewModel: AuthViewModel,
-    onLogoutClicked: () -> Unit
+fun HomeScreen(
+    am: AuthViewModel
 ) {
-    // Stato per verificare se l'utente è loggato
-    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
 
     Column(
         modifier = Modifier
@@ -32,17 +30,12 @@ fun HomeApp(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isLoggedIn) {
-            Text(text = "Benvenuto! Sei loggato.")
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                viewModel.logout() // Azione per fare il logout
-                onLogoutClicked()  // Callback per tornare alla schermata di login
-            }) {
-                Text("Logout")
-            }
-        } else {
-            Text(text = "Non sei loggato. Torna alla schermata di login.")
+        Text(text = "Benvenuto! Sei loggato. ${am.user}")
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
+
+        }) {
+            Text("Logout")
         }
     }
 }
