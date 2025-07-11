@@ -20,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.model.authenticate.User
-import com.example.ingsw_24_25_dietiestates25.ui.components.common.myToastMessage
 import kotlinx.coroutines.launch
 
 /* TODO NOTARE LA VARIABILE IS LOADING , UTILE PER INDICARE CHE IL PULSANTE è STATO
@@ -153,7 +152,7 @@ fun GitHubButton(
         }
     }
 
-    myToastMessage(context, resultMessage)
+    //myToastMessage(context, resultMessage)
 }
 
 fun openGitHubOAuth(context: Context, state: String) {

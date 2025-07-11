@@ -81,7 +81,7 @@ dependencies {
     implementation("androidx.compose.compiler:compiler:1.5.10")
     implementation ("androidx.compose.material3:material3:1.2.0") // O versione più recente
     implementation ("androidx.compose.material:material:1.4.3")
-
+    implementation("androidx.compose.material:material-icons-extended")
 
     // Google OAuth 2.0
     implementation("androidx.credentials:credentials:1.5.0-alpha05")

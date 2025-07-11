@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.ui.components.common.myToastMessage
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -103,7 +102,7 @@ fun GoogleSignInButton(
                         Log.d("GOGGLE COROUTINE","${e.message}")
                     }finally {
                         isLoading = false
-                        myToastMessage(context, resultMessage)
+                        //myToastMessage(context, resultMessage)
                     }
                 }
             }

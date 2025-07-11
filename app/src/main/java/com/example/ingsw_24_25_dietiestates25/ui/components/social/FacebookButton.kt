@@ -19,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.ui.components.common.myToastMessage
 import com.facebook.GraphRequest
 
 /*TEST FUNZIONI E VARIABILI PER CAPIRE SE L'ACCESSTOKEN DELL'UTENTE è VALIDO
@@ -87,7 +86,7 @@ fun FacebookLoginButton() {
 
                     Log.d("FacebookLogin", "Email: $email, Nome: $name")
                     Log.d("TEST TOAST","MESSAGE1")
-                    myToastMessage(context, resultMessage)
+                    //myToastMessage(context, resultMessage)
                     Log.d("TEST TOAST","MESSAGE2")
                 }.apply {
                     parameters = Bundle().apply {

@@ -1,9 +1,13 @@
 package com.example.ingsw_24_25_dietiestates25.ui.authenticate
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,38 +20,39 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.* // Per remember, mutableStateOf e delega by
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.dieti_estate.ui.authenticate.AuthEvent
 import com.example.ingsw_24_25_dietiestates25.R
-
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import com.example.ingsw_24_25_dietiestates25.ui.components.social.FacebookLoginButton
 import com.example.ingsw_24_25_dietiestates25.ui.components.social.GitHubButton
-
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 
 import com.example.ingsw_24_25_dietiestates25.ui.components.social.GoogleSignInButton
-import com.example.ingsw_24_25_dietiestates25.ui.components.common.Form
-import com.example.ingsw_24_25_dietiestates25.ui.components.common.LinkText
-
 @Composable
 fun AuthScreen(
     am: AuthViewModel = hiltViewModel(),
     navController: NavController
 ) {
-
-    // Stato per gestire la schermata attuale
-    var isLoginScreen by remember { mutableStateOf(true) } // True = Login, False = SignUp
-    val authState by am.authState.collectAsState()
     val context = LocalContext.current
+    val state = am.authState.collectAsState().value
+    var isLogin by remember { mutableStateOf(true) }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    // Mostra il Toast
     LaunchedEffect(Unit) {
         am.toastMessage.collect { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 
-    // Schermata principale
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -59,100 +64,105 @@ fun AuthScreen(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TopSection()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally // Allinea i contenuti al centro
+            ) {
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                Icon(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Icona personalizzata",
+                    tint = Color.Unspecified
+
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Contenuto dinamico in base allo stato
-            if (isLoginScreen) {
-                Form(
-                    email = authState.signInEmail,
-                    password = authState.signInPassword,
-                    onEmailChange = { am.onEvent(AuthEvent.SignInEmailChanged(it)) },
-                    onPasswordChange = { am.onEvent(AuthEvent.SignInPasswordChanged(it)) },
-                    linkText = "Did you forget your password? ",
-                    onClickText = {}, // TODO: Naviga a ResetPasswordScreen
-                    onClickButton = {
-                        am.onEvent(AuthEvent.SignIn)
-                    },
-                    textButton = "LOG IN",
-                    isSignUpMode = false // Modalità Login
-                )
-            } else {
-                Form(
-                    email = authState.signUpEmail,
-                    password = authState.signUpPassword,
-                    confirmPassword = authState.signUpConfirmPassword, // Nuovo parametro
-                    onEmailChange = { am.onEvent(AuthEvent.SignUpEmailChanged(it)) },
-                    onPasswordChange = { am.onEvent(AuthEvent.SignUpPasswordChanged(it)) },
-                    onConfirmPasswordChange = { am.onEvent(AuthEvent.SignUpConfirmPasswordChanged(it)) },
-                    linkText = "",
-                    onClickText = { isLoginScreen = true }, // Torna al login
-                    onClickButton = {
-                        am.onEvent(AuthEvent.SignUp)
-                    },
-                    textButton = "SIGN UP",
-                    isSignUpMode = true // Modalità Registrazione
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email", style = MaterialTheme.typography.labelMedium) },
+                textStyle = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            PasswordField(
+                password = state.signInPassword,
+                onPasswordChange = { password = it },
+                passwordVisible = passwordVisible,
+                onVisibilityToggle = { passwordVisible = !passwordVisible },
+                isError = state.errorMessage != null,
+                errorMessage = state.errorMessage
+            )
+
+
+            if (!isLogin) {
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    label = { Text("Confirm Password", style = MaterialTheme.typography.labelMedium) },
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation()
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    if (isLogin) {
+                        am.signInUser(email, password)
+                    } else {
+                        if (password == confirmPassword) {
+                            am.signUpUser(email, password)
+                        } else {
+                            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = if (isLogin) "LOG IN" else "SIGN UP",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             SocialLoginSection(
                 navController = navController,
                 authViewModel = am,
                 context = context
-                /*TODO
-                   QUESTA FUNZIONE DOVREBBE SALVARE L'USER NEL VIEWMODEL
-                   IL VIEWMODEL VIENE USATO COME "MULO" PER TRASPORTARE
-                   DATI DA UNO SCREEN AD UN ALTRO
-
-                onGitHubLogin = { code ->
-                    viewModel.onEvent(AuthUiEvent.GitHubLogin(code))
-                }*/
             )
+
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Link per cambiare schermata
-            LinkText(
-                linkText = if (isLoginScreen) "Not a member? Register now!" else "Already a member ? Login ",
-                fontSize = 24.sp,
-                onClick = { isLoginScreen = !isLoginScreen } // Cambia schermata
-
+            Text(
+                text = if (isLogin) "Not a member? Register now!" else "Already a member? Login",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isLogin = !isLogin }
+                    .padding(8.dp),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.primary
+                ),
+                textAlign = TextAlign.Center
             )
-
         }
     }
 }
-
-
-
-// Sezione superiore che include il titolo e una linea divisoria
-@Composable
-private fun TopSection() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally // Allinea i contenuti al centro
-    ) {/*
-        Text(
-            text = "DIETIESTATES25", // Testo del titolo principale
-            color = MaterialTheme.colorScheme.primary, // Colore primario del tema
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold), // Stile del testo
-            textAlign = TextAlign.Center // Centra il testo
-        )
-        Spacer(modifier = Modifier.height(8.dp)) // Spazio sotto il titolo
-        HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(0.5f), // Occupa metà larghezza dello schermo
-            thickness = 1.dp, // Spessore della linea
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f) // Colore semi-trasparente
-        )
-        */Spacer(modifier = Modifier.height(50.dp))
-
-        Icon(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Icona personalizzata",
-            tint = Color.Unspecified
-        )
-    }
-}
-
 
 @Composable
 private fun SocialLoginSection(
@@ -218,21 +228,54 @@ private fun SocialLoginSection(
     }
 }
 
-
-// Pulsante generico per social login
 @Composable
-private fun SocialButton(platform: String) {
-    OutlinedButton(
-        onClick = { /* Aggiungi logica per il social login */ }, // Callback per il click
-        modifier = Modifier
-            .height(40.dp) // Altezza del pulsante
+fun PasswordField(
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    passwordVisible: Boolean,
+    onVisibilityToggle: () -> Unit,
+    isError: Boolean,
+    errorMessage: String? = null
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = password,
+            onValueChange = onPasswordChange,
+            label = { Text("Password", style = MaterialTheme.typography.titleMedium) },
+            placeholder = { Text("Enter your password", style = MaterialTheme.typography.bodyMedium) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            isError = isError,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisible)
+                    Icons.Default.Visibility
+                else Icons.Default.VisibilityOff
 
-    ) {
-        Text(
-            text = platform, // Nome della piattaforma
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold) // Stile del testo
+                IconButton(onClick = onVisibilityToggle) {
+                    Icon(imageVector = image, contentDescription = null)
+                }
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = null
+                )
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = if (isError) Color.Red else MaterialTheme.colorScheme.outline
+            )
         )
+
+        if (isError && errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = Color.Red,
+                style = MaterialTheme.typography.labelSmall, // oppure bodySmall se preferisci
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+            )
+        }
     }
+
 }
-
-

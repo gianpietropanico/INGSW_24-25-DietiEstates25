@@ -3,7 +3,6 @@ package com.example.ingsw_24_25_dietiestates25.ui.authenticate
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dieti_estate.ui.authenticate.AuthEvent
 import com.example.dieti_estate.ui.authenticate.AuthState
 import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
@@ -39,41 +38,9 @@ class AuthViewModel @Inject constructor (
     private val _authSuccess = MutableSharedFlow<Unit>() // Evento per notificare il successo
     val authSuccess: SharedFlow<Unit> = _authSuccess
 
-    fun onEvent(event: AuthEvent) {
-        Log.d("AuthViewModel", "Evento ricevuto: $event")
-        when (event) {
-            is AuthEvent.SignUpEmailChanged -> {
-                _authState.value = _authState.value.copy(signUpEmail = event.value)
-            }
 
-            is AuthEvent.SignUpPasswordChanged -> {
-                _authState.value = _authState.value.copy(signUpPassword = event.value)
-            }
 
-            is AuthEvent.SignUp -> {
-                signUpUser(_authState.value.signUpEmail, _authState.value.signUpPassword)
-            }
-
-            is AuthEvent.SignInEmailChanged -> {
-                _authState.value = _authState.value.copy(signInEmail = event.value)
-            }
-
-            is AuthEvent.SignInPasswordChanged -> {
-                _authState.value = _authState.value.copy(signInPassword = event.value)
-            }
-
-            is AuthEvent.SignIn -> {
-                signInUser(_authState.value.signInEmail, _authState.value.signInPassword)
-            }
-
-            is AuthEvent.SignUpConfirmPasswordChanged -> {
-                _authState.value = _authState.value.copy(signUpConfirmPassword = event.value)
-            }
-
-        }
-    }
-
-    private fun signUpUser(email: String, password: String) {
+    fun signUpUser(email: String, password: String) {
         if (_authState.value.signUpPassword == _authState.value.signUpConfirmPassword) {
             viewModelScope.launch {
                 _authState.value = _authState.value.copy(isLoading = true)
@@ -88,7 +55,7 @@ class AuthViewModel @Inject constructor (
         }
     }
 
-    private fun signInUser(email: String, password: String) {
+    fun signInUser(email: String, password: String) {
         viewModelScope.launch {
             _authState.value = _authState.value.copy(isLoading = true)
             val result = authRepository.signIn(email, password)
@@ -125,18 +92,6 @@ class AuthViewModel @Inject constructor (
         }
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            try {
-                authRepository.logout()
-                _isLoggedIn.value = false
-                _toastMessage.emit("Sei stato disconnesso.")
-            } catch (e: Exception) {
-                Log.e("AuthViewModel", "Errore durante il logout", e)
-                _toastMessage.emit("Errore durante il logout.")
-            }
-        }
-    }
 
     suspend fun notifyServer(code: String?, state: String?): User? {
         return try {
