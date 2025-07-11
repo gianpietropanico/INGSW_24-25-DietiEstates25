@@ -2,10 +2,11 @@ import com.android.build.api.dsl.Packaging
 
 plugins {
     id("com.android.application")
-    kotlin("android") version "1.9.0"
-    kotlin("plugin.serialization") version "1.9.10"
+    kotlin("android") version "2.0.0"
+    kotlin("plugin.serialization") version "2.0.0"
     kotlin("kapt")                            // org.jetbrains.kotlin.kapt
     alias(libs.plugins.dagger.hilt)          // com.google.dagger.hilt.android
+    alias(libs.plugins.kotlin.compose)       // org.jetbrains.kotlin.plugin.compose
 }
 
 android {
@@ -44,9 +45,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -80,7 +78,7 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.5.3")
     implementation("androidx.compose.material:material:1.5.3")
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.3")
-
+    implementation("androidx.compose.compiler:compiler:1.5.10")
     implementation ("androidx.compose.material3:material3:1.2.0") // O versione più recente
     implementation ("androidx.compose.material:material:1.4.3")
 

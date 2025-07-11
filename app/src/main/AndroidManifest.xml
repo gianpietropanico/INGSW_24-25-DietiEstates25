@@ -15,6 +15,7 @@
     </queries>
 
     <application
+        android:name="com.example.ingsw_24_25_dietiestates25.MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -37,7 +38,7 @@
 
         <!-- Attività principale -->
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.ingsw_24_25_dietiestates25.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.INGSW_2425DietiEstates25">

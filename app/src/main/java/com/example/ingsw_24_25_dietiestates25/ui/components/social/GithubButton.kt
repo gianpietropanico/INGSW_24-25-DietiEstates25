@@ -19,7 +19,7 @@ import androidx.compose.ui.res.painterResource
 
 import androidx.compose.ui.unit.dp
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.data.model.User
+import com.example.ingsw_24_25_dietiestates25.model.authenticate.User
 import com.example.ingsw_24_25_dietiestates25.ui.components.common.myToastMessage
 import kotlinx.coroutines.launch
 

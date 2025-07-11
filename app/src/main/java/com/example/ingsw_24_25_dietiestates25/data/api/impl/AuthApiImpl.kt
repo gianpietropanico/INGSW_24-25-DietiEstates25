@@ -3,7 +3,9 @@ package com.example.ingsw_24_25_dietiestates25.data.api.impl
 import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.api.AuthApi
 import com.example.ingsw_24_25_dietiestates25.model.authenticate.AuthRequest
+import com.example.ingsw_24_25_dietiestates25.model.authenticate.AuthResponse
 import com.example.ingsw_24_25_dietiestates25.model.authenticate.TokenResponse
+import com.example.ingsw_24_25_dietiestates25.model.authenticate.User
 import io.ktor.client.HttpClient
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
