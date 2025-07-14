@@ -27,12 +27,11 @@ private val LightColorScheme = lightColorScheme(
 
 val Gabarito = FontFamily(
     Font(R.font.gabarito_regular, FontWeight.Normal),
-    Font(R.font.gabarito_bold, FontWeight.Bold)
-)
-
-val RobotoSlab = FontFamily(
-    Font(R.font.robotoslab_regular, FontWeight.Normal),
-    Font(R.font.robotoslab_medium, FontWeight.Medium)
+    Font(R.font.gabarito_medium, FontWeight.Medium),
+    Font(R.font.gabarito_semibold, FontWeight.SemiBold),
+    Font(R.font.gabarito_bold, FontWeight.Bold),
+    Font(R.font.gabarito_extrabold, FontWeight.ExtraBold),
+    Font(R.font.gabarito_black, FontWeight.Black)
 )
 
 

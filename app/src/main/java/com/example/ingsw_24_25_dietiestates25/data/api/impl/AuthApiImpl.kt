@@ -26,9 +26,14 @@ import javax.inject.Inject
 class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : AuthApi {
 
     override suspend fun signUp(request: AuthRequest) {
-        httpClient.post("http://10.0.2.2:8080/signup") {
+        val response = httpClient.post("http://10.0.2.2:8080/signup") {
             contentType(ContentType.Application.Json)
             setBody(request)
+        }
+
+        if (response.status != HttpStatusCode.OK) {
+            val msg = response.bodyAsText()
+            throw Exception(msg)
         }
     }
 
@@ -52,6 +57,12 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
+    override suspend fun resetPassword(request: AuthRequest) {
+        httpClient.post("http://10.0.2.2:8080/reset-password") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
 
     override suspend fun authenticate(token: String): HttpResponse {
         try {

@@ -45,7 +45,7 @@ fun AppNavHost(
         }
 
         composable(NavigationItem.Home.route) {
-            HomeScreen(am = authViewModel)
+            HomeScreen(am = authViewModel, navController = navController)
         }
 
 

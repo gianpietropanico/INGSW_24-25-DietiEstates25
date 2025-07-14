@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
-    val id: String, // O ObjectId, in base alla configurazione
+    val id: String,
     val username: String,
     val email: String,
     val type: String

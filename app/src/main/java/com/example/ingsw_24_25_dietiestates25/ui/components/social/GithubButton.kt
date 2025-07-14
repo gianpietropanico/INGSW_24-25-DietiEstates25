@@ -110,47 +110,47 @@ fun GitHubButton(
             )
         }
     }
-
-    GitHubCallbackManager.registerCallback { code, receivedState ->
-
-        if (!code.isNullOrBlank() && !receivedState.isNullOrBlank()) {
-            Log.d("GitHubButton", "Callback received with code: $code and state: $receivedState")
-
-            coroutineScope.launch {
-                try {
-                    isLoading = true
-                    Log.d(
-                        "GitHubButton",
-                        "Exchanging code for token with code: $code and state: $receivedState"
-                    )
-
-                    val user = notifyServer(code, receivedState)
-                    if (user != null) {
-                        resultMessage =
-                            "Authentication successful!" + "${user.email}, Username: ${user.username}"
-                        Log.d(
-                            "GitHubButton",
-                            "User Email: ${user.email}, Username: ${user.username} "
-                        )
-                        //SUCCESSO
-                    } else {
-                        resultMessage = "Failed to exchange code for token."
-                        Log.e("GitHubButton", "Access token is null or blank.")
-                    }
-                } catch (e: Exception) {
-                    Log.e("GitHubButton", "Error exchanging code: ${e.message}", e)
-                    resultMessage = "An error occurred during token exchange."
-                } finally {
-                    isLoading = false
-                    Log.d("GitHubButton", "Token exchange process completed.")
-
-                }
-            }
-        } else {
-            resultMessage = "Authentication failed: missing code or state."
-            Log.e("GitHubButton", "Code or state is null or blank in callback.")
-        }
-    }
+//
+//    GitHubCallbackManager.registerCallback { code, receivedState ->
+//
+//        if (!code.isNullOrBlank() && !receivedState.isNullOrBlank()) {
+//            Log.d("GitHubButton", "Callback received with code: $code and state: $receivedState")
+//
+//            coroutineScope.launch {
+//                try {
+//                    isLoading = true
+//                    Log.d(
+//                        "GitHubButton",
+//                        "Exchanging code for token with code: $code and state: $receivedState"
+//                    )
+//
+//                    val user = notifyServer(code, receivedState)
+//                    if (user != null) {
+//                        resultMessage =
+//                            "Authentication successful!" + "${user.email}, Username: ${user.username}"
+//                        Log.d(
+//                            "GitHubButton",
+//                            "User Email: ${user.email}, Username: ${user.username} "
+//                        )
+//                        //SUCCESSO
+//                    } else {
+//                        resultMessage = "Failed to exchange code for token."
+//                        Log.e("GitHubButton", "Access token is null or blank.")
+//                    }
+//                } catch (e: Exception) {
+//                    Log.e("GitHubButton", "Error exchanging code: ${e.message}", e)
+//                    resultMessage = "An error occurred during token exchange."
+//                } finally {
+//                    isLoading = false
+//                    Log.d("GitHubButton", "Token exchange process completed.")
+//
+//                }
+//            }
+//        } else {
+//            resultMessage = "Authentication failed: missing code or state."
+//            Log.e("GitHubButton", "Code or state is null or blank in callback.")
+//        }
+//    }
 
     //myToastMessage(context, resultMessage)
 }

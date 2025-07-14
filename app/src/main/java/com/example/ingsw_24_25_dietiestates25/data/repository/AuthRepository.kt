@@ -6,6 +6,7 @@ import com.example.ingsw_24_25_dietiestates25.model.authenticate.User
 interface AuthRepository {
     suspend fun signUp(email: String, password: String): AuthResult<Unit>
     suspend fun signIn(email:String, password: String): AuthResult<Unit>
+    suspend fun resetPassword(email: String, oldPassword: String , newPassword: String): AuthResult<Unit>
     suspend fun authenticate(): AuthResult<Unit>
     suspend fun logout()
     suspend fun fetchState(): AuthResult<String>

@@ -9,6 +9,8 @@ import io.ktor.client.statement.HttpResponse
 interface AuthApi {
     suspend fun signUp(request: AuthRequest)
     suspend fun signIn(request: AuthRequest): TokenResponse
+    suspend fun resetPassword ( request: AuthRequest)
+
     suspend fun authenticate(token: String): HttpResponse
     suspend fun fetchStateKtor() : String
     suspend fun notifyServer(code: String?, state: String?): User

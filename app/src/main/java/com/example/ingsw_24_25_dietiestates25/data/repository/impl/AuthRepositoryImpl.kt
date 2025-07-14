@@ -4,11 +4,13 @@ import android.content.SharedPreferences
 import android.util.Base64
 import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.api.AuthApi
+import com.example.ingsw_24_25_dietiestates25.data.jwt.parseJwtPayload
 import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.model.authenticate.AuthRequest
 import com.example.ingsw_24_25_dietiestates25.model.authenticate.AuthResult
 import com.example.ingsw_24_25_dietiestates25.model.authenticate.User
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
 import org.json.JSONObject
@@ -19,56 +21,64 @@ class AuthRepositoryImpl @Inject constructor (
     private val sessionManager: UserSessionManager
 ): AuthRepository {
 
+    override suspend fun resetPassword(email: String, oldPassword: String, newPassword: String): AuthResult<Unit> {
+        return try {
+            api.resetPassword(AuthRequest(email = email, password = oldPassword,  newPassword = newPassword))
+            AuthResult.Success()
+        } catch (e: ResponseException) {
+            when (e.response.status) {
+                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Reset failed: ${e.message}")
+                else -> AuthResult.UnknownError("Errore: ${e.response.status}")
+            }
+        } catch (e: Exception) {
+            AuthResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
 
     override suspend fun signUp(email: String, password: String): AuthResult<Unit> {
         return try {
             api.signUp(
-                request = AuthRequest(
-                    email = email,
-                    password = password
-                )
+                request = AuthRequest(email = email, password = password)
             )
-            signIn(email, password)
 
-        } catch (e: ResponseException) { // Gestisce le eccezioni HTTP
-            if (e.response.status == HttpStatusCode.Unauthorized) {
-                AuthResult.Unauthorized()
-            } else {
-                AuthResult.UnknownError()
+            AuthResult.Authorized()
+
+        } catch (e: ClientRequestException) {
+            when (e.response.status) {
+                HttpStatusCode.BadRequest -> AuthResult.UnknownError("Dati mancanti o formattazione errata.")
+                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Email già registrata o password troppo corta.")
+                else -> AuthResult.UnknownError("Errore: ${e.response.status}")
             }
-        } catch (e: Exception) { // Gestisce altre eccezioni
-            AuthResult.UnknownError()
+        } catch (e: Exception) {
+            AuthResult.UnknownError("Eccezione generica: ${e.localizedMessage}")
         }
     }
 
+
     override suspend fun signIn(email: String, password: String): AuthResult<Unit> {
         return try {
-            val response = api.signIn(AuthRequest(email, password))
+            // 1) fai la chiamata e ottieni il token
+            val response = api.signIn(AuthRequest(null, email, password, null, null))
             val token = response.token
 
-            // decode user from token (come prima)
-            val user = decodeJwtPayload(token)?.let { payload ->
-                User(
-                    email = payload.optString("email", null),
-                    username = payload.optString("username", null),
-                    id = payload.optString("id", null),
-                    type = payload.optString("type", null)
-                )
-            } ?: return AuthResult.UnknownError()
+            // 2) decodifica il payload
+            val payload = parseJwtPayload(token)
 
-            sessionManager.saveUser(user, token)
+            // 3) salva solo il userId e il token (il resto non è nel token)
+            sessionManager.saveUsernameSession(payload.username, token)
 
             AuthResult.Authorized()
         } catch (e: ResponseException) {
             if (e.response.status == HttpStatusCode.Unauthorized) {
                 AuthResult.Unauthorized()
             } else {
-                AuthResult.UnknownError()
+                AuthResult.UnknownError("Errore HTTP: ${e.response.status}")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError()
+            AuthResult.UnknownError("Eccezione: ${e.message}")
         }
     }
+
 
 
     override suspend fun authenticate(): AuthResult<Unit> {

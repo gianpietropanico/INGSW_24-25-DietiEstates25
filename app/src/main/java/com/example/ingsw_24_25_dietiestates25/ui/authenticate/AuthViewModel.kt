@@ -3,6 +3,7 @@ package com.example.ingsw_24_25_dietiestates25.ui.authenticate
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.dieti_estate.ui.authenticate.AuthState
 import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
@@ -13,13 +14,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor (
     private val authRepository: AuthRepository,
-    userSessionManager: UserSessionManager
+    val userSessionManager: UserSessionManager
 ) : ViewModel() {
 
     val user = userSessionManager.currentUser
@@ -27,21 +29,8 @@ class AuthViewModel @Inject constructor (
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState
 
-    // Stato per verificare se l'utente è loggato
-    private val _isLoggedIn = MutableStateFlow(false) // Stato iniziale non loggato
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
-
-    // Espone un evento per notificare il successo del login
-    private val _toastMessage = MutableSharedFlow<String>()
-    val toastMessage: SharedFlow<String> = _toastMessage
-
-    private val _authSuccess = MutableSharedFlow<Unit>() // Evento per notificare il successo
-    val authSuccess: SharedFlow<Unit> = _authSuccess
-
-
-
     fun signUpUser(email: String, password: String) {
-        if (_authState.value.signUpPassword == _authState.value.signUpConfirmPassword) {
+        if (_authState.value.password == _authState.value.confirmPassword) {
             viewModelScope.launch {
                 _authState.value = _authState.value.copy(isLoading = true)
                 val result = authRepository.signUp(email, password)
@@ -63,15 +52,30 @@ class AuthViewModel @Inject constructor (
         }
     }
 
-    private suspend fun handleResult(result: AuthResult<Unit>) {
+    fun sendResetPasswordEmail(email: String, newPassword :String, oldPassword: String) {
+        viewModelScope.launch {
+            _authState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                val result = authRepository.resetPassword(email, oldPassword, newPassword)
+                handleResult(result)
+            } catch (e: Exception) {
+                _authState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Failed to send reset link: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun handleResult(result: AuthResult<Unit>) {
         when (result) {
             is AuthResult.Authorized -> {
                 _authState.value = _authState.value.copy(
                     isLoading = false,
                     isAuthenticated = true
                 )
-                _toastMessage.emit("Sei stato loggato con successo!")
-                _authSuccess.emit(Unit)
             }
 
             is AuthResult.Unauthorized -> {
@@ -83,6 +87,14 @@ class AuthViewModel @Inject constructor (
             }
 
             is AuthResult.UnknownError -> {
+                _authState.value = _authState.value.copy(
+                    isLoading = false,
+                    isAuthenticated = false,
+                    errorMessage = result.message
+                )
+            }
+
+            is AuthResult.Success -> {
                 _authState.value = _authState.value.copy(
                     isLoading = false,
                     isAuthenticated = false,
@@ -168,4 +180,11 @@ class AuthViewModel @Inject constructor (
 
     }
 
+    fun clearErrorMessage() {
+        _authState.update { it.copy(errorMessage = null) }
+    }
+
+    fun logout(){
+        userSessionManager.clear()
+    }
 }

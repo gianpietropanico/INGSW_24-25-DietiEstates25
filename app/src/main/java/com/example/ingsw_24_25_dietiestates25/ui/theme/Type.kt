@@ -11,13 +11,16 @@ import com.example.ingsw_24_25_dietiestates25.R
 val Typography = Typography(
     headlineLarge = TextStyle(
         fontFamily = Gabarito,
-        fontWeight = FontWeight.Normal,
-        fontSize = 32.sp,              // 32px ≈ 24sp
-        lineHeight = 22.sp,
-        letterSpacing = 0.32.sp        // 1% of 32px = ~0.32px ≈ 0.32sp
+        fontWeight = FontWeight.Bold,
+        fontSize = 32.sp
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = Gabarito,
+        fontWeight = FontWeight.Medium,
+        fontSize = 24.sp
     ),
     bodyLarge = TextStyle(
-        fontFamily = RobotoSlab,
+        fontFamily = Gabarito,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
     ),
@@ -26,14 +29,10 @@ val Typography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp
     ),
-    headlineMedium = TextStyle(
-        fontFamily = Gabarito,
-        fontWeight = FontWeight.Normal,
-        fontSize = 24.sp
-    ),
     labelMedium = TextStyle(
-        fontFamily = RobotoSlab,
+        fontFamily = Gabarito,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp
+        fontSize = 12.sp
     )
 )
+
