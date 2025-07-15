@@ -7,9 +7,12 @@ interface AuthRepository {
     suspend fun signUp(email: String, password: String): AuthResult<Unit>
     suspend fun signIn(email:String, password: String): AuthResult<Unit>
     suspend fun resetPassword(email: String, oldPassword: String , newPassword: String): AuthResult<Unit>
+    suspend fun authWithThirdParty(email: String, username : String): AuthResult<Unit>
+
     suspend fun authenticate(): AuthResult<Unit>
     suspend fun logout()
+
     suspend fun fetchState(): AuthResult<String>
-    suspend fun notifyServer(code: String?, state: String?): AuthResult<User>
+    suspend fun exchangeGitHubCode(code: String?, state: String?): AuthResult<User>
 
 }

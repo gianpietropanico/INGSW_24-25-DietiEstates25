@@ -1,11 +1,12 @@
 package com.example.ingsw_24_25_dietiestates25.ui.authenticate
+
 import android.content.Context
-import android.widget.Toast
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
+
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -22,9 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.* // Per remember, mutableStateOf e delega by
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ingsw_24_25_dietiestates25.R
 import androidx.compose.material3.OutlinedTextField
@@ -59,7 +58,6 @@ fun AuthScreen(
     LaunchedEffect(state.isAuthenticated) {
         if (state.isAuthenticated == true) {
             navController.navigate(NavigationItem.Home.route)
-                //popUpTo("auth") { inclusive = true } // rimuove la schermata precedente
 
         }
     }
@@ -124,7 +122,7 @@ fun AuthScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     PasswordField(
-                        "Enter your old password",
+                        "Old password",
                         password = password,
                         onPasswordChange = {
                             password = it
@@ -138,7 +136,7 @@ fun AuthScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     PasswordField(
-                        "Enter new password",
+                        "New password",
                         password = newPassword,
                         onPasswordChange = {
                             newPassword = it
@@ -227,7 +225,7 @@ fun AuthScreen(
 
 
                     PasswordField(
-                        "Enter your password",
+                        "Password",
                         password = password,
                         onPasswordChange = {
                             password = it
@@ -237,6 +235,22 @@ fun AuthScreen(
                         onVisibilityToggle = { passwordVisible = !passwordVisible },
                         isError = state.errorMessage != null
                     )
+
+
+                    if (!isLogin) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        PasswordField(
+                            "Confirm Password",
+                            password = confirmPassword,
+                            onPasswordChange = {
+                                confirmPassword = it
+                                am.clearErrorMessage()
+                            },
+                            passwordVisible = passwordVisible,
+                            onVisibilityToggle = { passwordVisible = !passwordVisible },
+                            isError = state.errorMessage != null,
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -252,22 +266,6 @@ fun AuthScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                     )
-
-                    if (!isLogin) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        PasswordField(
-                            "Confirm your Password",
-                            password = confirmPassword,
-                            onPasswordChange = {
-                                confirmPassword = it
-                                am.clearErrorMessage()
-                            },
-                            passwordVisible = passwordVisible,
-                            onVisibilityToggle = { passwordVisible = !passwordVisible },
-                            isError = state.errorMessage != null,
-                        )
-                    }
-
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
@@ -312,7 +310,7 @@ fun AuthScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SocialLoginSection(
-                        authViewModel = am,
+                        am = am,
                         context = context
                     )
 
@@ -349,8 +347,8 @@ fun PasswordField(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Password", style = MaterialTheme.typography.titleMedium) },
-            placeholder = { Text(passwordLabel, style = MaterialTheme.typography.bodyMedium) },
+            label = { Text(passwordLabel, style = MaterialTheme.typography.titleMedium) },
+            placeholder = { Text("Enter your $passwordLabel", style = MaterialTheme.typography.bodyMedium) },
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp)),
@@ -384,7 +382,7 @@ fun PasswordField(
 
 @Composable
 private fun SocialLoginSection(
-    authViewModel: AuthViewModel,
+    am: AuthViewModel,
     context: Context = LocalContext.current
 ) {
     Column(
@@ -427,17 +425,9 @@ private fun SocialLoginSection(
             verticalAlignment = Alignment.CenterVertically // Allinea verticalmente i pulsanti
         ) {
 
-            GoogleSignInButton(context)
-            FacebookLoginButton()
-            GitHubButton(
-                fetchState = {
-                    authViewModel.fetchState() // Chiamata diretta alla funzione suspend
-                },
-                notifyServer = { code, state ->
-                    authViewModel.notifyServer(code, state) // Chiamata diretta alla funzione suspend per scambiare il codice
-                },
-                onSucces = {  }
-            )
+            GoogleSignInButton(context, am)
+            FacebookLoginButton(am)
+            GitHubButton(am)
 
 
         }

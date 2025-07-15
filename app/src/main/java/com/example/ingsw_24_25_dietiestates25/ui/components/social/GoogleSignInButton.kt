@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.authenticate.AuthViewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -35,7 +36,8 @@ import java.util.UUID
 
 @Composable
 fun GoogleSignInButton(
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
+    am: AuthViewModel,
 ) {
     var isLoading by remember { mutableStateOf(false) }
     var resultMessage by remember { mutableStateOf<String?>(null) }
@@ -51,6 +53,8 @@ fun GoogleSignInButton(
                 isLoading = true
                 resultMessage = null // Reset error messages
                 val credentialManager = CredentialManager.create(context)
+                var uniqueIdentifier : String? = null
+                var nameIdentifier : String? = null
 
                 val rawNonce = UUID.randomUUID().toString()
                 val bytes = rawNonce.toByteArray()
@@ -89,7 +93,8 @@ fun GoogleSignInButton(
                         val payloadAsByteArray =
                             android.util.Base64.decode(segments[1], android.util.Base64.NO_PADDING)
                         val payloadInJson = JSONObject(String(payloadAsByteArray, Charsets.UTF_8))
-                        val uniqueIdentifier = payloadInJson.getString("email")
+                        uniqueIdentifier = payloadInJson.getString("email")
+                        nameIdentifier = payloadInJson.getString("name")
 
                         resultMessage = "Authentication successful! " + payloadInJson.getString("email") + " " + payloadInJson.getString("name")
 
@@ -102,7 +107,7 @@ fun GoogleSignInButton(
                         Log.d("GOGGLE COROUTINE","${e.message}")
                     }finally {
                         isLoading = false
-                        //myToastMessage(context, resultMessage)
+                        am.authWithThirdParty(uniqueIdentifier, nameIdentifier )
                     }
                 }
             }

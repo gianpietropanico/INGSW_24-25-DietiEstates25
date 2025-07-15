@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.authenticate.AuthViewModel
 import com.facebook.GraphRequest
 
 /*TEST FUNZIONI E VARIABILI PER CAPIRE SE L'ACCESSTOKEN DELL'UTENTE è VALIDO
@@ -46,7 +47,9 @@ import com.facebook.GraphRequest
 
 
 @Composable
-fun FacebookLoginButton() {
+fun FacebookLoginButton(
+    am: AuthViewModel
+) {
 
     var isLoading by remember { mutableStateOf(false) }
     var resultMessage by remember { mutableStateOf<String?>(null) }
@@ -62,32 +65,26 @@ fun FacebookLoginButton() {
             override fun onCancel() {
                 Log.d("FacebookLogin", "Login cancelled.")
                 isLoading = false
-                resultMessage = "Operazione Fallita"
+                am.unAuthorized("Operazione annullata")
             }
 
             override fun onError(error: FacebookException) {
                 Log.e("FacebookLogin", "Error during login: ${error.message}")
-                resultMessage = "Operazione Fallita, errore durante il login"
+                am.unAuthorized("Operazione Fallita, errore durante il login")
                 isLoading = false
-                /*TODO NOTIFICARE CHE L'UTENTE NON è STATO LOGGATO */
             }
 
             override fun onSuccess(result: LoginResult) {
-                GraphRequest.newMeRequest(result?.accessToken) { obj, _ ->
+                GraphRequest.newMeRequest(result.accessToken) { obj, _ ->
                     val email = obj?.getString("email") ?: "Email non disponibile"
                     val name = obj?.getString("name") ?: "Nome non disponibile"
 
+                    Log.d("FacebookLogin", "Operazione riuscita" +" Email: $email, Nome: $name")
 
-                    /*TODO in questo caso bisogna chiamare il server per verificare
-                        i dati nel db nel caso salvarli con eventuali resultmessage cambiati
-                     */
                     isLoading = false
-                    resultMessage = "Operazione riuscita" +" Email: $email, Nome: $name"
 
-                    Log.d("FacebookLogin", "Email: $email, Nome: $name")
-                    Log.d("TEST TOAST","MESSAGE1")
-                    //myToastMessage(context, resultMessage)
-                    Log.d("TEST TOAST","MESSAGE2")
+                    am.authWithThirdParty(email, name )
+
                 }.apply {
                     parameters = Bundle().apply {
                         putString("fields", "id,name,email")

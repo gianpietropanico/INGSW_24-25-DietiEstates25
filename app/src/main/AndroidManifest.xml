@@ -51,21 +51,6 @@
 
         </activity>
 
-        <!-- Attività per il callback di GitHub -->
-        <activity
-            android:name=".ui.components.social.GitHubCallbackActivity"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="dietiestates25"
-                    android:host="callback"
-                    android:path="/github" />
-            </intent-filter>
-        </activity>
 
         <!-- Attività di Facebook -->
         <activity android:name="com.facebook.FacebookActivity"

@@ -8,5 +8,5 @@ sealed class AuthResult<T>(val data: T? = null, val message: String? = null) {
 
     class UnknownError<T>(message: String? = "An unknown error occurred") : AuthResult<T>(message = message)
 
-    class Success<T>(message: String? = "Operation Success") : AuthResult<T>(message = message)
+    class Success<T>(data: T? = null, message: String? = "Operation Success") : AuthResult<T>(data, message)
 }

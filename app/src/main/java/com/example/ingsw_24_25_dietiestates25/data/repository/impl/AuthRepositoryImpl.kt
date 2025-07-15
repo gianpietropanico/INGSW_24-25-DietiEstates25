@@ -41,7 +41,7 @@ class AuthRepositoryImpl @Inject constructor (
                 request = AuthRequest(email = email, password = password)
             )
 
-            AuthResult.Authorized()
+            AuthResult.Success()
 
         } catch (e: ClientRequestException) {
             when (e.response.status) {
@@ -54,11 +54,35 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
+    override suspend fun authWithThirdParty(email: String, username: String): AuthResult<Unit> {
+        return try {
+            // 1) fai la chiamata e ottieni il token
+            val response = api.authWithThirdParty(AuthRequest(email = email, username = username))
+            val token = response.token
+
+            // 2) decodifica il payload JWT
+            val payload = parseJwtPayload(token)
+
+            // 3) salva username e token nella sessione
+            sessionManager.saveUsernameSession(payload.username, token)
+
+            AuthResult.Authorized()
+
+        } catch (e: ResponseException) {
+            if (e.response.status == HttpStatusCode.Unauthorized) {
+                AuthResult.Unauthorized()
+            } else {
+                AuthResult.UnknownError("Errore HTTP: ${e.response.status}")
+            }
+        } catch (e: Exception) {
+            AuthResult.UnknownError("Eccezione: ${e.message}")
+        }
+    }
 
     override suspend fun signIn(email: String, password: String): AuthResult<Unit> {
         return try {
             // 1) fai la chiamata e ottieni il token
-            val response = api.signIn(AuthRequest(null, email, password, null, null))
+            val response = api.signIn(AuthRequest( email = email, password = password))
             val token = response.token
 
             // 2) decodifica il payload
@@ -79,14 +103,12 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
-
-
     override suspend fun authenticate(): AuthResult<Unit> {
         val token = sessionManager.token.value ?: return AuthResult.Unauthorized()
 
         return try {
             api.authenticate("Bearer $token")
-            AuthResult.Authorized()
+            AuthResult.Success()
 
         } catch (e: ResponseException) { // Gestisce le eccezioni HTTP
             if (e.response.status == HttpStatusCode.Unauthorized) {
@@ -99,6 +121,7 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
+
     override suspend fun logout() {
         try {
             sessionManager.clear()
@@ -108,33 +131,15 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
-    private fun saveTokenAndUser(token: String) {
-        val payload = decodeJwtPayload(token)
-        payload?.let {
-            val email = it.optString("email", null)
-            val username = it.optString("username", null)
-            val id = it.optString("id",null)
-            val type = it.optString("type",null)
-
-            val user = User(
-                email = email,
-                username = username,
-                id = id,
-                type = type
-            )
-
-            sessionManager.saveUser(user, token)
-        }
-    }
 
     override suspend fun fetchState(): AuthResult<String> {
         return try {
             Log.d("AuthRepository", "Inizio FetchState")
-            val state = api.fetchStateKtor() // Chiamata diretta all'API per ottenere lo stato
+            val state = api.fetchGitHubState() // Chiamata diretta all'API per ottenere lo stato
 
             Log.d("AuthRepository", "Stato generato con successo: $state")
 
-            AuthResult.Authorized(state) // Incapsula lo stato nel risultato
+            AuthResult.Success(state) // Incapsula lo stato nel risultato
         } catch (e: ResponseException) {
             Log.e("AuthRepository", "Errore HTTP: ${e.response.status}", e)
             when (e.response.status) {
@@ -147,11 +152,12 @@ class AuthRepositoryImpl @Inject constructor (
             AuthResult.UnknownError() // Errore generico in caso di eccezione
         }
     }
-    override suspend fun notifyServer(code: String?, state: String?): AuthResult<User> {
+
+    override suspend fun exchangeGitHubCode(code: String?, state: String?): AuthResult<User> {
         return try {
             Log.d("AuthRepository", "Inizio notify con code=$code e state=$state")
 
-            val user = api.notifyServer(code, state) // Chiamata diretta all'API per ottenere l'utente
+            val user = api.exchangeGitHubCode(code, state) // Chiamata diretta all'API per ottenere l'utente
 
             Log.d("AuthRepository", "Utente ricevuto con successo: ${user}")
 
@@ -170,20 +176,5 @@ class AuthRepositoryImpl @Inject constructor (
     }
 
 
-
-
-
-
-    private fun decodeJwtPayload(token: String): JSONObject? {
-        return try {
-            val parts = token.split(".")
-            if (parts.size == 3) {
-                val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
-                JSONObject(payload)
-            } else null
-        } catch (e: Exception) {
-            null
-        }
-    }
 
 }

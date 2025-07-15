@@ -26,7 +26,7 @@ import javax.inject.Inject
 class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : AuthApi {
 
     override suspend fun signUp(request: AuthRequest) {
-        val response = httpClient.post("http://10.0.2.2:8080/signup") {
+        val response = httpClient.post("http://10.0.2.2:8080/auth/signup") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
@@ -37,11 +37,29 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
+    override suspend fun authWithThirdParty(request: AuthRequest): TokenResponse {
+        Log.d("AuthApiImpl", "Invio richiesta OAUTH")
+        return try {
+            val response: TokenResponse = httpClient.post("http://10.0.2.2:8080/auth/thirdPartyUser") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(request)
+            }.body()
+            Log.d("AuthApiImpl", "Risposta ricevuta: token = ${response.token}")
+            response
+        } catch (e: ResponseException) {
+            Log.e("AuthApiImpl", "Errore nella risposta del server: ${e.response.status}", e)
+            throw e
+        } catch (e: NoTransformationFoundException) {
+            Log.e("AuthApiImpl", "Risposta non valida per deserializzazione", e)
+            throw e
+        }
+    }
 
     override suspend fun signIn(request: AuthRequest): TokenResponse {
         Log.d("AuthApiImpl", "Invio richiesta SignIn con email: ${request.email}")
         return try {
-            val response: TokenResponse = httpClient.post("http://10.0.2.2:8080/signin") {
+            val response: TokenResponse = httpClient.post("http://10.0.2.2:8080/auth/signin") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
                 setBody(request)
@@ -58,7 +76,7 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
     }
 
     override suspend fun resetPassword(request: AuthRequest) {
-        httpClient.post("http://10.0.2.2:8080/reset-password") {
+        httpClient.post("http://10.0.2.2:8080/auth/reset-password") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
@@ -79,7 +97,7 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
     }
 
 
-    override suspend fun fetchStateKtor(): String {
+    override suspend fun fetchGitHubState(): String {
         return try {
             // Effettua una richiesta GET all'endpoint del server
             val response: HttpResponse = httpClient.get("http://10.0.2.2:8080/generate-state")
@@ -108,7 +126,7 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
-    override suspend fun notifyServer(code: String?, state: String?): User {
+    override suspend fun exchangeGitHubCode(code: String?, state: String?): User {
         // Controllo dei parametri
         if (code.isNullOrBlank() || state.isNullOrBlank()) {
             Log.e("OAuth", "Parametri mancanti: code o state sono null o vuoti")

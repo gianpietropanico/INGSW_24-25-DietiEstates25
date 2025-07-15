@@ -10,11 +10,15 @@ interface AuthApi {
     suspend fun signUp(request: AuthRequest)
     suspend fun signIn(request: AuthRequest): TokenResponse
     suspend fun resetPassword ( request: AuthRequest)
+    suspend fun authWithThirdParty(request: AuthRequest): TokenResponse
+
+
+
+    suspend fun fetchGitHubState() : String
+    suspend fun exchangeGitHubCode(code: String?, state: String?): User
+
 
     suspend fun authenticate(token: String): HttpResponse
-    suspend fun fetchStateKtor() : String
-    suspend fun notifyServer(code: String?, state: String?): User
-
     suspend fun fetchJwtFromServer(code : String): String?
     suspend fun exchangeCodeForJwt(code: String): String?
     suspend fun fetchAuthResponse(code: String): AuthResponse?
