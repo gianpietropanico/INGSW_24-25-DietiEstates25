@@ -28,8 +28,8 @@ import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
-import com.example.ingsw_24_25_dietiestates25.utils.loadProfileImage
-import com.example.ingsw_24_25_dietiestates25.utils.rememberImagePicker
+import com.example.ingsw_24_25_dietiestates25.ui.utils.loadProfileImage
+import com.example.ingsw_24_25_dietiestates25.ui.utils.rememberImagePicker
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import kotlinx.coroutines.launch
@@ -172,11 +172,7 @@ fun EditProfileScreen(onBackPress: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(30.dp))
 
             // Campi dell'utente
-            FieldName(label = "Name", value = name, isEditing = isEditing, onValueChange = { name = it })
-
-            FieldName(label = "Surname", value = surname, isEditing = isEditing, onValueChange = { surname = it })
-
-            FieldName(label = "Email", value = email, isEditing = isEditing, onValueChange = { email = it })
+            FieldName(label = "Username", value = name, isEditing = isEditing, onValueChange = { name = it })
 
             FieldName(label = "Username", value = username, isEditing = isEditing, onValueChange = { username = it })
         }

@@ -22,7 +22,9 @@ import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.R
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()

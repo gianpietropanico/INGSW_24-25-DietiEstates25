@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.utils
+package com.example.ingsw_24_25_dietiestates25.ui.utils
 
 
 import android.net.Uri
