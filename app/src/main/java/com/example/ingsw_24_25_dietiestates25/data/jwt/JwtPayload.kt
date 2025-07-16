@@ -11,7 +11,9 @@ data class JwtPayload(
     val aud: String? = null,
     val iss: String? = null,
     val exp: Long?   = null,
-    val username: String? = null
+    val username: String? = null,
+    val email: String? = null,
+    val type: String? = null
 )
 
 fun parseJwtPayload(jwt: String): JwtPayload {

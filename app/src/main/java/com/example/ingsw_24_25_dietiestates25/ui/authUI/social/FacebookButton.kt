@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui.components.social
+package com.example.ingsw_24_25_dietiestates25.ui.authUI.social
 
 import android.os.Bundle
 import android.util.Log
@@ -19,7 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.ui.authenticate.AuthViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 import com.facebook.GraphRequest
 
 /*TEST FUNZIONI E VARIABILI PER CAPIRE SE L'ACCESSTOKEN DELL'UTENTE è VALIDO

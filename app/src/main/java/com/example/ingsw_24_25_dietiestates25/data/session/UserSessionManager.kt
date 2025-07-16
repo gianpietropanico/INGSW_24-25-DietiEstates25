@@ -1,6 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.data.session
 
-import com.example.ingsw_24_25_dietiestates25.model.authenticate.User
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +22,7 @@ class UserSessionManager @Inject constructor() {
         _currentUser.value = user
         _token.value = token
     }
+
     fun saveUsernameSession( username : String?, token :String){
         _currentUsername.value = username
         _token.value = token

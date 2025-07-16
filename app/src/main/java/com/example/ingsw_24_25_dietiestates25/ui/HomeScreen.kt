@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.ingsw_24_25_dietiestates25.ui.authenticate.AuthViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 
 
@@ -24,7 +24,7 @@ fun HomeScreen(
     am: AuthViewModel,
     navController: NavController
 ) {
-    val username by am.userSessionManager.currentUsername.collectAsState()
+    val currentUser by am.userSessionManager.currentUser.collectAsState()
 
     Column(
         modifier = Modifier
@@ -33,7 +33,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Benvenuto! Sei loggato:  $username")
+        Text(text = "Benvenuto! Sei loggato:  ${currentUser?.username}")
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
             am.logout()

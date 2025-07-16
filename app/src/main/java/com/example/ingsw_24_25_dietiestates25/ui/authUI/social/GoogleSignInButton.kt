@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui.components.social
+package com.example.ingsw_24_25_dietiestates25.ui.authUI.social
 
 
 import android.content.Context
@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.ui.authenticate.AuthViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException

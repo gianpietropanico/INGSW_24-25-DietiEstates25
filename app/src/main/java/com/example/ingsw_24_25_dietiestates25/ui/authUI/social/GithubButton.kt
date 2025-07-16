@@ -1,6 +1,5 @@
-package com.example.ingsw_24_25_dietiestates25.ui.components.social
+package com.example.ingsw_24_25_dietiestates25.ui.authUI.social
 
-import com.example.ingsw_24_25_dietiestates25.ui.components.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
@@ -11,12 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+
 import androidx.compose.ui.unit.dp
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.ui.authenticate.AuthViewModel
-import kotlinx.coroutines.launch
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 
 /* TODO NOTARE LA VARIABILE IS LOADING , UTILE PER INDICARE CHE IL PULSANTE è STATO
 *   PREMUTO E CHE STA ESEGUENDO I PROCESSI DEL ONCLICK BUTTON*/
@@ -51,28 +48,43 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun GitHubButton(
-    authViewModel: AuthViewModel
+    viewModel: AuthViewModel
 ) {
     val context = LocalContext.current
-    var isLoading = false
+    val uiState by viewModel.authState.collectAsState()
+
+    // Registriamo una volta sola il deep-link callback
+    LaunchedEffect(Unit) {
+        GitHubCallbackManager.register { code, state ->
+            viewModel.onOAuthResponse(code, state)
+        }
+    }
 
     Box(
         modifier = Modifier
+            .padding(8.dp)
             .size(60.dp)
-            .clickable(enabled = !isLoading) {
-                authViewModel.launchGithubOauth(context)
-                isLoading = true
+            .clickable(enabled = !uiState.isLoading) {
+                viewModel.startLogin(context)
             }
     ) {
-        if (isLoading) CircularProgressIndicator(modifier = Modifier.size(16.dp))
-        else Icon(
-            painter = painterResource(id = R.drawable.github),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            tint = Color.Unspecified
-        )
+        if (uiState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.size(16.dp))
+        } else {
+            Icon(
+                painter = painterResource(R.drawable.github),
+                contentDescription = "Login with GitHub",
+                modifier = Modifier.fillMaxSize(),
+                tint = Color.Unspecified
+            )
+        }
     }
+
 }
+
+
+
+
 
 //@Composable
 //fun GitHubButton(

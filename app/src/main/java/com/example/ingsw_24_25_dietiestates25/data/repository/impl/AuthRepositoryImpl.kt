@@ -1,19 +1,16 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.impl
 
-import android.content.SharedPreferences
-import android.util.Base64
 import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.api.AuthApi
 import com.example.ingsw_24_25_dietiestates25.data.jwt.parseJwtPayload
 import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.authenticate.AuthRequest
-import com.example.ingsw_24_25_dietiestates25.model.authenticate.AuthResult
-import com.example.ingsw_24_25_dietiestates25.model.authenticate.User
+import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
+import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
-import org.json.JSONObject
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor (
@@ -37,11 +34,23 @@ class AuthRepositoryImpl @Inject constructor (
 
     override suspend fun signUp(email: String, password: String): AuthResult<Unit> {
         return try {
-            api.signUp(
-                request = AuthRequest(email = email, password = password)
-            )
+            val response = api.signUp( request = AuthRequest(email = email, password = password))
 
-            AuthResult.Success()
+            val token = response.token
+
+
+            val payload = parseJwtPayload(token)
+
+
+            sessionManager.saveUser(
+                User(
+                    username = payload.username!!,
+                    id = payload.userId,
+                    email = payload.email!!,
+                    type = payload.type!!
+                ), token)
+
+            AuthResult.Authorized()
 
         } catch (e: ClientRequestException) {
             when (e.response.status) {
@@ -56,15 +65,19 @@ class AuthRepositoryImpl @Inject constructor (
 
     override suspend fun authWithThirdParty(email: String, username: String): AuthResult<Unit> {
         return try {
-            // 1) fai la chiamata e ottieni il token
+
             val response = api.authWithThirdParty(AuthRequest(email = email, username = username))
             val token = response.token
 
-            // 2) decodifica il payload JWT
             val payload = parseJwtPayload(token)
 
-            // 3) salva username e token nella sessione
-            sessionManager.saveUsernameSession(payload.username, token)
+            sessionManager.saveUser(
+                User(
+                    username = payload.username!!,
+                    id = payload.userId,
+                    email = payload.email!!,
+                    type = payload.type!!
+                ), token)
 
             AuthResult.Authorized()
 
@@ -81,15 +94,19 @@ class AuthRepositoryImpl @Inject constructor (
 
     override suspend fun signIn(email: String, password: String): AuthResult<Unit> {
         return try {
-            // 1) fai la chiamata e ottieni il token
+
             val response = api.signIn(AuthRequest( email = email, password = password))
             val token = response.token
 
-            // 2) decodifica il payload
             val payload = parseJwtPayload(token)
 
-            // 3) salva solo il userId e il token (il resto non è nel token)
-            sessionManager.saveUsernameSession(payload.username, token)
+            sessionManager.saveUser(
+                User(
+                    username = payload.username!!,
+                    id = payload.userId,
+                    email = payload.email!!,
+                    type = payload.type!!
+                ), token)
 
             AuthResult.Authorized()
         } catch (e: ResponseException) {
@@ -100,24 +117,6 @@ class AuthRepositoryImpl @Inject constructor (
             }
         } catch (e: Exception) {
             AuthResult.UnknownError("Eccezione: ${e.message}")
-        }
-    }
-
-    override suspend fun authenticate(): AuthResult<Unit> {
-        val token = sessionManager.token.value ?: return AuthResult.Unauthorized()
-
-        return try {
-            api.authenticate("Bearer $token")
-            AuthResult.Success()
-
-        } catch (e: ResponseException) { // Gestisce le eccezioni HTTP
-            if (e.response.status == HttpStatusCode.Unauthorized) {
-                AuthResult.Unauthorized()
-            } else {
-                AuthResult.UnknownError()
-            }
-        } catch (e: Exception) { // Gestisce altre eccezioni
-            AuthResult.UnknownError()
         }
     }
 
@@ -153,15 +152,26 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun exchangeGitHubCode(code: String?, state: String?): AuthResult<User> {
+    override suspend fun exchangeGitHubCode(code: String?, state: String?): AuthResult<Unit> {
         return try {
             Log.d("AuthRepository", "Inizio notify con code=$code e state=$state")
 
-            val user = api.exchangeGitHubCode(code, state) // Chiamata diretta all'API per ottenere l'utente
+            val response = api.exchangeGitHubCode(code, state) // Chiamata diretta all'API per ottenere l'utente
+            val token = response.token
 
-            Log.d("AuthRepository", "Utente ricevuto con successo: ${user}")
+            // 2) decodifica il payload JWT
+            val payload = parseJwtPayload(token)
 
-            AuthResult.Authorized(user) // Incapsula l'utente nella risposta
+            // 3) salva username e token nella sessione
+            sessionManager.saveUser(
+                User(
+                    username = payload.username!!,
+                    id = payload.userId,
+                    email = payload.email!!,
+                    type = payload.type!!
+                ), token)
+
+            AuthResult.Authorized()
         } catch (e: ResponseException) {
             Log.e("AuthRepository", "Errore HTTP: ${e.response.status}", e)
             when (e.response.status) {

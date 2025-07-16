@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui
+package com.example.ingsw_24_25_dietiestates25.ui.profileUI
 
 import android.net.Uri
 import androidx.compose.foundation.Image

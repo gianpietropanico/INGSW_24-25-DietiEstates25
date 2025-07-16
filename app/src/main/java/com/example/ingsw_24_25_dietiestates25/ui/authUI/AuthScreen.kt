@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui.authenticate
+package com.example.ingsw_24_25_dietiestates25.ui.authUI
 
 import android.content.Context
 
@@ -29,13 +29,13 @@ import com.example.ingsw_24_25_dietiestates25.R
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import com.example.ingsw_24_25_dietiestates25.ui.components.social.FacebookLoginButton
-import com.example.ingsw_24_25_dietiestates25.ui.components.social.GitHubButton
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.social.FacebookLoginButton
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.social.GitHubButton
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.draw.clip
 
-import com.example.ingsw_24_25_dietiestates25.ui.components.social.GoogleSignInButton
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.social.GoogleSignInButton
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 
 @Composable

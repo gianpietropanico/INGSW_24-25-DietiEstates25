@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.model.authenticate
+package com.example.ingsw_24_25_dietiestates25.model.result
 
 sealed class AuthResult<T>(val data: T? = null, val message: String? = null) {
 

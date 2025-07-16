@@ -9,5 +9,4 @@ data class AuthState(
     val errorMessage: String? = null,
     val jwtToken: String? = null,
     val isAuthenticated: Boolean? = false
-
 )
