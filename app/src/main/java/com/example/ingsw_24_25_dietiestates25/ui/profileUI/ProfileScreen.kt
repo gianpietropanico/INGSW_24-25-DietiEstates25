@@ -21,10 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.R
 
+
+
 @Composable
 fun ProfileScreen(
 
 ) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -142,9 +145,9 @@ fun ProfileTopSection(name: String, email: String) {
     }
 }
 
+
 @Composable
 fun ProfileOptionItem(icon: Int, title: String, onClick: () -> Unit) {
-
 
         Row(
             modifier = Modifier
@@ -188,9 +191,8 @@ fun ProfileOptionItem(icon: Int, title: String, onClick: () -> Unit) {
                 modifier = Modifier.size(25.dp)
             )
         }
-
-
 }
+
 
 @Preview(showBackground = true)
 @Composable

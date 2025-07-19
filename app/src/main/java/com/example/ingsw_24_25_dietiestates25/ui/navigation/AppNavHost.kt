@@ -13,7 +13,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 
-
+//PUSHINNNNNNGGGG
 enum class Screen {
     HOME,
     AUTH,
@@ -25,12 +25,14 @@ sealed class NavigationItem(val route: String) {
     object Profile : NavigationItem(Screen.PROFILE.name)
 }
 
+
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: String = NavigationItem.Auth.route
 ) {
+
     val authViewModel: AuthViewModel = hiltViewModel()
     val profileViewModel : ProfileViewModel = hiltViewModel()
 
@@ -52,6 +54,8 @@ fun AppNavHost(
                 navController = navController
             )
         }
+
+
 
 
         composable(NavigationItem.Home.route) {

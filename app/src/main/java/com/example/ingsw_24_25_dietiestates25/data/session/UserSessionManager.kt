@@ -27,6 +27,7 @@ class UserSessionManager @Inject constructor() {
         _currentUsername.value = username
         _token.value = token
     }
+
     fun clear() {
         _currentUser.value = null
         _token.value = null
