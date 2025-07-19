@@ -13,7 +13,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 
-//PUSHINNNNNNGGGG
+
 enum class Screen {
     HOME,
     AUTH,
