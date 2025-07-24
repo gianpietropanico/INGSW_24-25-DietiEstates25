@@ -10,6 +10,7 @@ val LightBlueWhite = Color(0xFFF1F5F9) //Social media background
 val BlueGray = Color(0xFF334155)
 val primaryBlu = Color(0xFF3A7CA5)
 val primaryBlueWithOpacity: Color = primaryBlu.copy(alpha = 0.1f)
+val DarkRed = Color(0xFFC62828)
 
 val ColorScheme.myFocusedTextFieldText: Color
     @Composable

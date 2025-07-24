@@ -8,7 +8,7 @@ interface AuthApi {
     suspend fun signIn(request: AuthRequest): TokenResponse
     suspend fun resetPassword ( request: AuthRequest)
     suspend fun authWithThirdParty(request: AuthRequest): TokenResponse
-
+    suspend fun sendAgencyRequest(request: AuthRequest)
 
     suspend fun fetchGitHubState() : String
     suspend fun exchangeGitHubCode(code: String?, state: String?): TokenResponse

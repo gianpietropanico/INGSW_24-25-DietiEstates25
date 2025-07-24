@@ -9,20 +9,29 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.ui.HomeScreen
-import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthScreen
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.AgencySignInScreen
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignInScreen
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignUpScreen
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.WelcomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 
 
 enum class Screen {
     HOME,
-    AUTH,
-    PROFILE
+    WELCOME,
+    PROFILE,
+    SIGNIN,
+    SIGNUP,
+    AGENCYSIGNIN
 }
 sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
-    object Auth : NavigationItem(Screen.AUTH.name)
+    object SignIn : NavigationItem(Screen.SIGNIN.name)
+    object SignUp : NavigationItem(Screen.SIGNUP.name)
+    object Welcome : NavigationItem(Screen.WELCOME.name)
     object Profile : NavigationItem(Screen.PROFILE.name)
+    object AgencySignIn : NavigationItem(Screen.AGENCYSIGNIN.name)
 }
 
 
@@ -30,7 +39,7 @@ sealed class NavigationItem(val route: String) {
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = NavigationItem.Auth.route
+    startDestination: String = NavigationItem.Welcome.route
 ) {
 
     val authViewModel: AuthViewModel = hiltViewModel()
@@ -42,8 +51,30 @@ fun AppNavHost(
         startDestination = startDestination
     ) {
 
-        composable(NavigationItem.Auth.route){
-            AuthScreen(
+        composable(NavigationItem.Welcome.route){
+            WelcomeScreen(
+                am = authViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.AgencySignIn.route){
+            AgencySignInScreen(
+                am = authViewModel,
+                navController = navController
+            )
+        }
+
+
+        composable(NavigationItem.SignIn.route){
+            SignInScreen(
+                am = authViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.SignUp.route){
+            SignUpScreen(
                 am = authViewModel,
                 navController = navController
             )
@@ -57,8 +88,7 @@ fun AppNavHost(
 
 
 
-
-        composable(NavigationItem.Home.route) {
+        composable(NavigationItem.Profile.route) {
             ProfileScreen(
 //                pm = profileViewModel,
 //                navController = navController

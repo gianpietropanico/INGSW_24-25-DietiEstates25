@@ -7,5 +7,5 @@ data class User(
     val id: String,
     val username: String,
     val email: String,
-    val type: String
+    val type: String   // "superadmin" "agency_admin" "agent" "localuser" "thirdpartyuser"
 )

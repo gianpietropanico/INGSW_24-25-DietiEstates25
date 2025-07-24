@@ -8,6 +8,7 @@ interface AuthRepository {
     suspend fun resetPassword(email: String, oldPassword: String , newPassword: String): AuthResult<Unit>
     suspend fun authWithThirdParty(email: String, username : String): AuthResult<Unit>
     suspend fun logout()
+    suspend fun sendAgencyRequest(email: String, password: String, agencyName: String): AuthResult<Unit>
 
     //GITHUB
     suspend fun fetchState(): AuthResult<String>

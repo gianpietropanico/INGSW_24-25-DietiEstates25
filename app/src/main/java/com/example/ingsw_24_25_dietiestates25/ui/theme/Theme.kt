@@ -15,7 +15,7 @@ import com.example.ingsw_24_25_dietiestates25.R
 
 // Colori personalizzati
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF2C80B4), // blu pulsante login
+    primary = Color(0xFF3A7CA5), // blu pulsante logi
     onPrimary = Color.White,
     secondary = Color(0xFF000000), // testo nero
     onSecondary = Color.White,
@@ -31,6 +31,15 @@ val Gabarito = FontFamily(
     Font(R.font.gabarito_bold, FontWeight.Bold),
     Font(R.font.gabarito_extrabold, FontWeight.ExtraBold),
     Font(R.font.gabarito_black, FontWeight.Black)
+)
+
+val Rubik = FontFamily(
+    Font(R.font.rubik_regular, FontWeight.Normal),
+    Font(R.font.rubik_medium, FontWeight.Medium),
+    Font(R.font.rubik_semibold, FontWeight.SemiBold),
+    Font(R.font.rubik_bold, FontWeight.Bold),
+    Font(R.font.rubik_extrabold, FontWeight.ExtraBold),
+    Font(R.font.rubik_black, FontWeight.Black)
 )
 
 

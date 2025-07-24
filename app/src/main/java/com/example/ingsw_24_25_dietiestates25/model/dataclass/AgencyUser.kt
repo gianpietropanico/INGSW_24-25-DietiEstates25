@@ -1,0 +1,10 @@
+package com.example.ingsw_24_25_dietiestates25.model.dataclass
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AgencyUser(
+    val id: String, //id dell'utente
+    val agencyId: String, //id della agenzia
+    val role: String //ruolo dell'utente "agency_admin" o "agent"
+)

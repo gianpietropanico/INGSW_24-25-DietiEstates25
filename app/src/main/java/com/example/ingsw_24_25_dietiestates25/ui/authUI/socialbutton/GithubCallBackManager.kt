@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui.authUI.social
+package com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton
 
 
 

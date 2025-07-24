@@ -1,12 +1,16 @@
-package com.example.dieti_estate.ui.authenticate
+package com.example.ingsw_24_25_dietiestates25.ui.authUI
 
 data class AuthState(
     val email: String = "",
-    val password: String = "",
+    var password: String = "",
     var confirmPassword: String = "",
     val state: String? = null,
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
     val jwtToken: String? = null,
-    val isAuthenticated: Boolean? = false
+
+    val isAuthenticated: Boolean? = false,
+    val isLoading: Boolean = false,
+    var resultMessage: String? = null,
+    var localError: Boolean = false,
+    val success: Boolean = false
+
 )

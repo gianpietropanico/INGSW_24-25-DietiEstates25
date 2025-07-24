@@ -53,7 +53,7 @@
 
         <!-- Attività per il callback di GitHub -->
         <activity
-            android:name=".ui.authUI.social.GitHubCallbackActivity"
+            android:name=".ui.authUI.socialbutton.GitHubCallbackActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>

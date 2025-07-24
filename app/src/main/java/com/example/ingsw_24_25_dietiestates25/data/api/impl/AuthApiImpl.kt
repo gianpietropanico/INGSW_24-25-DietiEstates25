@@ -15,6 +15,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import org.json.JSONException
 import javax.inject.Inject
@@ -22,64 +23,95 @@ import javax.inject.Inject
 class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : AuthApi {
 
     override suspend fun signUp(request: AuthRequest): TokenResponse {
-        Log.d("AuthApiImpl", "Tentativo di SignUp")
-        return try {
-            val response: TokenResponse = httpClient.post("http://10.0.2.2:8080/auth/signup") {
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                setBody(request)
-            }.body()
-            Log.d("AuthApiImpl", "Risposta ricevuta: token = ${response.token}")
-            response
-        } catch (e: ResponseException) {
-            Log.e("AuthApiImpl", "Errore nella risposta del server: ${e.response.status}", e)
-            throw e
-        } catch (e: NoTransformationFoundException) {
-            Log.e("AuthApiImpl", "Risposta non valida per deserializzazione", e)
-            throw e
+        Log.d("AuthApiImpl", "Invio richiesta SignUp con email: ${request.email}")
+        val response = httpClient.post("http://10.0.2.2:8080/auth/signup") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(request)
+        }
+
+        return when (response.status) {
+            HttpStatusCode.OK -> {
+                val tokenResp = response.body<TokenResponse>()
+                Log.d("AuthApiImpl", "Risposta ricevuta: token = ${tokenResp.token}")
+                tokenResp
+            }
+            HttpStatusCode.Conflict, HttpStatusCode.Unauthorized -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Credenziali errate: $err")
+                throw ResponseException(response, "Registrazione fallita: $err")
+            }
+            else -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Errore HTTP ${response.status}: $err")
+                throw ResponseException(response, "Errore HTTP ${response.status}")
+            }
         }
     }
 
     override suspend fun authWithThirdParty(request: AuthRequest): TokenResponse {
-        Log.d("AuthApiImpl", "Invio richiesta OAUTH")
-        return try {
-            val response: TokenResponse = httpClient.post("http://10.0.2.2:8080/auth/thirdPartyUser") {
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                setBody(request)
-            }.body()
-            Log.d("AuthApiImpl", "Risposta ricevuta: token = ${response.token}")
-            response
-        } catch (e: ResponseException) {
-            Log.e("AuthApiImpl", "Errore nella risposta del server: ${e.response.status}", e)
-            throw e
-        } catch (e: NoTransformationFoundException) {
-            Log.e("AuthApiImpl", "Risposta non valida per deserializzazione", e)
-            throw e
+        Log.d("AuthApiImpl", "Invio richiesta OAUTH con email: ${request.email}")
+        val response = httpClient.post("http://10.0.2.2:8080/auth/thirdPartyUser") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(request)
+        }
+
+        return when (response.status) {
+            HttpStatusCode.OK -> {
+                val tokenResp = response.body<TokenResponse>()
+                Log.d("AuthApiImpl", "Risposta ricevuta: token = ${tokenResp.token}")
+                tokenResp
+            }
+            HttpStatusCode.Conflict, HttpStatusCode.Unauthorized -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Credenziali errate: $err")
+                throw ResponseException(response, "Registrazione fallita: $err")
+            }
+            else -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Errore HTTP ${response.status}: $err")
+                throw ResponseException(response, "Errore HTTP ${response.status}")
+            }
         }
     }
 
     override suspend fun signIn(request: AuthRequest): TokenResponse {
         Log.d("AuthApiImpl", "Invio richiesta SignIn con email: ${request.email}")
-        return try {
-            val response: TokenResponse = httpClient.post("http://10.0.2.2:8080/auth/signin") {
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                setBody(request)
-            }.body()
-            Log.d("AuthApiImpl", "Risposta ricevuta: token = ${response.token}")
-            response
-        } catch (e: ResponseException) {
-            Log.e("AuthApiImpl", "Errore nella risposta del server: ${e.response.status}", e)
-            throw e
-        } catch (e: NoTransformationFoundException) {
-            Log.e("AuthApiImpl", "Risposta non valida per deserializzazione", e)
-            throw e
+        val response = httpClient.post("http://10.0.2.2:8080/auth/signin") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(request)
+        }
+
+        return when (response.status) {
+            HttpStatusCode.OK -> {
+                val tokenResp = response.body<TokenResponse>()
+                Log.d("AuthApiImpl", "Risposta ricevuta: token = ${tokenResp.token}")
+                tokenResp
+            }
+            HttpStatusCode.Conflict, HttpStatusCode.Unauthorized -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Credenziali errate: $err")
+                throw ResponseException(response, "Accesso fallito: $err")
+            }
+            else -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Errore HTTP ${response.status}: $err")
+                throw ResponseException(response, "Errore HTTP ${response.status}")
+            }
         }
     }
 
     override suspend fun resetPassword(request: AuthRequest) {
         httpClient.post("http://10.0.2.2:8080/auth/reset-password") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    override suspend fun sendAgencyRequest(request: AuthRequest) {
+        httpClient.post("http://10.0.2.2:8080/agency-admin-request") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }

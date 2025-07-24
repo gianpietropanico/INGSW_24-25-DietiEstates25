@@ -18,29 +18,49 @@ class AuthRepositoryImpl @Inject constructor (
     private val sessionManager: UserSessionManager
 ): AuthRepository {
 
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex = Regex("^[A-Za-z0-9]+@[A-Za-z0-9]+\\.(?:it|com)$")
+        return emailRegex.matches(email)
+    }
+
     override suspend fun resetPassword(email: String, oldPassword: String, newPassword: String): AuthResult<Unit> {
         return try {
             api.resetPassword(AuthRequest(email = email, password = oldPassword,  newPassword = newPassword))
-            AuthResult.Success()
+            AuthResult.Success(Unit, "Operation Successfull, Password changed")
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Reset failed: ${e.message}")
-                else -> AuthResult.UnknownError("Errore: ${e.response.status}")
+                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Reset failed ")
+                else -> AuthResult.UnknownError("Errore")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            AuthResult.UnknownError("Errore generico")
+        }
+    }
+
+    override suspend fun sendAgencyRequest(email: String, password: String, agencyName: String): AuthResult<Unit> {
+        return try {
+            api.sendAgencyRequest(AuthRequest(email = email, password = password, agencyName = agencyName))
+            AuthResult.Success(Unit, "Operation Successfull , You can now log in. You can check the status of your request in your user profile.")
+        } catch (e: ResponseException) {
+            when (e.response.status) {
+                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Reset failed ")
+                else -> AuthResult.UnknownError("Errore")
+            }
+        } catch (e: Exception) {
+            AuthResult.UnknownError("Errore generico")
         }
     }
 
     override suspend fun signUp(email: String, password: String): AuthResult<Unit> {
+
+        if( !isValidEmail(email) ) return AuthResult.Unauthorized("Email non valida ")
+
         return try {
             val response = api.signUp( request = AuthRequest(email = email, password = password))
 
             val token = response.token
 
-
             val payload = parseJwtPayload(token)
-
 
             sessionManager.saveUser(
                 User(
@@ -48,18 +68,22 @@ class AuthRepositoryImpl @Inject constructor (
                     id = payload.userId,
                     email = payload.email!!,
                     type = payload.type!!
-                ), token)
+                ),
+                token
+            )
 
             AuthResult.Authorized()
 
         } catch (e: ClientRequestException) {
             when (e.response.status) {
                 HttpStatusCode.BadRequest -> AuthResult.UnknownError("Dati mancanti o formattazione errata.")
-                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Email già registrata o password troppo corta.")
-                else -> AuthResult.UnknownError("Errore: ${e.response.status}")
+
+                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Email già registrata ")
+
+                else -> AuthResult.UnknownError("Errore ")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Eccezione generica: ${e.localizedMessage}")
+            AuthResult.UnknownError("Errore generico")
         }
     }
 
@@ -85,38 +109,42 @@ class AuthRepositoryImpl @Inject constructor (
             if (e.response.status == HttpStatusCode.Unauthorized) {
                 AuthResult.Unauthorized()
             } else {
-                AuthResult.UnknownError("Errore HTTP: ${e.response.status}")
+                AuthResult.UnknownError("Errore HTTP")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Eccezione: ${e.message}")
+            AuthResult.UnknownError("Errore generico")
         }
     }
 
     override suspend fun signIn(email: String, password: String): AuthResult<Unit> {
         return try {
-
-            val response = api.signIn(AuthRequest( email = email, password = password))
-            val token = response.token
-
-            val payload = parseJwtPayload(token)
+            val response = api.signIn(AuthRequest(email = email, password = password))
+            val payload = parseJwtPayload(response.token)
 
             sessionManager.saveUser(
                 User(
                     username = payload.username!!,
-                    id = payload.userId,
-                    email = payload.email!!,
-                    type = payload.type!!
-                ), token)
+                    id       = payload.userId,
+                    email    = payload.email!!,
+                    type     = payload.type!!
+                ),
+                response.token
+            )
 
             AuthResult.Authorized()
+
         } catch (e: ResponseException) {
-            if (e.response.status == HttpStatusCode.Unauthorized) {
-                AuthResult.Unauthorized()
-            } else {
-                AuthResult.UnknownError("Errore HTTP: ${e.response.status}")
+            when (e.response.status) {
+                HttpStatusCode.Unauthorized,
+                HttpStatusCode.Conflict -> {
+                    AuthResult.Unauthorized("Accesso fallito: credenziali errate.")
+                }
+                else -> {
+                    AuthResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                }
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Eccezione: ${e.message}")
+            AuthResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
 
