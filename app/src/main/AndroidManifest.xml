@@ -28,7 +28,7 @@
         <!-- Meta-data per Google Maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBRqZijZkh6dzbC6kq6fOG_VLc__AwD5_Q" />
+            android:value="da inserire" />
 
 
         <!-- Meta-data per Facebook SDK -->
