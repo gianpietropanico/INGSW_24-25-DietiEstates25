@@ -23,7 +23,9 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 foundationLayoutAndroid = "1.7.5"
+mapsCompose = "6.7.0"
 navigationCompose = "2.8.4"
+playServicesMaps = "19.2.0"
 volley = "1.2.1"
 transportRuntime = "4.0.0"
 workRuntimeKtx = "2.9.1"
@@ -51,6 +53,7 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version = "
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version = "2.48" }
 androidx-navigation-compose-android = { group = "androidx.navigation", name = "navigation-compose-android", version.ref = "navigationComposeAndroid" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
@@ -85,6 +88,7 @@ ktor-client-core-v234 = { module = "io.ktor:ktor-client-core", version.ref = "kt
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
 ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktorClientSerialization" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "transportRuntime" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }

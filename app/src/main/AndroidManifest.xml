@@ -25,6 +25,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.INGSW_2425DietiEstates25"
         tools:targetApi="31">
+        <!-- Meta-data per Google Maps -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBRqZijZkh6dzbC6kq6fOG_VLc__AwD5_Q" />
+
 
         <!-- Meta-data per Facebook SDK -->
         <meta-data
