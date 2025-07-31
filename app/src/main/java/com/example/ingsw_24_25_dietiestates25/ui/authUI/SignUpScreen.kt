@@ -67,6 +67,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import com.example.ingsw_24_25_dietiestates25.testmock.FakeAuthRepository
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.GitHubCallbackManager
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.SocialLoginSection
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
@@ -120,7 +121,7 @@ fun  SignUpScreen (
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Icon(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Icona personalizzata",
@@ -138,8 +139,7 @@ fun  SignUpScreen (
                 onError = state.localError
             )
 
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             MinimalPasswordField(
                 "password",
@@ -153,7 +153,7 @@ fun  SignUpScreen (
                 modifier = Modifier.width(320.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             MinimalPasswordField(
                 "password again",
@@ -180,7 +180,7 @@ fun  SignUpScreen (
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             GradientButton(
                 text = "Sign Up",
@@ -193,9 +193,12 @@ fun  SignUpScreen (
             //commentare gli argomenti del click per la preview
             SocialLoginSection(
                 isLoading = am.isLoading(),
-                onGoogleClick = { am.startGoogleLogin(context) },
-                onFacebookClick = { am.startFacebookLogin(activity) },
-                onGithubClick = {  am.startGithubLogin(context)  },
+                onGoogleClick = { am.startGoogleLogin(context)
+                                },
+                onFacebookClick = { am.startFacebookLogin(activity)
+                                  },
+                onGithubClick = {  am.startGithubLogin(context)
+                                },
                 iconSize = 60.dp, // personalizzabile
                 spacing = 45.dp
             )
@@ -224,6 +227,7 @@ fun  SignUpScreen (
                     modifier = Modifier
                         .clickable {
                             navController.navigate(NavigationItem.SignIn.route)
+                            am.clearResultMessage()
                         }
                 )
             }
@@ -252,45 +256,3 @@ fun SignUpScreenPreview() {
     )
 }
 
-class FakeAuthRepository : AuthRepository {
-
-    override suspend fun signUp(email: String, password: String): AuthResult<Unit> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun signIn(email: String, password: String): AuthResult<Unit> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun resetPassword(
-        email: String,
-        oldPassword: String,
-        newPassword: String
-    ): AuthResult<Unit> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun authWithThirdParty(email: String, username: String): AuthResult<Unit> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun logout() {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun sendAgencyRequest(
-        email: String,
-        password: String,
-        agencyName: String
-    ): AuthResult<Unit> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun fetchState(): AuthResult<String> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun exchangeGitHubCode(code: String?, state: String?): AuthResult<Unit> {
-        TODO("Not yet implemented")
-    }
-}

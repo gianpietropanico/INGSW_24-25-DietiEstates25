@@ -18,8 +18,8 @@ val Typography = Typography(
         color = Color(0xFF424242)
     ),
     headlineMedium = TextStyle(
-        fontFamily = Gabarito,
-        fontWeight = FontWeight.Medium,
+        fontFamily = Rubik,
+        fontWeight = FontWeight.Normal,
         fontSize = 24.sp
     ),
     bodyLarge = TextStyle(

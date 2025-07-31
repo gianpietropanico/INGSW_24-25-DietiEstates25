@@ -11,6 +11,7 @@ val BlueGray = Color(0xFF334155)
 val primaryBlu = Color(0xFF3A7CA5)
 val primaryBlueWithOpacity: Color = primaryBlu.copy(alpha = 0.1f)
 val DarkRed = Color(0xFFC62828)
+val bluPerchEcipiace = Color(0xFF2F6690)
 
 val ColorScheme.myFocusedTextFieldText: Color
     @Composable

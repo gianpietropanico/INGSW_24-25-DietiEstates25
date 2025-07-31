@@ -13,6 +13,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.authUI.AgencySignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignUpScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.WelcomeScreen
+import com.example.ingsw_24_25_dietiestates25.ui.profileUI.FakeProfileVM
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 
@@ -90,8 +91,7 @@ fun AppNavHost(
 
         composable(NavigationItem.Profile.route) {
             ProfileScreen(
-//                pm = profileViewModel,
-//                navController = navController
+                FakeProfileVM()
             )
         }
 

@@ -41,6 +41,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
+import com.example.ingsw_24_25_dietiestates25.testmock.FakeAuthRepository
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.GitHubCallbackManager
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.SocialLoginSection
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
@@ -90,7 +91,7 @@ fun WelcomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Icon(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Icona personalizzata",
@@ -144,16 +145,18 @@ fun WelcomeScreen(
                         modifier = Modifier
                             .clickable {
                                 navController.navigate(NavigationItem.AgencySignIn.route)
+                                am.clearResultMessage()
                             }
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(56.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             GradientButton(
                 text = "Sign In",
                 onClick = {
                     navController.navigate(NavigationItem.SignIn.route)
+                    am.clearResultMessage()
                 }
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -162,6 +165,7 @@ fun WelcomeScreen(
                 text = "Sign Up",
                 onClick = {
                     navController.navigate(NavigationItem.SignUp.route)
+                    am.clearResultMessage()
                 }
             )
 

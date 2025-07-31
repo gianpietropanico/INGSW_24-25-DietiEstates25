@@ -46,6 +46,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
+import com.example.ingsw_24_25_dietiestates25.testmock.FakeAuthRepository
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlueWithOpacity
 import com.example.ingsw_24_25_dietiestates25.ui.utils.GradientButton
@@ -81,7 +82,7 @@ fun  AgencySignInScreen (
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Icon(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Icona personalizzata",
@@ -113,7 +114,7 @@ fun  AgencySignInScreen (
                 modifier = Modifier.width(320.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             MinimalPasswordField(
                 "Confirm password",
@@ -155,7 +156,7 @@ fun  AgencySignInScreen (
 
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             GradientButton(
                 text = "Send Request",

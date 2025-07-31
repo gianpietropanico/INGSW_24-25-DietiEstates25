@@ -58,6 +58,7 @@ import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
+import com.example.ingsw_24_25_dietiestates25.testmock.FakeAuthRepository
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.GitHubCallbackManager
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.SocialLoginSection
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
@@ -116,7 +117,7 @@ fun  SignInScreen (
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Icon(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Icona personalizzata",
@@ -127,7 +128,7 @@ fun  SignInScreen (
                 when {
                     showResetPassword -> {
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         MinimalTextField(
                             value = email,
@@ -182,7 +183,7 @@ fun  SignInScreen (
                             )
 
                         }
-                        Spacer(modifier = Modifier.height(64.dp))
+                        Spacer(modifier = Modifier.height(38.dp))
 
                         GradientButton(
                             text = "Send Reset Password",
@@ -211,7 +212,7 @@ fun  SignInScreen (
 
                     else -> {
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         MinimalTextField(
                             value = email,
@@ -276,7 +277,7 @@ fun  SignInScreen (
                             }
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
 
                         //commentare gli argomenti del click per la preview
                         SocialLoginSection(
@@ -318,6 +319,7 @@ fun  SignInScreen (
                                 modifier = Modifier
                                     .clickable {
                                         navController.navigate(NavigationItem.SignUp.route)
+                                        am.clearResultMessage()
                                     }
                             )
                         }
