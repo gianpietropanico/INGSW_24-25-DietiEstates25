@@ -1,4 +1,8 @@
 import com.android.build.api.dsl.Packaging
+import java.io.FileInputStream
+import java.util.Properties
+
+
 
 plugins {
     id("com.android.application")
@@ -24,6 +28,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
     }
 
     buildTypes {
@@ -135,5 +140,9 @@ dependencies {
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+
+    // Google Maps
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
 
 }
