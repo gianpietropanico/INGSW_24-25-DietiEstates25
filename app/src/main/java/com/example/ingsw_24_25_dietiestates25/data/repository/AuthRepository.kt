@@ -3,7 +3,8 @@ package com.example.ingsw_24_25_dietiestates25.data.repository
 import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
 
 interface AuthRepository {
-    suspend fun signUp(email: String, password: String): AuthResult<Unit>
+    suspend fun getLoggedUser() : AuthResult<Unit>
+    suspend fun signUp(email: String, password: String, profilePicBase64 : String): AuthResult<Unit>
     suspend fun signIn(email:String, password: String): AuthResult<Unit>
     suspend fun resetPassword(email: String, oldPassword: String , newPassword: String): AuthResult<Unit>
     suspend fun authWithThirdParty(email: String, username : String): AuthResult<Unit>

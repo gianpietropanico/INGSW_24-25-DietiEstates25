@@ -9,5 +9,6 @@ data class User(
     val name: String? = null,
     val surname: String? = null,
     val email: String,
-    val type: String   // "superadmin" "agency_admin" "agent" "localuser" "thirdpartyuser"
+    val type: String,   // "superadmin" "agency_admin" "agent" "localuser" "thirdpartyuser"
+    val profilePicture: String? = null
 )

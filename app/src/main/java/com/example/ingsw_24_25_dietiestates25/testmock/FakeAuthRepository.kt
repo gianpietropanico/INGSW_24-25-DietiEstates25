@@ -4,8 +4,11 @@ import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
 
 class FakeAuthRepository : AuthRepository {
+    override suspend fun getLoggedUser(): AuthResult<Unit> {
+        TODO("Not yet implemented")
+    }
 
-    override suspend fun signUp(email: String, password: String): AuthResult<Unit> {
+    override suspend fun signUp(email: String, password: String, profilePicBase64: String): AuthResult<Unit> {
         TODO("Not yet implemented")
     }
 

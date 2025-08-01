@@ -75,6 +75,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlueWithOpacity
 import com.example.ingsw_24_25_dietiestates25.ui.utils.GradientButton
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MinimalPasswordField
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MinimalTextField
+import com.example.ingsw_24_25_dietiestates25.ui.utils.drawableToBase64
 
 @Composable
 fun  SignUpScreen (
@@ -185,8 +186,12 @@ fun  SignUpScreen (
             GradientButton(
                 text = "Sign Up",
                 onClick = {
+                    val profilePicBase64 = drawableToBase64(context, R.drawable.account_circle_blue)
                     state.confirmPassword = confirmPassword
-                    am.signUpUser(email, password)
+
+                    if (profilePicBase64 != null) {
+                        am.signUpUser(email, password, profilePicBase64)
+                    }
                 }
             )
 

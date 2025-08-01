@@ -4,22 +4,19 @@ import androidx.lifecycle.ViewModel
 import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
-import com.example.ingsw_24_25_dietiestates25.testmock.FakeUserSessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor (
-    private val authRepository: AuthRepository,
-    userSessionManager: FakeUserSessionManager
+    userSessionManager: UserSessionManager
 ) : ViewModel() {
 
-    private val user = userSessionManager.currentUser
+    val user = userSessionManager.currentUser
 
-    fun checkUserInfo(): Boolean {
-        return user.value != null && (user.value?.name == null || user.value?.surname == null)
+    fun checkNullUserInfo(): Boolean{
+        return (user.value?.name == null || user.value?.surname == null)
     }
-
 
 
 }

@@ -9,7 +9,5 @@ class PropertyRepositoryImpl @Inject constructor(
     private val api: PropertyApi
 ) : PropertyRepository {
 
-
-
     override suspend fun addProperty(property: Property): Property = api.addProperty(property)
 }

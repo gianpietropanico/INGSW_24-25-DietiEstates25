@@ -16,20 +16,29 @@ open class UserSessionManager @Inject constructor() {
     val token: StateFlow<String?> = _token.asStateFlow()
 
     private val _currentUsername = MutableStateFlow<String?>(null)
-    val currentUsername : StateFlow<String?> = _currentUsername.asStateFlow()
+    val currentUsername: StateFlow<String?> = _currentUsername.asStateFlow()
 
     fun saveUser(user: User, token: String) {
         _currentUser.value = user
         _token.value = token
     }
 
-    fun saveUsernameSession( username : String?, token :String){
+    fun saveUsernameSession(username: String?, token: String) {
         _currentUsername.value = username
+        _token.value = token
+    }
+
+    fun saveToken(token: String) {
         _token.value = token
     }
 
     fun clear() {
         _currentUser.value = null
         _token.value = null
+        _currentUsername.value = null
+    }
+
+    fun getToken(): String? {
+        return _token.value
     }
 }

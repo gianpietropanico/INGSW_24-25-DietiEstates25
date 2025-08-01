@@ -91,7 +91,8 @@ fun AppNavHost(
 
         composable(NavigationItem.Profile.route) {
             ProfileScreen(
-                FakeProfileVM()
+                navController = navController,
+                pm = profileViewModel
             )
         }
 

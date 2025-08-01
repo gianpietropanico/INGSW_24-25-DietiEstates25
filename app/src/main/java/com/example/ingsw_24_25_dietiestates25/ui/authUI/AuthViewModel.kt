@@ -32,19 +32,12 @@ import com.facebook.CallbackManager
 
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
-import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.security.MessageDigest
 import java.util.UUID
 
-
-import androidx.compose.foundation.layout.*
 
 import com.facebook.GraphRequest
 
@@ -61,14 +54,14 @@ class AuthViewModel @Inject constructor (
     val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    fun signUpUser(email: String, password: String) {
+    fun signUpUser(email: String, password: String, defaultProfilePic: String) {
         clearResultMessage()
 
         if ( password == _authState.value.confirmPassword) {
 
             viewModelScope.launch {
                 _authState.update { it.copy(isLoading = true, resultMessage = null) }
-                val result = authRepository.signUp(email, password)
+                val result = authRepository.signUp(email, password, defaultProfilePic)
                 handleResult(result)
             }
         } else {
@@ -81,7 +74,13 @@ class AuthViewModel @Inject constructor (
 
         viewModelScope.launch {
             _authState.update { it.copy(isLoading = true, resultMessage = null) }
-            val result = authRepository.signIn(email, password)
+            var result = authRepository.signIn(email, password)
+
+            if (result is AuthResult.Authorized) {
+
+                result = authRepository.getLoggedUser()
+            }
+
             handleResult(result)
         }
     }
@@ -112,7 +111,7 @@ class AuthViewModel @Inject constructor (
     private fun handleResult(result: AuthResult<Unit>) {
         when (result) {
             is AuthResult.Authorized -> {
-                _authState.update { it.copy(isLoading = false, resultMessage = null, isAuthenticated = true, localError = false) }
+                _authState.update{ it.copy(isLoading = false,isAuthenticated = true,resultMessage = null,localError = false)}
             }
 
             is AuthResult.Unauthorized -> {
@@ -130,6 +129,7 @@ class AuthViewModel @Inject constructor (
             }
         }
     }
+
 
     fun clearResultMessage() {
         _authState.update { it.copy(resultMessage = null, success = false, localError = false) }

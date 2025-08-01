@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.profileUI
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,10 +12,13 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -23,49 +27,61 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
+import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
+import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
+import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 
 
 @Composable
 fun ProfileScreen(
-    fpm: FakeProfileVM
+    navController : NavController,
+    pm : ProfileViewModel
 ) {
 
+    val user by pm.user.collectAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.rectangleblu),
-            contentDescription = "Background Image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-                .offset(y = (-40).dp)
-                .align(Alignment.TopCenter),
-            contentScale = ContentScale.Crop
-        )
-
-        IconButton(
-            onClick = {  },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 16.dp, top = 16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                modifier = Modifier.size(36.dp),
-                contentDescription = "Back",
-                tint = bluPerchEcipiace
+    Scaffold(
+        bottomBar = {
+            DietiNavBar(
+                currentRoute = currentRoute ?: Screen.Home.route,
+                onRouteSelected = { newRoute ->
+                    navController.navigate(newRoute) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                    }
+                }
             )
         }
-        // Contenuto sovrapposto
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    ) { paddingValues ->
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            Image(
+                painter = painterResource(id = R.drawable.rectangleblu),
+                contentDescription = "Background Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .offset(y = (-40).dp)
+                    .align(Alignment.TopCenter),
+                contentScale = ContentScale.Crop
+            )
+
+            // Contenuto sovrapposto
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
                 Column(
                     modifier = Modifier
@@ -75,40 +91,55 @@ fun ProfileScreen(
                 ) {
                     Spacer(modifier = Modifier.height(60.dp))
 
-                    // Immagine profilo
-                    Image(
-                        painter = painterResource(id = R.drawable.adolfo),
-                        contentDescription = "Profile Picture",
+                    Box(
                         modifier = Modifier
                             .size(100.dp)
-                            .clip(CircleShape)
-                    )
+                            .clip(CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (user?.profilePicture != null) {
+                            Image(
+                                bitmap = bse64ToImageBitmap(user!!.profilePicture!!),
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    if(!fpm.checkUserInfo()){
+                    if (pm.checkNullUserInfo()) {
                         Text(
-                            text = "${fpm.getUser()?.name} ${fpm.getUser()?.surname}",
+                            text = user!!.email.substringBefore("@"),
                             fontSize = 30.sp,
                             style = MaterialTheme.typography.labelMedium
                         )
-                    }else{
+                    } else {
                         Text(
-                            text = "Update Your Name and Surname",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = DarkRed
+                            text = "${user?.name} ${user?.surname}",
+                            fontSize = 30.sp,
+                            style = MaterialTheme.typography.labelMedium
                         )
 
                     }
 
-                    Text(fpm.getUser()?.email.toString(), fontSize = 14.sp, color = Color.Gray)
+                    Text(user!!.email, fontSize = 14.sp, color = Color.Gray)
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Voci menu
-                    ProfileOption(ImageVector.vectorResource( R.drawable.account_circle), "Edit personal details",!fpm.checkUserInfo(), onClick = {} )
-                    ProfileOption(ImageVector.vectorResource( R.drawable.lock), "Security and password", onClick = {})
+                    ProfileOption(
+                        ImageVector.vectorResource(R.drawable.account_circle),
+                        "Edit personal details",
+                        pm.checkNullUserInfo(),
+                        onClick = {})
+                    ProfileOption(
+                        ImageVector.vectorResource(R.drawable.lock),
+                        "Security and password",
+                        onClick = {})
 
                     ProfileOption(Icons.Default.History, "Your activities", onClick = {})
                     ProfileOption(Icons.AutoMirrored.Filled.Logout, "Logout", onClick = {})
@@ -116,16 +147,16 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
+            }
         }
     }
 }
-
 
 @Composable
 fun ProfileOption(
     icon: ImageVector,
     title: String,
-    showNotification: Boolean = true,
+    showNotification: Boolean = false,
     onClick: () -> Unit
 ) {
     Row(
@@ -148,7 +179,7 @@ fun ProfileOption(
             modifier = Modifier.weight(1f)
         ) {
             Text(title, fontSize = 16.sp)
-            if (!showNotification) {
+            if (showNotification) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
                     imageVector = Icons.Default.Notifications,
@@ -168,16 +199,4 @@ fun ProfileOption(
 }
 
 
-@Preview(showBackground = true, name = "Sign Up Screen Preview")
-@Composable
-fun ProfileScreenPreview() {
-    val navController = rememberNavController()
-
-    val fakeViewModel = FakeProfileVM(
-    )
-
-    ProfileScreen(
-        fakeViewModel
-    )
-}
 

@@ -1,7 +1,11 @@
 package com.example.ingsw_24_25_dietiestates25.di
 
 import com.example.ingsw_24_25_dietiestates25.data.api.AuthApi
+import com.example.ingsw_24_25_dietiestates25.data.api.ImageApi
+import com.example.ingsw_24_25_dietiestates25.data.api.PropertyApi
 import com.example.ingsw_24_25_dietiestates25.data.api.impl.AuthApiImpl
+import com.example.ingsw_24_25_dietiestates25.data.api.impl.ImageApiImpl
+import com.example.ingsw_24_25_dietiestates25.data.api.impl.PropertyApiImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,6 +49,16 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApiService(httpClient: HttpClient): AuthApi =
+    fun provideAuthApi(httpClient: HttpClient): AuthApi =
         AuthApiImpl(httpClient)
+
+    @Provides
+    @Singleton
+    fun providePropertyApi(httpClient: HttpClient): PropertyApi =
+        PropertyApiImpl(httpClient)
+
+    @Provides
+    @Singleton
+    fun provideImageApi(httpClient: HttpClient): ImageApi =
+        ImageApiImpl(httpClient)
 }

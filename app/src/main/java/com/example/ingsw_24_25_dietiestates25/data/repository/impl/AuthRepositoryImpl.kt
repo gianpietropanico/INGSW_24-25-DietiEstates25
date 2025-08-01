@@ -2,18 +2,22 @@ package com.example.ingsw_24_25_dietiestates25.data.repository.impl
 
 import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.api.AuthApi
+import com.example.ingsw_24_25_dietiestates25.data.api.ImageApi
 import com.example.ingsw_24_25_dietiestates25.data.jwt.parseJwtPayload
 import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
 import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.model.request.ImageRequest
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor (
+    private val imageApi: ImageApi,
     private val api: AuthApi,
     private val sessionManager: UserSessionManager
 ): AuthRepository {
@@ -51,16 +55,24 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun signUp(email: String, password: String): AuthResult<Unit> {
+    override suspend fun signUp(email: String, password: String, profilePicBase64: String): AuthResult<Unit> {
 
         if( !isValidEmail(email) ) return AuthResult.Unauthorized("Email non valida ")
 
         return try {
-            val response = api.signUp( request = AuthRequest(email = email, password = password))
+            var response = api.signUp( request = AuthRequest(email = email, password = password))
 
             val token = response.token
 
             val payload = parseJwtPayload(token)
+
+            imageApi.insertProfilePicture(
+                ImageRequest(
+                    ownerId = payload.userId,
+                    base64Images = listOf(profilePicBase64),
+                )
+            )
+
 
             sessionManager.saveUser(
                 User(
@@ -118,18 +130,10 @@ class AuthRepositoryImpl @Inject constructor (
 
     override suspend fun signIn(email: String, password: String): AuthResult<Unit> {
         return try {
-            val response = api.signIn(AuthRequest(email = email, password = password))
-            val payload = parseJwtPayload(response.token)
 
-            sessionManager.saveUser(
-                User(
-                    username = payload.username!!,
-                    id       = payload.userId,
-                    email    = payload.email!!,
-                    type     = payload.type!!
-                ),
-                response.token
-            )
+            val token = api.signIn(AuthRequest(email = email, password = password))
+
+            sessionManager.saveToken(token)
 
             AuthResult.Authorized()
 
@@ -148,6 +152,31 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
+    override suspend fun getLoggedUser(): AuthResult<Unit> {
+        val token = sessionManager.getToken()
+            ?: return AuthResult.Unauthorized("Token mancante.")
+
+        return try {
+            val responseUser = api.getLoggedUser("Bearer $token")
+            val responseImage = imageApi.getImage(responseUser.id)
+
+            val user = User(
+                id = responseUser.id,
+                name = responseUser.name,
+                surname = responseUser.surname,
+                email = responseUser.email,
+                username = responseUser.username,
+                type = responseUser.type,
+                profilePicture = responseImage
+            )
+
+            sessionManager.saveUser(user, token)
+
+            AuthResult.Authorized()
+        } catch (e: Exception) {
+            AuthResult.UnknownError("Errore nel recupero profilo: ${e.localizedMessage}")
+        }
+    }
 
     override suspend fun logout() {
         try {

@@ -56,9 +56,8 @@ android {
         }
     }
 }
+
 dependencies {
-
-
     implementation ("androidx.compose.material3:material3")
     implementation ("androidx.activity:activity-compose:1.7.2")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
@@ -142,7 +141,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
     // Google Maps
-    implementation(libs.maps.compose)
+    implementation("com.google.maps.android:maps-compose:2.0.0")
     implementation(libs.play.services.maps)
 
 }

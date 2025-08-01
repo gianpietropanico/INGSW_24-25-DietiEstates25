@@ -2,6 +2,7 @@ package com.example.ingsw_24_25_dietiestates25.data.api.impl
 
 import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.api.AuthApi
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
 import com.example.ingsw_24_25_dietiestates25.model.response.TokenResponse
 import io.ktor.client.HttpClient
@@ -10,6 +11,7 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -76,8 +78,9 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
-    override suspend fun signIn(request: AuthRequest): TokenResponse {
+    override suspend fun signIn(request: AuthRequest): String {
         Log.d("AuthApiImpl", "Invio richiesta SignIn con email: ${request.email}")
+
         val response = httpClient.post("http://10.0.2.2:8080/auth/signin") {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
@@ -86,15 +89,21 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
 
         return when (response.status) {
             HttpStatusCode.OK -> {
-                val tokenResp = response.body<TokenResponse>()
-                Log.d("AuthApiImpl", "Risposta ricevuta: token = ${tokenResp.token}")
-                tokenResp
+                val token = response.headers["Authorization"]?.removePrefix("Bearer ")
+                if (token == null) {
+                    Log.e("AuthApiImpl", "Token mancante nell'header Authorization")
+                    throw IllegalStateException("Token mancante nella risposta del server.")
+                }
+                Log.d("AuthApiImpl", "Token ricevuto: $token")
+                token
             }
+
             HttpStatusCode.Conflict, HttpStatusCode.Unauthorized -> {
                 val err = response.bodyAsText()
                 Log.e("AuthApiImpl", "Credenziali errate: $err")
                 throw ResponseException(response, "Accesso fallito: $err")
             }
+
             else -> {
                 val err = response.bodyAsText()
                 Log.e("AuthApiImpl", "Errore HTTP ${response.status}: $err")
@@ -102,6 +111,7 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
             }
         }
     }
+
 
     override suspend fun resetPassword(request: AuthRequest) {
         httpClient.post("http://10.0.2.2:8080/auth/reset-password") {
@@ -173,9 +183,21 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
+    override suspend fun getLoggedUser(authHeader: String): User {
+        val response = httpClient.get("http://10.0.2.2:8080/auth/me") {
+            header("Authorization", authHeader)
+            accept(ContentType.Application.Json)
+        }
 
-
-
+        return when (response.status) {
+            HttpStatusCode.OK -> response.body()
+            else -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Errore HTTP ${response.status}: $err")
+                throw ResponseException(response, "Errore HTTP ${response.status}")
+            }
+        }
+    }
 
 
 }
