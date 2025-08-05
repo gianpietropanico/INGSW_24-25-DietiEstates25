@@ -1,11 +1,11 @@
 package com.example.ingsw_24_25_dietiestates25.di
 
-import com.example.ingsw_24_25_dietiestates25.data.api.AuthApi
-import com.example.ingsw_24_25_dietiestates25.data.api.ImageApi
-import com.example.ingsw_24_25_dietiestates25.data.api.PropertyApi
-import com.example.ingsw_24_25_dietiestates25.data.api.impl.AuthApiImpl
-import com.example.ingsw_24_25_dietiestates25.data.api.impl.ImageApiImpl
-import com.example.ingsw_24_25_dietiestates25.data.api.impl.PropertyApiImpl
+import com.example.ingsw_24_25_dietiestates25.data.api.authApi.AuthApi
+import com.example.ingsw_24_25_dietiestates25.data.api.imageApi.ImageApi
+import com.example.ingsw_24_25_dietiestates25.data.api.propertyApi.PropertyApi
+import com.example.ingsw_24_25_dietiestates25.data.api.authApi.AuthApiImpl
+import com.example.ingsw_24_25_dietiestates25.data.api.imageApi.ImageApiImpl
+import com.example.ingsw_24_25_dietiestates25.data.api.propertyApi.PropertyApiImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

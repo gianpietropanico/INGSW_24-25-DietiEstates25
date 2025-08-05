@@ -7,7 +7,7 @@ import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
+import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,8 +22,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.ActivityResultRegistryOwner
 
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
@@ -32,6 +30,8 @@ import com.facebook.CallbackManager
 
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
+import com.example.ingsw_24_25_dietiestates25.ui.utils.downloadImageAsBase64
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import org.json.JSONObject
@@ -46,7 +46,8 @@ import com.facebook.GraphRequest
 @HiltViewModel
 class AuthViewModel @Inject constructor (
     private val authRepository: AuthRepository,
-    userSessionManager: UserSessionManager
+    userSessionManager: UserSessionManager,
+    private val imageRepository: ImageRepository
 ) : ViewModel() {
 
     val user = userSessionManager.currentUser
@@ -61,9 +62,20 @@ class AuthViewModel @Inject constructor (
 
             viewModelScope.launch {
                 _authState.update { it.copy(isLoading = true, resultMessage = null) }
-                val result = authRepository.signUp(email, password, defaultProfilePic)
+
+                var result = authRepository.signUp(email, password, defaultProfilePic)
+
+                if (result is AuthResult.Authorized) {
+
+                    result = authRepository.getLoggedUser()
+
+                    if ( result is  AuthResult.Authorized)
+                        imageRepository.insertProfilePicture(user.value!!.id,defaultProfilePic )
+                }
+
                 handleResult(result)
             }
+
         } else {
             _authState.update { it.copy(isLoading = false, resultMessage = "Le password non combaciano", localError = true) }
         }
@@ -79,21 +91,43 @@ class AuthViewModel @Inject constructor (
             if (result is AuthResult.Authorized) {
 
                 result = authRepository.getLoggedUser()
+
+                if ( result is  AuthResult.Authorized)
+                    imageRepository.getImage(user.value!!.id)
             }
 
             handleResult(result)
         }
     }
 
-    fun authWithThirdParty(email : String?, username :String?) {
+    fun authWithThirdParty(email : String?, username :String?, defaultProfilePic: String) {
         clearResultMessage()
-        viewModelScope.launch {
-            _authState.update { it.copy(isLoading = true, resultMessage = null) }
+        if ( email != null && username != null ) {
 
-            val result = if ( email == null || username == null ) AuthResult.Unauthorized("Problema con OUATH")
-                         else authRepository.authWithThirdParty(email, username)
+            viewModelScope.launch {
+                _authState.update { it.copy(isLoading = true, resultMessage = null) }
 
-            handleResult(result)
+                var result = authRepository.authWithThirdParty(email, username)
+
+                if (result is AuthResult.Authorized) {
+
+                    result = authRepository.getLoggedUser()
+
+                    if( user.value?.profilePicture == null){
+
+                        imageRepository.insertProfilePicture(user.value!!.id, defaultProfilePic )
+
+                    }else{
+                        imageRepository.getImage(user.value!!.id)
+                    }
+
+                }
+
+                handleResult(result)
+            }
+
+        } else {
+            _authState.update { it.copy(isLoading = false, resultMessage = "Problema con OUATH ", localError = true) }
         }
     }
 
@@ -240,19 +274,26 @@ class AuthViewModel @Inject constructor (
                     Log.e("FacebookLogin", "Login error: ${error.message}")
                     unAuthorized("Errore durante il login con Facebook")
                 }
-
                 override fun onSuccess(result: LoginResult) {
                     GraphRequest.newMeRequest(result.accessToken) { obj, _ ->
                         val email = obj?.getString("email") ?: "Email non disponibile"
                         val name = obj?.getString("name") ?: "Nome non disponibile"
+                        val profilePic = obj
+                            ?.getJSONObject("picture")
+                            ?.getJSONObject("data")
+                            ?.getString("url") ?: ""
+
                         Log.d("FacebookLogin", "Login success. Email: $email, Name: $name")
 
-                        authWithThirdParty(email, name)
-                        authorized()
+                        viewModelScope.launch {
+                            val base64 = downloadImageAsBase64(profilePic)
+                            authWithThirdParty(email, name, base64!!)
+                            authorized()
+                        }
 
                     }.apply {
                         parameters = Bundle().apply {
-                            putString("fields", "id,name,email")
+                            putString("fields", "id,name,email,picture.type(large)")
                         }
                         executeAsync()
                     }
@@ -314,8 +355,9 @@ class AuthViewModel @Inject constructor (
 
                 val email = payloadInJson.getString("email")
                 val name = payloadInJson.getString("name")
+                val base64Image = downloadImageAsBase64(payloadInJson.getString("picture"))
 
-                authWithThirdParty(email, name)
+                authWithThirdParty(email, name, base64Image!!)
                 authorized()
 
             } catch (e: Exception) {

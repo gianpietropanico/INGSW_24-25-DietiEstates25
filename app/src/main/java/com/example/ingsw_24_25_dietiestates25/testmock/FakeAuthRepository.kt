@@ -1,6 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.testmock
 
-import com.example.ingsw_24_25_dietiestates25.data.repository.AuthRepository
+import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
 
 class FakeAuthRepository : AuthRepository {

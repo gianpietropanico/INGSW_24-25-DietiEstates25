@@ -41,4 +41,12 @@ open class UserSessionManager @Inject constructor() {
     fun getToken(): String? {
         return _token.value
     }
+
+    fun saveProfilePic(profilePicture: String) {
+        val current = _currentUser.value
+        if (current != null) {
+            val updatedUser = current.copy(profilePicture = profilePicture)
+            _currentUser.value = updatedUser
+        }
+    }
 }

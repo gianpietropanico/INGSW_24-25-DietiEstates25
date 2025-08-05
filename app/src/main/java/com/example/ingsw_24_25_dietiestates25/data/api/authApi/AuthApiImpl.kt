@@ -1,12 +1,10 @@
-package com.example.ingsw_24_25_dietiestates25.data.api.impl
+package com.example.ingsw_24_25_dietiestates25.data.api.authApi
 
 import android.util.Log
-import com.example.ingsw_24_25_dietiestates25.data.api.AuthApi
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
 import com.example.ingsw_24_25_dietiestates25.model.response.TokenResponse
 import io.ktor.client.HttpClient
-import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.request.accept
@@ -78,7 +76,7 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
-    override suspend fun signIn(request: AuthRequest): String {
+    override suspend fun signIn(request: AuthRequest): TokenResponse {
         Log.d("AuthApiImpl", "Invio richiesta SignIn con email: ${request.email}")
 
         val response = httpClient.post("http://10.0.2.2:8080/auth/signin") {
@@ -89,18 +87,14 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
 
         return when (response.status) {
             HttpStatusCode.OK -> {
-                val token = response.headers["Authorization"]?.removePrefix("Bearer ")
-                if (token == null) {
-                    Log.e("AuthApiImpl", "Token mancante nell'header Authorization")
-                    throw IllegalStateException("Token mancante nella risposta del server.")
-                }
-                Log.d("AuthApiImpl", "Token ricevuto: $token")
-                token
+                val tokenResponse = response.body<TokenResponse>()
+                Log.d("AuthApiImpl", "Token ricevuto: ${tokenResponse.token}")
+                tokenResponse
             }
 
             HttpStatusCode.Conflict, HttpStatusCode.Unauthorized -> {
                 val err = response.bodyAsText()
-                Log.e("AuthApiImpl", "Credenziali errate: $err")
+                Log.e("AuthApiImpl", "Accesso fallito: $err")
                 throw ResponseException(response, "Accesso fallito: $err")
             }
 

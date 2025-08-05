@@ -1,6 +1,5 @@
-package com.example.ingsw_24_25_dietiestates25.data.api.impl
+package com.example.ingsw_24_25_dietiestates25.data.api.imageApi
 
-import com.example.ingsw_24_25_dietiestates25.data.api.ImageApi
 import com.example.ingsw_24_25_dietiestates25.model.request.ImageRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ResponseException
@@ -11,7 +10,6 @@ import javax.inject.Inject
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import io.ktor.client.request.put
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 

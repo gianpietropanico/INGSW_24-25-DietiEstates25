@@ -193,21 +193,5 @@ fun  AgencySignInScreen (
     }
 }
 
-@Preview(showBackground = true, name = "Sign Up Screen Preview")
-@Composable
-fun AgencyScreenPreview() {
-    val navController = rememberNavController()
-
-    val fakeViewModel = AuthViewModel(
-        authRepository = FakeAuthRepository(),
-        userSessionManager = UserSessionManager()
-    )
-
-    AgencySignInScreen(
-        am = fakeViewModel,
-        navController = navController
-    )
-}
-
 
 

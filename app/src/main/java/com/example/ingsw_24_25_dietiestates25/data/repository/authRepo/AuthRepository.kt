@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.data.repository
+package com.example.ingsw_24_25_dietiestates25.data.repository.authRepo
 
 import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
 

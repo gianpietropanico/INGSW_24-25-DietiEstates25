@@ -205,21 +205,7 @@ fun WelcomeScreen(
     }
 }
 
-@Preview(showBackground = true, name = "Sign Up Screen Preview")
-@Composable
-fun WelcomeScreenPreview() {
-    val navController = rememberNavController()
 
-    val fakeViewModel = AuthViewModel(
-        authRepository = FakeAuthRepository(),
-        userSessionManager = UserSessionManager()
-    )
-
-    WelcomeScreen(
-        am = fakeViewModel,
-        navController = navController
-    )
-}
 
 
 
