@@ -41,7 +41,7 @@ fun MinimalTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    leadingIcon: ImageVector,
+    leadingIcon: ImageVector? = null,
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     textStyle: TextStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
@@ -65,13 +65,16 @@ fun MinimalTextField(
                 .padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = leadingIcon,
-                contentDescription = null,
-                tint = if (onError) DarkRed else iconTint,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
+            if (leadingIcon != null) {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = null,
+                    tint = if (onError) DarkRed else iconTint,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
 
             Box(modifier = Modifier.fillMaxWidth()) {
                 if (value.isEmpty() && placeholder != null) {

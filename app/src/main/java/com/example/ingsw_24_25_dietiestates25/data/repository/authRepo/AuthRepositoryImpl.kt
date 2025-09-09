@@ -15,7 +15,7 @@ import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor (
-    private val api: AuthApi,
+    private val authApi: AuthApi,
     private val sessionManager: UserSessionManager
 ): AuthRepository {
 
@@ -24,23 +24,10 @@ class AuthRepositoryImpl @Inject constructor (
         return emailRegex.matches(email)
     }
 
-    override suspend fun resetPassword(email: String, oldPassword: String, newPassword: String): AuthResult<Unit> {
-        return try {
-            api.resetPassword(AuthRequest(email = email, password = oldPassword,  newPassword = newPassword))
-            AuthResult.Success(Unit, "Operation Successfull, Password changed")
-        } catch (e: ResponseException) {
-            when (e.response.status) {
-                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Reset failed ")
-                else -> AuthResult.UnknownError("Errore")
-            }
-        } catch (e: Exception) {
-            AuthResult.UnknownError("Errore generico")
-        }
-    }
 
     override suspend fun sendAgencyRequest(email: String, password: String, agencyName: String): AuthResult<Unit> {
         return try {
-            api.sendAgencyRequest(AuthRequest(email = email, password = password, agencyName = agencyName))
+            authApi.sendAgencyRequest(AuthRequest(email = email, password = password, agencyName = agencyName))
             AuthResult.Success(Unit, "Operation Successfull , You can now log in. You can check the status of your request in your user profile.")
         } catch (e: ResponseException) {
             when (e.response.status) {
@@ -60,7 +47,7 @@ class AuthRepositoryImpl @Inject constructor (
 
         return try {
             // Invia la richiesta di registrazione e ricevi il token
-            val response = api.signUp(AuthRequest(email = email, password = password))
+            val response = authApi.signUp(AuthRequest(email = email, password = password))
             val token = response.token
 
             sessionManager.saveToken(token)
@@ -81,7 +68,7 @@ class AuthRepositoryImpl @Inject constructor (
     override suspend fun authWithThirdParty(email: String, username: String): AuthResult<Unit> {
         return try {
 
-            val tokenResponse = api.authWithThirdParty(AuthRequest(email = email, username = username))
+            val tokenResponse = authApi.authWithThirdParty(AuthRequest(email = email, username = username))
 
             sessionManager.saveToken(tokenResponse.token)
 
@@ -101,7 +88,7 @@ class AuthRepositoryImpl @Inject constructor (
     override suspend fun signIn(email: String, password: String): AuthResult<Unit> {
         return try {
             // 1. Chiama l’API e ottiene un TokenResponse
-            val tokenResponse = api.signIn(AuthRequest(email = email, password = password))
+            val tokenResponse = authApi.signIn(AuthRequest(email = email, password = password))
 
             // 2. Salva il token ricevuto
             sessionManager.saveToken(tokenResponse.token)
@@ -129,7 +116,7 @@ class AuthRepositoryImpl @Inject constructor (
             ?: return AuthResult.Unauthorized("Token mancante.")
 
         return try {
-            val responseUser = api.getLoggedUser("Bearer $token")
+            val responseUser = authApi.getLoggedUser("Bearer $token")
 
             val user = User(
                 id = responseUser.id,
@@ -148,20 +135,10 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun logout() {
-        try {
-            sessionManager.clear()
-            Log.d("AuthRepository", "Logout completato con successo")
-        } catch (e: Exception) {
-            Log.e("AuthRepository", "Errore durante il logout", e)
-        }
-    }
-
-
     override suspend fun fetchState(): AuthResult<String> {
         return try {
             Log.d("AuthRepository", "Inizio FetchState")
-            val state = api.fetchGitHubState() // Chiamata diretta all'API per ottenere lo stato
+            val state = authApi.fetchGitHubState() // Chiamata diretta all'API per ottenere lo stato
 
             Log.d("AuthRepository", "Stato generato con successo: $state")
 
@@ -183,7 +160,7 @@ class AuthRepositoryImpl @Inject constructor (
         return try {
             Log.d("AuthRepository", "Inizio notify con code=$code e state=$state")
 
-            val response = api.exchangeGitHubCode(code, state) // Chiamata diretta all'API per ottenere l'utente
+            val response = authApi.exchangeGitHubCode(code, state) // Chiamata diretta all'API per ottenere l'utente
             val token = response.token
 
             // 2) decodifica il payload JWT

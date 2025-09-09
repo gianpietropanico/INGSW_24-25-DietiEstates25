@@ -13,7 +13,8 @@ import com.example.ingsw_24_25_dietiestates25.ui.authUI.AgencySignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignUpScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.WelcomeScreen
-import com.example.ingsw_24_25_dietiestates25.ui.profileUI.FakeProfileVM
+import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileDetailsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileEditDetailsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 
@@ -24,7 +25,9 @@ enum class Screen {
     PROFILE,
     SIGNIN,
     SIGNUP,
-    AGENCYSIGNIN
+    AGENCYSIGNIN,
+    PROFILEDETAILS,
+    PROFILEEDITDETAILS
 }
 sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
@@ -33,6 +36,8 @@ sealed class NavigationItem(val route: String) {
     object Welcome : NavigationItem(Screen.WELCOME.name)
     object Profile : NavigationItem(Screen.PROFILE.name)
     object AgencySignIn : NavigationItem(Screen.AGENCYSIGNIN.name)
+    object ProfileDetails : NavigationItem(Screen.PROFILEDETAILS.name)
+    object ProfileEditDetails : NavigationItem(Screen.PROFILEEDITDETAILS.name)
 }
 
 
@@ -74,6 +79,14 @@ fun AppNavHost(
             )
         }
 
+        composable(NavigationItem.ProfileEditDetails.route){
+            ProfileEditDetailsScreen(
+                pm = profileViewModel,
+                navController = navController
+            )
+        }
+
+
         composable(NavigationItem.SignUp.route){
             SignUpScreen(
                 am = authViewModel,
@@ -87,14 +100,21 @@ fun AppNavHost(
             )
         }
 
-
-
         composable(NavigationItem.Profile.route) {
             ProfileScreen(
                 navController = navController,
                 pm = profileViewModel
             )
         }
+
+        composable(NavigationItem.ProfileDetails.route) {
+            ProfileDetailsScreen(
+                navController = navController,
+                pm = profileViewModel
+            )
+        }
+
+
 
     }
 }

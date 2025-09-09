@@ -31,6 +31,7 @@ import com.facebook.CallbackManager
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
+import com.example.ingsw_24_25_dietiestates25.model.state.AuthState
 import com.example.ingsw_24_25_dietiestates25.ui.utils.downloadImageAsBase64
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -52,7 +53,7 @@ class AuthViewModel @Inject constructor (
 
     val user = userSessionManager.currentUser
 
-    val _authState = MutableStateFlow(AuthState())
+    private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     fun signUpUser(email: String, password: String, defaultProfilePic: String) {
@@ -131,16 +132,7 @@ class AuthViewModel @Inject constructor (
         }
     }
 
-    fun sendResetPasswordEmail(email: String, newPassword :String, oldPassword: String) {
-        clearResultMessage()
 
-        viewModelScope.launch {
-            _authState.update { it.copy(isLoading = true, resultMessage = null) }
-                val result = authRepository.resetPassword(email, oldPassword, newPassword)
-                handleResult(result)
-        }
-
-    }
 
     private fun handleResult(result: AuthResult<Unit>) {
         when (result) {
@@ -171,10 +163,6 @@ class AuthViewModel @Inject constructor (
 
     fun unAuthorized( message : String){
         _authState.update { it.copy(isLoading = false, resultMessage = message, isAuthenticated = false) }
-    }
-
-    fun authorized( ){
-        _authState.update { it.copy(isLoading = false, resultMessage = null, isAuthenticated = true) }
     }
 
     fun isLoading( ) : Boolean{
@@ -288,7 +276,6 @@ class AuthViewModel @Inject constructor (
                         viewModelScope.launch {
                             val base64 = downloadImageAsBase64(profilePic)
                             authWithThirdParty(email, name, base64!!)
-                            authorized()
                         }
 
                     }.apply {
@@ -358,13 +345,16 @@ class AuthViewModel @Inject constructor (
                 val base64Image = downloadImageAsBase64(payloadInJson.getString("picture"))
 
                 authWithThirdParty(email, name, base64Image!!)
-                authorized()
 
             } catch (e: Exception) {
                 Log.e(tag, "Login failed: ${e.message}")
                 unAuthorized("Errore durante il login con Google")
             }
         }
+    }
+
+    fun clearState() {
+        _authState.update{ it.copy(isLoading = false,isAuthenticated = false,resultMessage = null,localError = false)}
     }
 
 }

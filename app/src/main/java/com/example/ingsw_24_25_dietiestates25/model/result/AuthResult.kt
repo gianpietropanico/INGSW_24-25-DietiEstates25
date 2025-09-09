@@ -11,3 +11,4 @@ sealed class AuthResult<T>(val data: T? = null, val message: String? = null) {
     class Success<T>(data: T, message: String? = "ok") : AuthResult<T>(data = data, message = message)
 
 }
+
