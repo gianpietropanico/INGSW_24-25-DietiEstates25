@@ -106,14 +106,6 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
-
-    override suspend fun resetPassword(request: AuthRequest) {
-        httpClient.post("http://10.0.2.2:8080/auth/reset-password") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }
-    }
-
     override suspend fun sendAgencyRequest(request: AuthRequest) {
         httpClient.post("http://10.0.2.2:8080/agency-admin-request") {
             contentType(ContentType.Application.Json)

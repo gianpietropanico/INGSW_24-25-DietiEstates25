@@ -1,6 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.ui.authUI
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,11 +32,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.auth0.android.jwt.JWT
+import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
+import com.example.ingsw_24_25_dietiestates25.testmock.FakeAuthRepository
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.GitHubCallbackManager
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.SocialLoginSection
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
@@ -67,57 +69,24 @@ fun  SignInScreen (
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var showResetPassword by remember { mutableStateOf(false) }
 
-//      stati per monitorare la preview
+//    var showResetPassword by remember { mutableStateOf(false) }
+//    var newPassword by remember { mutableStateOf("") }
+//    stati per monitorare la preview
 //    state.localError = true
 //    state.resultMessage = "VABBè FORZA NAPOLI SKIBIDIPOOPPY"
 //    showResetPassword = true
 
-    //modifica per mandare alla home specifica
-    fun getUserRoleFromToken(token: String?): String? {
-        val jwt = JWT(token!!)
-        return jwt.getClaim("type").asString()
-    }
     LaunchedEffect(state.isAuthenticated) {
         if (state.isAuthenticated == true) {
-            // val role = getUserRoleFromToken(state.jwtToken)
-            val role = "AGENT"
-            println(role)
-            when (role) {
-
-                "SUPERADMIN" -> {
-                    navController.navigate(NavigationItem.Home.route) {
-                        popUpTo(0) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
-                "AGENT" -> {
-                    navController.navigate(NavigationItem.AgentHome.route) {
-                        popUpTo(0) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
-                "AGENCY_ADMIN" -> {
-                    navController.navigate(NavigationItem.Home.route) {
-                        popUpTo(0) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
-                else -> {
-                    // default fallback
-                    // modifica per provare agent, perche'non funziona questo when, va sempre nell'else
-                    navController.navigate(NavigationItem.Home.route) {
-                        popUpTo(0) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
+            am.clearState()
+            navController.navigate(NavigationItem.Home.route) {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
             }
         }
     }
-
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -138,207 +107,206 @@ fun  SignInScreen (
                 modifier = Modifier.size(210.dp)
             )
 
-                when {
-                    showResetPassword -> {
 
-                        Spacer(modifier = Modifier.height(8.dp))
+//                when {
+//                    showResetPassword -> {
+//
+//                        Spacer(modifier = Modifier.height(8.dp))
+//
+//                        MinimalTextField(
+//                            value = email,
+//                            onValueChange = { email = it },
+//                            label = "Email",
+//                            leadingIcon = ImageVector.vectorResource(id = R.drawable.mail),
+//                            placeholder = "Inserisci la tua email",
+//                            modifier = Modifier.width(320.dp),
+//                            onError = state.localError
+//                        )
+//
+//                        Spacer(modifier = Modifier.height(8.dp))
+//
+//                        MinimalPasswordField(
+//                            "Old password",
+//                            password = password,
+//                            onPasswordChange = {
+//                                password = it
+//                            },
+//                            passwordVisible = passwordVisible,
+//                            onVisibilityToggle = { passwordVisible = !passwordVisible },
+//                            onError = state.localError,
+//                            modifier = Modifier.width(320.dp)
+//                        )
+//
+//                        Spacer(modifier = Modifier.height(8.dp))
+//
+//                        MinimalPasswordField(
+//                            "New password",
+//                            password = newPassword,
+//                            onPasswordChange = {
+//                                newPassword = it
+//                            },
+//                            passwordVisible = passwordVisible,
+//                            onVisibilityToggle = { passwordVisible = !passwordVisible },
+//                            onError = state.localError,
+//                            modifier = Modifier.width(320.dp)
+//                        )
+//
+//                        Spacer(modifier = Modifier.height(4.dp))
+//
+//                        if (state.resultMessage != null) {
+//
+//                            Text(
+//                                text = state.resultMessage ?: "",
+//                                color = if (state.success) Color.Green else DarkRed,
+//                                style = MaterialTheme.typography.labelLarge.copy( fontSize = 14.sp),
+//                                textAlign = TextAlign.Center,
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .padding(horizontal = 8.dp)
+//                            )
+//
+//                        }
+//                        Spacer(modifier = Modifier.height(38.dp))
+//
+//                        GradientButton(
+//                            text = "Send Reset Password",
+//                            onClick = {
+//                                am.sendResetPasswordEmail(email, password, newPassword)
+//                                showResetPassword = false // torna indietro dopo l’invio
+//                            }
+//                        )
+//
+//                        Text(
+//                            text = "Back to Login",
+//                            modifier = Modifier
+//                                .clickable {
+//                                    am.clearResultMessage()
+//                                    showResetPassword = false
+//                                }
+//                                .padding(8.dp),
+//                            style = MaterialTheme.typography.labelLarge.copy(
+//                                fontSize = 14.sp,
+//                                color = primaryBlueWithOpacity.copy(alpha = 0.95f),
+//                            ),
+//                            textAlign = TextAlign.Center
+//                        )
+//
+//                    }
+//
+//                    else -> {
 
-                        MinimalTextField(
-                            value = email,
-                            onValueChange = { email = it },
-                            label = "Email",
-                            leadingIcon = ImageVector.vectorResource(id = R.drawable.mail),
-                            placeholder = "Inserisci la tua email",
-                            modifier = Modifier.width(320.dp),
-                            onError = state.localError
-                        )
+            Spacer(modifier = Modifier.height(8.dp))
 
-                        Spacer(modifier = Modifier.height(8.dp))
+            MinimalTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = "Email",
+                leadingIcon = ImageVector.vectorResource(id = R.drawable.mail),
+                placeholder = "Inserisci la tua email",
+                modifier = Modifier.width(320.dp),
+                onError = state.localError
+            )
 
-                        MinimalPasswordField(
-                            "Old password",
-                            password = password,
-                            onPasswordChange = {
-                                password = it
-                            },
-                            passwordVisible = passwordVisible,
-                            onVisibilityToggle = { passwordVisible = !passwordVisible },
-                            onError = state.localError,
-                            modifier = Modifier.width(320.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        MinimalPasswordField(
-                            "New password",
-                            password = newPassword,
-                            onPasswordChange = {
-                                newPassword = it
-                            },
-                            passwordVisible = passwordVisible,
-                            onVisibilityToggle = { passwordVisible = !passwordVisible },
-                            onError = state.localError,
-                            modifier = Modifier.width(320.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        if (state.resultMessage != null) {
-
-                            Text(
-                                text = state.resultMessage ?: "",
-                                color = if (state.success) Color.Green else DarkRed,
-                                style = MaterialTheme.typography.labelLarge.copy( fontSize = 14.sp),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp)
-                            )
-
-                        }
-                        Spacer(modifier = Modifier.height(38.dp))
-
-                        GradientButton(
-                            text = "Send Reset Password",
-                            onClick = {
-                                am.sendResetPasswordEmail(email, password, newPassword)
-                                showResetPassword = false // torna indietro dopo l’invio
-                            }
-                        )
-
-                        Text(
-                            text = "Back to Login",
-                            modifier = Modifier
-                                .clickable {
-                                    am.clearResultMessage()
-                                    showResetPassword = false
-                                }
-                                .padding(8.dp),
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontSize = 14.sp,
-                                color = primaryBlueWithOpacity.copy(alpha = 0.95f),
-                            ),
-                            textAlign = TextAlign.Center
-                        )
-
-                    }
-
-                    else -> {
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        MinimalTextField(
-                            value = email,
-                            onValueChange = { email = it },
-                            label = "Email",
-                            leadingIcon = ImageVector.vectorResource(id = R.drawable.mail),
-                            placeholder = "Inserisci la tua email",
-                            modifier = Modifier.width(320.dp),
-                            onError = state.localError
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
 
-                        MinimalPasswordField(
-                            "Password",
-                            password = password,
-                            onPasswordChange = {
-                                password = it
-                            },
-                            passwordVisible = passwordVisible,
-                            onVisibilityToggle = { passwordVisible = !passwordVisible },
-                            onError = state.localError,
-                            modifier = Modifier.width(320.dp)
-                        )
+            MinimalPasswordField(
+                "Password",
+                password = password,
+                onPasswordChange = {
+                    password = it
+                },
+                passwordVisible = passwordVisible,
+                onVisibilityToggle = { passwordVisible = !passwordVisible },
+                onError = state.localError,
+                modifier = Modifier.width(320.dp)
+            )
 
-                        Text(
-                            text = "Forgot password?",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    showResetPassword = true
-                                }
-                                .padding(end = 18.dp),
-                            textAlign = TextAlign.End,
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontSize = 12.sp,
-                                color = primaryBlueWithOpacity.copy(alpha = 0.95f),
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
+//                        Text(
+//                            text = "Forgot password?",
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .clickable {
+//                                    showResetPassword = true
+//                                }
+//                                .padding(end = 18.dp),
+//                            textAlign = TextAlign.End,
+//                            style = MaterialTheme.typography.labelLarge.copy(
+//                                fontSize = 12.sp,
+//                                color = primaryBlueWithOpacity.copy(alpha = 0.95f),
+//                            )
+//                        )
+            Spacer(modifier = Modifier.height(4.dp))
 
-                        if (state.resultMessage != null) {
+            if (state.resultMessage != null) {
 
-                            Text(
-                                text = state.resultMessage ?: "",
-                                color = if (state.success) Color.Green else DarkRed,
-                                style = MaterialTheme.typography.labelLarge.copy( fontSize = 14.sp),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp)
-                            )
+                Text(
+                    text = state.resultMessage ?: "",
+                    color = if (state.success) Color.Green else DarkRed,
+                    style = MaterialTheme.typography.labelLarge.copy( fontSize = 14.sp),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                )
 
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
+            }
+            Spacer(modifier = Modifier.height(4.dp))
 
-                        GradientButton(
-                            text = "Sign In",
-                            onClick = {
-                                am.signInUser(email, password)
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        //commentare gli argomenti del click per la preview
-                        SocialLoginSection(
-                            isLoading = am.isLoading(),
-                            onGoogleClick = {
-                                am.startGoogleLogin(context)
-                            },
-                            onFacebookClick = {
-                                am.startFacebookLogin(activity)
-                            },
-                            onGithubClick = {
-                                am.startGithubLogin(context)
-                            },
-                            iconSize = 60.dp, // personalizzabile
-                            spacing = 45.dp
-                        )
-
-                        Row {
-                            Text(
-                                text = "You dont have an Account?    ",
-                                fontSize = 14.sp,
-                                lineHeight = 20.sp,
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    fontSize = 14.sp,
-                                    color = Color.DarkGray
-                                )
-                            )
-
-                            Text(
-                                text = "Sign Up!",
-                                fontSize = 14.sp,
-                                lineHeight =  20.sp,
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    fontSize = 14.sp,
-                                    color = primaryBlueWithOpacity.copy(alpha = 0.95f),
-                                ),
-                                modifier = Modifier
-                                    .clickable {
-                                        navController.navigate(NavigationItem.SignUp.route)
-                                        am.clearResultMessage()
-                                    }
-                            )
-                        }
-
-                    }
+            GradientButton(
+                text = "Sign In",
+                onClick = {
+                    am.signInUser(email, password)
                 }
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            //commentare gli argomenti del click per la preview
+            SocialLoginSection(
+                isLoading = am.isLoading(),
+                onGoogleClick = {
+                    am.startGoogleLogin(context)
+                },
+                onFacebookClick = {
+                    am.startFacebookLogin(activity)
+                },
+                onGithubClick = {
+                    am.startGithubLogin(context)
+                },
+                iconSize = 60.dp, // personalizzabile
+                spacing = 45.dp
+            )
+
+            Row {
+                Text(
+                    text = "You dont have an Account?    ",
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        color = Color.DarkGray
+                    )
+                )
+
+                Text(
+                    text = "Sign Up!",
+                    fontSize = 14.sp,
+                    lineHeight =  20.sp,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        color = primaryBlueWithOpacity.copy(alpha = 0.95f),
+                    ),
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(NavigationItem.SignUp.route)
+                            am.clearResultMessage()
+                        }
+                )
+            }
+
         }
 
         //Funzione per mettere a schermo il caricamento
