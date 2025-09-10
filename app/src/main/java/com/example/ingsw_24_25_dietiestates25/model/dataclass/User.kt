@@ -12,3 +12,12 @@ data class User(
     val type: String,   // "superadmin" "agency_admin" "agent" "localuser" "thirdpartyuser"
     val profilePicture: String? = null
 )
+
+//da trasformare tipo in enumerazione
+enum class Role(val label: String) {
+    A("SUPERADMIN"),
+    B("AGENCY_ADMIN"),
+    C("AGENT"),
+    D("LOCALUSER"),
+    E("THIRDPARTYUSER")
+}

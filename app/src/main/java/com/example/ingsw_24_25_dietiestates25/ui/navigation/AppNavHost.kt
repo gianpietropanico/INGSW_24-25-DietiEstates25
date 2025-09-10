@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.navigation
 
+import androidx.compose.material3.NavigationBar
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,9 +14,11 @@ import com.example.ingsw_24_25_dietiestates25.ui.authUI.AgencySignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignUpScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.WelcomeScreen
-import com.example.ingsw_24_25_dietiestates25.ui.profileUI.FakeProfileVM
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.agentUI.AgentHomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.AddPropertyListingScreen
+import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.PropertyListingViewModel
 
 
 enum class Screen {
@@ -24,7 +27,9 @@ enum class Screen {
     PROFILE,
     SIGNIN,
     SIGNUP,
-    AGENCYSIGNIN
+    AGENCYSIGNIN,
+    PROPERTYLISTING,
+    AGENTHOME
 }
 sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
@@ -33,6 +38,8 @@ sealed class NavigationItem(val route: String) {
     object Welcome : NavigationItem(Screen.WELCOME.name)
     object Profile : NavigationItem(Screen.PROFILE.name)
     object AgencySignIn : NavigationItem(Screen.AGENCYSIGNIN.name)
+    object PropertyListing : NavigationItem(Screen.PROPERTYLISTING.name)
+    object AgentHome : NavigationItem(Screen.AGENTHOME.name)
 }
 
 
@@ -45,6 +52,7 @@ fun AppNavHost(
 
     val authViewModel: AuthViewModel = hiltViewModel()
     val profileViewModel : ProfileViewModel = hiltViewModel()
+    val propertyListingViewModel : PropertyListingViewModel = hiltViewModel()
 
     NavHost(
         modifier = modifier,
@@ -93,6 +101,21 @@ fun AppNavHost(
             ProfileScreen(
                 navController = navController,
                 pm = profileViewModel
+            )
+        }
+
+        composable(NavigationItem.PropertyListing.route){
+            AddPropertyListingScreen(
+                navController = navController,
+                plm = propertyListingViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavigationItem.AgentHome.route) {
+            AgentHomeScreen(
+                plm = propertyListingViewModel,
+                navController = navController
             )
         }
 

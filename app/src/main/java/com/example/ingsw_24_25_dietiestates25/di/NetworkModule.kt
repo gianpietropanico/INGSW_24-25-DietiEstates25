@@ -2,10 +2,10 @@ package com.example.ingsw_24_25_dietiestates25.di
 
 import com.example.ingsw_24_25_dietiestates25.data.api.authApi.AuthApi
 import com.example.ingsw_24_25_dietiestates25.data.api.imageApi.ImageApi
-import com.example.ingsw_24_25_dietiestates25.data.api.propertyApi.PropertyApi
+import com.example.ingsw_24_25_dietiestates25.data.api.propertyListingApi.PropertyListingApi
 import com.example.ingsw_24_25_dietiestates25.data.api.authApi.AuthApiImpl
 import com.example.ingsw_24_25_dietiestates25.data.api.imageApi.ImageApiImpl
-import com.example.ingsw_24_25_dietiestates25.data.api.propertyApi.PropertyApiImpl
+import com.example.ingsw_24_25_dietiestates25.data.api.propertyListingApi.PropertyListingApiImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,8 +54,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun providePropertyApi(httpClient: HttpClient): PropertyApi =
-        PropertyApiImpl(httpClient)
+    fun providePropertyApi(httpClient: HttpClient): PropertyListingApi =
+        PropertyListingApiImpl(httpClient)
 
     @Provides
     @Singleton

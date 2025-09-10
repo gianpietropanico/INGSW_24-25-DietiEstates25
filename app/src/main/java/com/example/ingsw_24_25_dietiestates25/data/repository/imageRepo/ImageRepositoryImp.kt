@@ -31,8 +31,11 @@ class ImageRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertHouseImages(request: ImageRequest) {
-        imageApi.insertHouseImages(request)
+    override suspend fun insertHouseImages(ownerId: String, propertyPicture :String) {
+        imageApi.insertHouseImages(
+            ImageRequest(
+                ownerId = ownerId,
+                base64Images = listOf(propertyPicture)))
     }
 
     override suspend fun getImage(userId: String) {

@@ -54,7 +54,7 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         val response = httpClient.post("http://10.0.2.2:8080/auth/thirdPartyUser") {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
-            setBody(request)
+            setBody(request) 
         }
 
         return when (response.status) {

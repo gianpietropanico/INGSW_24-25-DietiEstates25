@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.authUI
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,14 +33,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.auth0.android.jwt.JWT
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.testmock.FakeAuthRepository
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.GitHubCallbackManager
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.socialbutton.SocialLoginSection
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
@@ -78,14 +76,48 @@ fun  SignInScreen (
 //    state.resultMessage = "VABBè FORZA NAPOLI SKIBIDIPOOPPY"
 //    showResetPassword = true
 
+    //modifica per mandare alla home specifica
+    fun getUserRoleFromToken(token: String?): String? {
+        val jwt = JWT(token!!)
+        return jwt.getClaim("type").asString()
+    }
     LaunchedEffect(state.isAuthenticated) {
         if (state.isAuthenticated == true) {
-            navController.navigate(NavigationItem.Home.route) {
-                popUpTo(0) { inclusive = true }
-                launchSingleTop = true
+            // val role = getUserRoleFromToken(state.jwtToken)
+            val role = "AGENT"
+            println(role)
+            when (role) {
+
+                "SUPERADMIN" -> {
+                    navController.navigate(NavigationItem.Home.route) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+                "AGENT" -> {
+                    navController.navigate(NavigationItem.AgentHome.route) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+                "AGENCY_ADMIN" -> {
+                    navController.navigate(NavigationItem.Home.route) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+                else -> {
+                    // default fallback
+                    // modifica per provare agent, perche'non funziona questo when, va sempre nell'else
+                    navController.navigate(NavigationItem.Home.route) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             }
         }
     }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
 

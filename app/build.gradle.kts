@@ -58,70 +58,78 @@ android {
 }
 
 dependencies {
-    implementation ("androidx.compose.material3:material3")
-    implementation ("androidx.activity:activity-compose:1.7.2")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation ("androidx.compose.ui:ui")
-    implementation ("androidx.compose.ui:ui-tooling-preview")
-    implementation ("androidx.compose.material:material-icons-extended")
-
-    //webview
-    implementation ("androidx.compose.ui:ui:1.5.4")
-    implementation ("androidx.compose.ui:ui-tooling:1.5.4")
-    implementation ("androidx.compose.material:material:1.5.4")
-    implementation ("androidx.activity:activity-compose:1.7.2")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-
-    //github oauth
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation ("com.squareup.okhttp3:okhttp:4.11.0")
-
-    // Facebook SDK (Versione aggiornata)
-    implementation ("com.facebook.android:facebook-android-sdk:[8,9)")
-    implementation ("com.auth0.android:jwtdecode:2.0.0")
-    implementation ("com.facebook.android:facebook-core:latest.release")
-    implementation ("com.facebook.android:facebook-login:latest.release")
-    implementation ("com.facebook.android:facebook-share:latest.release")
-    implementation ("com.facebook.android:facebook-applinks:latest.release")
-
-    // Jetpack Compose
-    implementation("androidx.activity:activity-compose:1.7.2")
-    implementation("androidx.compose.ui:ui:1.5.3")
-    implementation("androidx.compose.material:material:1.5.3")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.5.3")
-    implementation("androidx.compose.compiler:compiler:1.5.10")
-    implementation ("androidx.compose.material3:material3:1.2.0") // O versione più recente
-    implementation ("androidx.compose.material:material:1.4.3")
+    // Compose
+    implementation("androidx.compose.ui:ui:1.5.4")
+    implementation("androidx.compose.material:material:1.5.4")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
+    implementation("androidx.compose.material3:material3:1.2.0") // o versione più recente
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Google OAuth 2.0
-    implementation("androidx.credentials:credentials:1.5.0-alpha05")
-    implementation("androidx.credentials:credentials-play-services-auth:1.5.0-alpha05")
+    // DA RIMUOVERE duplicati Compose
+    // implementation ("androidx.compose.ui:ui:1.5.4")
+    // implementation ("androidx.compose.ui:ui-tooling:1.5.4")
+    // implementation ("androidx.compose.material:material:1.5.4")
+    // implementation("androidx.compose.ui:ui:1.5.3")
+    // implementation("androidx.compose.material:material:1.4.3")
+    // implementation("androidx.compose.ui:ui-tooling-preview:1.5.3")
+    // implementation("androidx.compose.compiler:compiler:1.5.10")
 
-    // Ktor Client per rete e serializzazione
+    // Activity & Lifecycle
+    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    // DA RIMUOVERE duplicati
+    // implementation ("androidx.activity:activity-compose:1.7.2")
+    // implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+
+    // Kotlin Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+    // Kotlinx Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation(libs.kotlinx.serialization.json) // se già definito nel catalogo versioni
+
+    // Ktor Client
     implementation("io.ktor:ktor-client-core:2.3.4")
     implementation("io.ktor:ktor-client-cio:2.3.4")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.4")
     implementation("io.ktor:ktor-client-logging:2.3.4")
 
-    // Kotlin Coroutines e Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-
-    // Librerie AndroidX
+    // AndroidX libraries
     implementation("androidx.core:core-ktx:1.10.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.navigation:navigation-compose:2.6.0")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.material3.android) // se usi catalogo versioni
     implementation("io.coil-kt:coil-compose:2.2.2")
 
     // Google Play Services
     implementation("com.google.android.gms:play-services-auth:20.7.0")
-    implementation(libs.googleid)
+    implementation(libs.googleid) // da catalogo versioni
     implementation("androidx.browser:browser:1.8.0")
+    implementation(libs.androidx.foundation)
+    implementation(libs.material3)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Google Maps
+    implementation("com.google.maps.android:maps-compose:2.0.0")
+    implementation(libs.play.services.maps)
+
+    // Webview / network
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    // Facebook SDK
+    implementation("com.facebook.android:facebook-android-sdk:[8,9)")
+    implementation("com.auth0.android:jwtdecode:2.0.0")
+    implementation("com.facebook.android:facebook-core:latest.release")
+    implementation("com.facebook.android:facebook-login:latest.release")
+    implementation("com.facebook.android:facebook-share:latest.release")
+    implementation("com.facebook.android:facebook-applinks:latest.release")
 
     // Test
     testImplementation("junit:junit:4.13.2")
@@ -131,17 +139,15 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.3")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.3")
 
-    // Hilt per Dependency Injection
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
 
-    // Kotlinx Serialization
-    implementation(libs.kotlinx.serialization.json)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("org.jetbrains:annotations:23.0.0")
+    // Forza l'uso della versione più recente di annotations per evitare Duplicate class
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains:annotations:23.0.0")
 
-    // Google Maps
-    implementation("com.google.maps.android:maps-compose:2.0.0")
-    implementation(libs.play.services.maps)
+        }
+    }
+    // DA RIMUOVERE: com.intellij:annotations:12.0
 
 }

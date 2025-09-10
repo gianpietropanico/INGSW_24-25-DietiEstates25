@@ -4,6 +4,7 @@ package com.example.ingsw_24_25_dietiestates25.ui.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.DrawableRes
@@ -47,6 +48,23 @@ suspend fun downloadImageAsBase64(imageUrl: String): String? = withContext(Dispa
         val byteArray = outputStream.toByteArray()
 
         Base64.encodeToString(byteArray, Base64.DEFAULT)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+
+
+}
+
+fun uriToBase64(context: Context, uri: Uri): String? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        inputStream?.close()
+
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT)
     } catch (e: Exception) {
         e.printStackTrace()
         null
