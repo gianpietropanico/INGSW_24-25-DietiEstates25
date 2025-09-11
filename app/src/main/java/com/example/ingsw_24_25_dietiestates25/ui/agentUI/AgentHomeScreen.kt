@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui.authUI.agentUI
+package com.example.ingsw_24_25_dietiestates25.ui.agentUI
 
 import androidx.annotation.Nullable
 import androidx.compose.foundation.Image

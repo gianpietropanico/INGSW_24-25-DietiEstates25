@@ -14,7 +14,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.authUI.AgencySignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignUpScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.WelcomeScreen
-import com.example.ingsw_24_25_dietiestates25.ui.authUI.agentUI.AgentHomeScreen
+import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentHomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileDetailsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileEditDetailsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
