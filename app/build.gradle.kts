@@ -60,6 +60,17 @@ android {
 }
 
 dependencies {
+
+    // Credential Manager (core + provider)
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+
+    // Google ID SDK (Sign in with Google via Credential Manager)
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+    // Play Services Auth (se ti serve ancora l’API legacy, altrimenti puoi anche rimuoverlo)
+    implementation("com.google.android.gms:play-services-auth:21.1.0")
+
     // Compose
     implementation("androidx.compose.ui:ui:1.5.4")
     implementation("androidx.compose.material:material:1.5.4")
