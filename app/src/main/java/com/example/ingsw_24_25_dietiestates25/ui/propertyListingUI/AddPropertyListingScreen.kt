@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
-import com.example.ingsw_24_25_dietiestates25.ui.utils.loadProfileImage
 import java.util.Locale
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +42,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.EnergyClass
@@ -168,7 +168,7 @@ fun AddPropertyListingScreen(
             imageUris.forEach { uri ->
                 Box {
                     Image(
-                        painter = loadProfileImage(uri, R.drawable.default_house),
+                        painter = painterResource(id = R.drawable.default_house) ,
                         contentDescription = null,
                         modifier = Modifier
                             .size(80.dp)

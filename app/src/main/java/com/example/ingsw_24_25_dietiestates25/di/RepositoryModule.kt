@@ -8,7 +8,6 @@ import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRep
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepositoryImpl
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepo
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepoImp
-import com.example.ingsw_24_25_dietiestates25.data.repository.propertyRepo.PropertyRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

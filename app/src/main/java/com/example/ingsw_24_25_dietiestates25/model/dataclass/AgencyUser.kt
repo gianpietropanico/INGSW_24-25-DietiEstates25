@@ -6,5 +6,4 @@ import kotlinx.serialization.Serializable
 data class AgencyUser(
     val id: String, //id dell'utente
     val agencyId: String, //id della agenzia
-    val role: String //ruolo dell'utente "agency_admin" o "agent"
 )
