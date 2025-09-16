@@ -107,9 +107,32 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
     }
 
     override suspend fun sendAgencyRequest(request: AuthRequest) {
-        httpClient.post("http://10.0.2.2:8080/agency-admin-request") {
+        Log.d("AuthApiImpl", "Invio richiesta AgencySignIn con email: ${request.email}")
+
+        val response = httpClient.post("http://10.0.2.2:8080/agency/request") {
             contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
             setBody(request)
+        }
+
+        when (response.status) {
+            HttpStatusCode.OK, HttpStatusCode.Created -> {
+                val body = response.bodyAsText()
+                Log.d("AuthApiImpl", "Richiesta inviata con successo: $body")
+
+            }
+
+            HttpStatusCode.Conflict, HttpStatusCode.BadRequest, HttpStatusCode.Unauthorized -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Richiesta agency fallita: $err")
+                throw ResponseException(response, "Richiesta agency fallita: $err")
+            }
+
+            else -> {
+                val err = response.bodyAsText()
+                Log.e("AuthApiImpl", "Errore HTTP ${response.status}: $err")
+                throw ResponseException(response, "Errore HTTP ${response.status}")
+            }
         }
     }
 
@@ -142,7 +165,7 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
-    override suspend fun exchangeGitHubCode(code: String?, state: String?): TokenResponse {
+    override suspend fun githubOauth(code: String?, state: String?): TokenResponse {
         // Controllo dei parametri
         if (code.isNullOrBlank() || state.isNullOrBlank()) {
             Log.e("OAuth", "Parametri mancanti: code o state sono null o vuoti")

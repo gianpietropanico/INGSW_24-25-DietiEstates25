@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepo
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
+import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.model.state.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,18 +36,16 @@ class ProfileViewModel @Inject constructor (
         this.description = description
     }
 
-    fun getName() : String{
-        val parts = value.trim().split(" ")
-        return parts.first()
+    fun getName() : String {
+        return user.value?.name ?: ""
     }
 
     fun getSurname() : String{
-        val parts = value.trim().split(" ")
-        return parts.last()
+        return user.value?.surname ?: ""
     }
 
     fun getUserType ( ) : String{
-        return user.value!!.type
+        return user.value!!.role.name
     }
 
     fun getUserId(): String{
@@ -88,30 +86,32 @@ class ProfileViewModel @Inject constructor (
 
         clearResultMessage()
         viewModelScope.launch {
+
             _authState.update { it.copy(isLoading = true, resultMessage = null) }
-            val result = profileRepo.updateUserInfo(value, type = type)
+            val result = profileRepo.updateUserInfo(value, type)
             handleResult(result)
+
         }
     }
 
 
-    private fun handleResult(result: AuthResult<Unit>) {
+    private fun handleResult(result: ApiResult<Unit>) {
         when (result) {
-            is AuthResult.Authorized -> {
+            is ApiResult.Authorized -> {
                 _authState.update{ it.copy(isLoading = false,success = true, resultMessage = null,localError = false)}
                 user = userSessionManager.currentUser
             }
 
-            is AuthResult.Unauthorized -> {
+            is ApiResult.Unauthorized -> {
                 _authState.update { it.copy(isLoading = false, resultMessage = result.message, success = false, localError = true) }
 
             }
 
-            is AuthResult.UnknownError -> {
+            is ApiResult.UnknownError -> {
                 _authState.update { it.copy(isLoading = false, resultMessage = result.message,success = false, localError = true) }
             }
 
-            is AuthResult.Success -> {
+            is ApiResult.Success -> {
                 _authState.update { it.copy(isLoading = false, resultMessage = result.message, success = true) }
                 user = userSessionManager.currentUser
             }

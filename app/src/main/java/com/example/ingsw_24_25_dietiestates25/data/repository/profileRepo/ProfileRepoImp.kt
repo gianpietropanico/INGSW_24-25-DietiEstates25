@@ -6,7 +6,7 @@ import com.example.ingsw_24_25_dietiestates25.data.api.profileApi.ProfileApi
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
 import com.example.ingsw_24_25_dietiestates25.model.request.UserInfoRequest
-import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
+import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
@@ -25,14 +25,17 @@ class ProfileRepoImp @Inject constructor(
         }
     }
 
-    override suspend fun updateUserInfo( value: String, type: String): AuthResult<Unit> {
+    override suspend fun updateUserInfo( value: String, type: String): ApiResult<Unit> {
         return try {
+            Log.d("updateUserInfo", "typo richiesta : $type")
 
-            if (type == "Full Name") {
-                val parts = value.trim().split("\\s+".toRegex()).filter { it.isNotBlank() }
+            if (type == "Name And Surname" ) {
+                val clean = value.trim().replace("\\s+".toRegex(), " ")
+                val parts = clean.split(" ", limit = 2)
+                Log.d("updateUserInfo", "Validazione full name: $clean")
 
                 if (parts.size < 2) {
-                    return AuthResult.Unauthorized("Inserisci almeno nome e cognome")
+                    return ApiResult.Unauthorized("Inserisci sia nome che cognome")
                 }
             }
 
@@ -40,38 +43,41 @@ class ProfileRepoImp @Inject constructor(
 
             updateSessionManagerInfo(value, type)
 
-            AuthResult.Success(Unit, "Operation Successfull, Info updated")
+            ApiResult.Success(Unit, "Operation Successfull, Info updated")
 
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Update failed ")
-                else -> AuthResult.UnknownError("Errore")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Update failed ")
+                else -> ApiResult.UnknownError("Errore")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Errore generico")
+            ApiResult.UnknownError("Errore generico")
         }
     }
 
 
-    override suspend fun resetPassword( oldPassword: String, newPassword: String): AuthResult<Unit> {
+    override suspend fun resetPassword( oldPassword: String, newPassword: String): ApiResult<Unit> {
         return try {
             profileApi.resetPassword(AuthRequest(email = sessionManager.currentUser.value!!.email, password = oldPassword,  newPassword = newPassword))
-            AuthResult.Success(Unit, "Operation Successfull, Password changed")
+            ApiResult.Success(Unit, "Operation Successfull, Password changed")
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Reset failed ")
-                else -> AuthResult.UnknownError("Errore")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Reset failed ")
+                else -> ApiResult.UnknownError("Errore")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Errore generico")
+            ApiResult.UnknownError("Errore generico")
         }
     }
 
     private fun updateSessionManagerInfo(value : String , type: String) {
         when (type.lowercase()) {
             "username" -> sessionManager.currentUser.value!!.username = value
-            "name" -> sessionManager.currentUser.value!!.name = value
-            "surname" -> sessionManager.currentUser.value!!.surname = value
+            "name and surname" ->{
+                val parts = value.trim().split("\\s+".toRegex()).filter { it.isNotBlank() }
+                sessionManager.currentUser.value!!.name = parts.getOrNull(0) ?: ""
+                sessionManager.currentUser.value!!.surname = parts.getOrNull(1) ?: ""
+            }
         }
     }
 }

@@ -5,7 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Agency(
     val id: String, //id agenzia
-    val name: String //nome agenzia
+    val name: String, //nome agenzia
+    val pending: Boolean,
+    val agencyEmail: String //email dell'admin dell'agenzia
 )
 
 // per controllare i dati di un agenzia bisogna

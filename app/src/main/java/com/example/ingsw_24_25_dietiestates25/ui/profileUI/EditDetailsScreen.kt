@@ -36,12 +36,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
@@ -58,8 +56,8 @@ fun ProfileEditDetailsScreen(
     val state by pm.authState.collectAsState()
     var value by remember { mutableStateOf(pm.value) }
 
-    var name by remember { mutableStateOf("") }
-    var surname by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(( pm.getName() )) }
+    var surname by remember { mutableStateOf(pm.getSurname()) }
 
     var password by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
@@ -131,9 +129,8 @@ fun ProfileEditDetailsScreen(
                                 "Password" -> {
                                     pm.sendResetPasswordEmail(newPassword = newPassword, oldPassword = password)
                                 }
-                                "Full Name" -> {
-                                    value = "$name $surname"
-                                    pm.updateUserInfo(value, pm.label)
+                                "Name And Surname" -> {
+                                    pm.updateUserInfo("$name $surname", pm.label)
                                 }
                                 else -> {
                                     pm.updateUserInfo(value, pm.label)
@@ -180,34 +177,27 @@ fun ProfileEditDetailsScreen(
                     modifier = Modifier.width(320.dp)
                 )
 
-            } else if (pm.label == "Full Name"){
+            } else if (pm.label == "Name And Surname"){
 
-                if(value.isNotEmpty()){
-                    name = pm.getName()
-                    surname = pm.getSurname()
-                }else{
-                    name = ""
-                    surname = ""
-                }
 
                 MinimalTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = pm.label,
+                    label = "Name",
                     leadingIcon = null,
-                    placeholder = "Inserisci il tuo nome",
+                    placeholder = "Insert your name",
                     modifier = Modifier.width(320.dp),
                     onError = false
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 MinimalTextField(
                     value = surname,
                     onValueChange = { surname = it },
-                    label = pm.label,
+                    label = "Surname",
                     leadingIcon = null,
-                    placeholder = "Inserisci il tuo cognome",
+                    placeholder = "Insert your surname",
                     modifier = Modifier.width(320.dp),
                     onError = false
                 )
@@ -218,7 +208,7 @@ fun ProfileEditDetailsScreen(
                     onValueChange = { value = it },
                     label = pm.label,
                     leadingIcon = null,
-                    placeholder = "Inserisci il tuo username",
+                    placeholder = "Insert your username",
                     modifier = Modifier.width(320.dp),
                     onError = false
                 )

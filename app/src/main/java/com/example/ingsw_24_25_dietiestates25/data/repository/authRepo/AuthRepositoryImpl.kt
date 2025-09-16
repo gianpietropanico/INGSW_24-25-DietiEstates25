@@ -6,9 +6,8 @@ import com.example.ingsw_24_25_dietiestates25.data.api.imageApi.ImageApi
 import com.example.ingsw_24_25_dietiestates25.data.jwt.parseJwtPayload
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
-import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
+import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
-import com.example.ingsw_24_25_dietiestates25.model.request.ImageRequest
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
@@ -25,24 +24,24 @@ class AuthRepositoryImpl @Inject constructor (
     }
 
 
-    override suspend fun sendAgencyRequest(email: String, password: String, agencyName: String): AuthResult<Unit> {
+    override suspend fun sendAgencyRequest(email: String, password: String, agencyName: String): ApiResult<Unit> {
         return try {
             authApi.sendAgencyRequest(AuthRequest(email = email, password = password, agencyName = agencyName))
-            AuthResult.Success(Unit, "Operation Successfull , You can now log in. You can check the status of your request in your user profile.")
+            ApiResult.Success(Unit, "Operation Successfull , You can now log in. You can check the status of your request in your user profile.")
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Reset failed ")
-                else -> AuthResult.UnknownError("Errore")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Reset failed ")
+                else -> ApiResult.UnknownError("Errore")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Errore generico")
+            ApiResult.UnknownError("Errore generico")
         }
     }
 
-    override suspend fun signUp(email: String, password: String, profilePicBase64: String): AuthResult<Unit> {
+    override suspend fun signUp(email: String, password: String, profilePicBase64: String): ApiResult<Unit> {
 
         if (!isValidEmail(email)) {
-            return AuthResult.Unauthorized("Email non valida")
+            return ApiResult.Unauthorized("Email non valida")
         }
 
         return try {
@@ -52,40 +51,40 @@ class AuthRepositoryImpl @Inject constructor (
 
             sessionManager.saveToken(token)
 
-            AuthResult.Authorized()
+            ApiResult.Authorized()
 
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.BadRequest -> AuthResult.UnknownError("Dati mancanti o formattazione errata.")
-                HttpStatusCode.Conflict -> AuthResult.Unauthorized("Email già registrata")
-                else -> AuthResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.BadRequest -> ApiResult.UnknownError("Dati mancanti o formattazione errata.")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Email già registrata")
+                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
 
-    override suspend fun authWithThirdParty(email: String, username: String): AuthResult<Unit> {
+    override suspend fun authWithThirdParty(email: String, username: String): ApiResult<Unit> {
         return try {
 
             val tokenResponse = authApi.authWithThirdParty(AuthRequest(email = email, username = username))
 
             sessionManager.saveToken(tokenResponse.token)
 
-            AuthResult.Authorized()
+            ApiResult.Authorized()
 
         } catch (e: ResponseException) {
             if (e.response.status == HttpStatusCode.Unauthorized) {
-                AuthResult.Unauthorized()
+                ApiResult.Unauthorized()
             } else {
-                AuthResult.UnknownError("Errore HTTP")
+                ApiResult.UnknownError("Errore HTTP")
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Errore generico")
+            ApiResult.UnknownError("Errore generico")
         }
     }
 
-    override suspend fun signIn(email: String, password: String): AuthResult<Unit> {
+    override suspend fun signIn(email: String, password: String): ApiResult<Unit> {
         return try {
             // 1. Chiama l’API e ottiene un TokenResponse
             val tokenResponse = authApi.signIn(AuthRequest(email = email, password = password))
@@ -94,26 +93,26 @@ class AuthRepositoryImpl @Inject constructor (
             sessionManager.saveToken(tokenResponse.token)
 
             // 3. Restituisce il risultato positivo
-            AuthResult.Authorized()
+            ApiResult.Authorized()
 
         } catch (e: ResponseException) {
             when (e.response.status) {
                 HttpStatusCode.Unauthorized,
                 HttpStatusCode.Conflict -> {
-                    AuthResult.Unauthorized("Accesso fallito: credenziali errate.")
+                    ApiResult.Unauthorized("Accesso fallito: credenziali errate.")
                 }
                 else -> {
-                    AuthResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                    ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
                 }
             }
         } catch (e: Exception) {
-            AuthResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
 
-    override suspend fun getLoggedUser(): AuthResult<Unit> {
+    override suspend fun getLoggedUser(): ApiResult<Unit> {
         val token = sessionManager.getToken()
-            ?: return AuthResult.Unauthorized("Token mancante.")
+            ?: return ApiResult.Unauthorized("Token mancante.")
 
         return try {
             val responseUser = authApi.getLoggedUser("Bearer $token")
@@ -124,71 +123,70 @@ class AuthRepositoryImpl @Inject constructor (
                 surname = responseUser.surname,
                 email = responseUser.email,
                 username = responseUser.username,
-                type = responseUser.type,
+                role = responseUser.role,
             )
 
             sessionManager.saveUser(user, token)
 
-            AuthResult.Authorized()
+            ApiResult.Authorized()
         } catch (e: Exception) {
-            AuthResult.UnknownError("Errore nel recupero profilo: ${e.localizedMessage}")
+            ApiResult.UnknownError("Errore nel recupero profilo: ${e.localizedMessage}")
         }
     }
 
-    override suspend fun fetchState(): AuthResult<String> {
+    override suspend fun fetchState(): ApiResult<String> {
         return try {
             Log.d("AuthRepository", "Inizio FetchState")
             val state = authApi.fetchGitHubState() // Chiamata diretta all'API per ottenere lo stato
 
             Log.d("AuthRepository", "Stato generato con successo: $state")
 
-            AuthResult.Success(state) // Incapsula lo stato nel risultato
+            ApiResult.Success(state) // Incapsula lo stato nel risultato
         } catch (e: ResponseException) {
             Log.e("AuthRepository", "Errore HTTP: ${e.response.status}", e)
             when (e.response.status) {
-                HttpStatusCode.BadRequest -> AuthResult.Unauthorized() // Errore di richiesta
-                HttpStatusCode.Unauthorized -> AuthResult.Unauthorized() // Errore di autorizzazione
-                else -> AuthResult.UnknownError() // Errore generico
+                HttpStatusCode.BadRequest -> ApiResult.Unauthorized() // Errore di richiesta
+                HttpStatusCode.Unauthorized -> ApiResult.Unauthorized() // Errore di autorizzazione
+                else -> ApiResult.UnknownError() // Errore generico
             }
         } catch (e: Exception) {
             Log.e("AuthRepository", "Errore generale durante FetchState", e)
-            AuthResult.UnknownError() // Errore generico in caso di eccezione
+            ApiResult.UnknownError() // Errore generico in caso di eccezione
         }
     }
 
-    override suspend fun exchangeGitHubCode(code: String?, state: String?): AuthResult<Unit> {
+    override suspend fun githubOauth(code: String?, state: String?): ApiResult<Unit> {
         return try {
             Log.d("AuthRepository", "Inizio notify con code=$code e state=$state")
 
-            val response = authApi.exchangeGitHubCode(code, state) // Chiamata diretta all'API per ottenere l'utente
+            val response = authApi.githubOauth(code, state) // Chiamata diretta all'API per ottenere l'utente
             val token = response.token
 
-            // 2) decodifica il payload JWT
             val payload = parseJwtPayload(token)
 
-            // 3) salva username e token nella sessione
             sessionManager.saveUser(
                 User(
                     username = payload.username!!,
                     id = payload.userId,
+                    name = payload.name,
+                    surname = payload.surname,
                     email = payload.email!!,
-                    type = payload.type!!
+                    role = payload.role!!
                 ), token)
 
-            AuthResult.Authorized()
+            ApiResult.Authorized()
+
         } catch (e: ResponseException) {
             Log.e("AuthRepository", "Errore HTTP: ${e.response.status}", e)
             when (e.response.status) {
-                HttpStatusCode.BadRequest -> AuthResult.Unauthorized() // Errore di richiesta
-                HttpStatusCode.Unauthorized -> AuthResult.Unauthorized() // Errore di autorizzazione
-                else -> AuthResult.UnknownError() // Errore generico
+                HttpStatusCode.BadRequest -> ApiResult.Unauthorized() // Errore di richiesta
+                HttpStatusCode.Unauthorized -> ApiResult.Unauthorized() // Errore di autorizzazione
+                else -> ApiResult.UnknownError() // Errore generico
             }
         } catch (e: Exception) {
             Log.e("AuthRepository", "Errore generale durante notifyServer", e)
-            AuthResult.UnknownError() // Errore generico in caso di eccezione
+            ApiResult.UnknownError() // Errore generico in caso di eccezione
         }
     }
-
-
 
 }

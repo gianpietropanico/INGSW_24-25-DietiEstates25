@@ -1,0 +1,11 @@
+package com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI
+
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.Agency
+
+data class SysAdminState(
+    val isLoading: Boolean = false,
+    val success: Boolean = false,
+    val resultMessage: String? = null,
+    val localError: Boolean = false,
+    val agencies: List<Agency> = emptyList()
+)

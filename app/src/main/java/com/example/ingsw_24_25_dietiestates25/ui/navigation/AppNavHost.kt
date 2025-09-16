@@ -20,6 +20,10 @@ import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.AddPropertyListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.PropertyListingViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminAgencyScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminHomeScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminInboxScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminViewModel
 
 
 enum class Screen {
@@ -30,9 +34,10 @@ enum class Screen {
     SIGNUP,
     AGENCYSIGNIN,
     PROPERTYLISTING,
-    AGENTHOME,
     PROFILEDETAILS,
-    PROFILEEDITDETAILS
+    PROFILEEDITDETAILS,
+    SYSADMINAGENCY,
+    INBOX
 }
 sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
@@ -42,9 +47,10 @@ sealed class NavigationItem(val route: String) {
     object Profile : NavigationItem(Screen.PROFILE.name)
     object AgencySignIn : NavigationItem(Screen.AGENCYSIGNIN.name)
     object PropertyListing : NavigationItem(Screen.PROPERTYLISTING.name)
-    object AgentHome : NavigationItem(Screen.AGENTHOME.name)
     object ProfileDetails : NavigationItem(Screen.PROFILEDETAILS.name)
     object ProfileEditDetails : NavigationItem(Screen.PROFILEEDITDETAILS.name)
+    object Inbox : NavigationItem(Screen.INBOX.name)
+    object SysAdminAgency : NavigationItem(Screen.SYSADMINAGENCY.name)
 }
 
 
@@ -58,6 +64,7 @@ fun AppNavHost(
     val authViewModel: AuthViewModel = hiltViewModel()
     val profileViewModel : ProfileViewModel = hiltViewModel()
     val propertyListingViewModel : PropertyListingViewModel = hiltViewModel()
+    val systemAdminViewModel : SysAdminViewModel = hiltViewModel()
 
     NavHost(
         modifier = modifier,
@@ -72,13 +79,76 @@ fun AppNavHost(
             )
         }
 
+        composable(NavigationItem.Home.route){
+
+            val userRole = authViewModel.getUserRole()
+
+            when (userRole){
+                "SUPER_ADMIN" -> {
+                    SysAdminHomeScreen(
+                        navController = navController,
+                        sysAdminVm = systemAdminViewModel
+                    )
+                }
+                "SUPPORT_ADMIN" -> {
+                    SysAdminHomeScreen(
+                        navController = navController,
+                        sysAdminVm = systemAdminViewModel
+                    )
+                }
+                "AGENCY_ADMIN" -> {
+                    HomeScreen(
+                        navController = navController
+                    )
+                }
+                "AGENT_USER" ->{
+                    AgentHomeScreen(
+                        plm = propertyListingViewModel,
+                        navController = navController
+                    )
+                }
+                else -> {
+                    HomeScreen(
+                        navController = navController
+                    )
+                }
+            }
+
+        }
+
+        composable(NavigationItem.Inbox.route){
+
+            val userRole = authViewModel.getUserRole()
+
+            when (userRole){
+                "SUPER_ADMIN" -> {
+                    SysAdminInboxScreen(
+                        navController = navController,
+                        sysAdminVm = systemAdminViewModel
+                    )
+                }
+                "SUPPORT_ADMIN" -> {
+                    /*TODO*/
+                }
+                "AGENCY_ADMIN" -> {
+                    /*TODO*/
+                }
+                "AGENT_USER" ->{
+                    /*TODO*/
+                }
+                else -> {
+                    /*TODO*/
+                }
+            }
+
+        }
+
         composable(NavigationItem.AgencySignIn.route){
             AgencySignInScreen(
                 am = authViewModel,
                 navController = navController
             )
         }
-
 
         composable(NavigationItem.SignIn.route){
             SignInScreen(
@@ -94,16 +164,9 @@ fun AppNavHost(
             )
         }
 
-
         composable(NavigationItem.SignUp.route){
             SignUpScreen(
                 am = authViewModel,
-                navController = navController
-            )
-        }
-
-        composable(NavigationItem.Home.route) {
-            HomeScreen(
                 navController = navController
             )
         }
@@ -123,13 +186,6 @@ fun AppNavHost(
             )
         }
 
-        composable(NavigationItem.AgentHome.route) {
-            AgentHomeScreen(
-                plm = propertyListingViewModel,
-                navController = navController
-            )
-        }
-
         composable(NavigationItem.ProfileDetails.route) {
             ProfileDetailsScreen(
                 navController = navController,
@@ -138,6 +194,12 @@ fun AppNavHost(
         }
 
 
+        composable(NavigationItem.SysAdminAgency.route) {
+            SysAdminAgencyScreen(
+                navController = navController,
+                sysAdminVm = systemAdminViewModel
+            )
+        }
 
     }
 }

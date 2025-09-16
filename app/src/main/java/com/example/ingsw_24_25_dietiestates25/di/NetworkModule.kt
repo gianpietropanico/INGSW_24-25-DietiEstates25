@@ -1,5 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.di
 
+import com.example.ingsw_24_25_dietiestates25.data.api.adminApi.AdminApi
+import com.example.ingsw_24_25_dietiestates25.data.api.adminApi.AdminApiImpl
 import com.example.ingsw_24_25_dietiestates25.data.api.authApi.AuthApi
 import com.example.ingsw_24_25_dietiestates25.data.api.imageApi.ImageApi
 import com.example.ingsw_24_25_dietiestates25.data.api.propertyListingApi.PropertyListingApi
@@ -49,6 +51,7 @@ object NetworkModule {
             }
         }
 
+
     @Provides
     @Singleton
     fun provideAuthApi(httpClient: HttpClient): AuthApi =
@@ -70,4 +73,8 @@ object NetworkModule {
     fun provideProfileApi(httpClient: HttpClient): ProfileApi =
         ProfileApiImp(httpClient)
 
+    @Provides
+    @Singleton
+    fun provideAdminApi(httpClient: HttpClient): AdminApi =
+        AdminApiImpl(httpClient)
 }
