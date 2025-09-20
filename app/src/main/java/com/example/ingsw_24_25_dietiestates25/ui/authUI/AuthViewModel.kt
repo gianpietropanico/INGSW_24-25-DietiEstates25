@@ -65,7 +65,7 @@ class AuthViewModel @Inject constructor (
             viewModelScope.launch {
                 _authState.update { it.copy(isLoading = true, resultMessage = null) }
 
-                var result = authRepository.signUp(email, password, defaultProfilePic)
+                var result = authRepository.signUp(email, password)
 
                 if (result is ApiResult.Authorized<*>) {
 
@@ -79,6 +79,37 @@ class AuthViewModel @Inject constructor (
             }
 
         } else {
+            _authState.update { it.copy(isLoading = false, resultMessage = "Le password non combaciano", localError = true) }
+        }
+    }
+
+    fun sendAgencyRequest(agencyName: String , email: String , password: String, defaultProfilePic : String) {
+
+        clearResultMessage()
+
+        if ( password == _authState.value.confirmPassword) {
+
+            viewModelScope.launch {
+                Log.d("sendAgencyRequest", "Inizio richiesta con email=$email, agencyName=$agencyName")
+
+                _authState.update { it.copy(isLoading = true, resultMessage = null) }
+                var result = authRepository.sendAgencyRequest(email, password, agencyName)
+                Log.d("sendAgencyRequest", "Risultato sendAgencyRequest: $result")
+                Log.d("sendAgencyRequest", "Tipo result dopo sendAgencyRequest: ${result::class.simpleName}, valore=$result")
+
+                if (result is ApiResult.Success<*>) {
+                    Log.d("sendAgencyRequest", "sendAgencyRequest autorizzato, chiamo getLoggedUser()")
+
+
+                    Log.d("sendAgencyRequest", "Utente loggato, inserisco immagine di default con userId=${user.value?.id}")
+                    result = imageRepository.insertProfilePicture(email, defaultProfilePic )
+                }
+
+                Log.d("sendAgencyRequest", "handleResult con risultato: $result")
+                handleResult(result)
+            }
+        } else {
+            Log.d("sendAgencyRequest", "Password e conferma NON combaciano")
             _authState.update { it.copy(isLoading = false, resultMessage = "Le password non combaciano", localError = true) }
         }
     }
@@ -234,22 +265,6 @@ class AuthViewModel @Inject constructor (
             }
         }.getOrNull()
 
-    fun sendAgencyRequest(agencyName: String , email: String , password: String) {
-
-        clearResultMessage()
-
-        if ( password == _authState.value.confirmPassword) {
-
-            viewModelScope.launch {
-                _authState.update { it.copy(isLoading = true, resultMessage = null) }
-                val result = authRepository.sendAgencyRequest(email, password, agencyName)
-                handleResult(result)
-            }
-        } else {
-            _authState.update { it.copy(isLoading = false, resultMessage = "Le password non combaciano", localError = true) }
-        }
-
-    }
 
     fun startFacebookLogin(activity: Activity) {
         val callbackManager = CallbackManager.Factory.create()
@@ -296,6 +311,7 @@ class AuthViewModel @Inject constructor (
         )
 
         val registryOwner = activity as? ActivityResultRegistryOwner
+
         if (registryOwner != null) {
             loginManager.logIn(
                 registryOwner,

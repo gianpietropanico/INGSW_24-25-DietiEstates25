@@ -60,9 +60,10 @@ class ProfileRepoImp @Inject constructor(
         return try {
             profileApi.resetPassword(AuthRequest(email = sessionManager.currentUser.value!!.email, password = oldPassword,  newPassword = newPassword))
             ApiResult.Success(Unit, "Operation Successfull, Password changed")
+
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Reset failed ")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Reset failed")
                 else -> ApiResult.UnknownError("Errore")
             }
         } catch (e: Exception) {

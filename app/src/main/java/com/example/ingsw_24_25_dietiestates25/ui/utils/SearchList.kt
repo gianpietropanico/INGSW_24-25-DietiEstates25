@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -114,27 +116,49 @@ fun GenericListItem(
             )
         }
 
-        if( visibleIcons )
-        Icon(
-            imageVector = Icons.Default.Check,
-            contentDescription = "Accept",
-            tint = Color(0xFF3A7CA5),
-            modifier = Modifier
-                .size(28.dp)
-                .clickable { onAccept() }
-        )
+        if( visibleIcons ){
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Accept",
+                tint = Color(0xFF3A7CA5),
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable { onAccept() }
+            )
 
-        Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
-        if( visibleIcons )
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "Reject",
-            tint = Color(0xFF3A7CA5),
-            modifier = Modifier
-                .size(28.dp)
-                .clickable { onReject() }
-        )
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Reject",
+                tint = Color(0xFF3A7CA5),
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable { onReject() }
+            )
+        }else{
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit",
+                tint = Color(0xFF3A7CA5),
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable { /*TODO*/ }
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete",
+                tint = Color(0xFF3A7CA5),
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable { /*TODO*/ }
+            )
+        }
+
+
     }
 }
 
@@ -149,13 +173,11 @@ fun <T> SearchableList(
     itemContent: @Composable (T) -> Unit
 ) {
 
-    // Barra di ricerca
     SearchBar(
         query = query,
         onQueryChange = onQueryChange,
         modifier = modifier
     )
-
 
     LazyColumn {
         items(

@@ -2,7 +2,6 @@ package com.example.ingsw_24_25_dietiestates25.data.repository.authRepo
 
 import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.api.authApi.AuthApi
-import com.example.ingsw_24_25_dietiestates25.data.api.imageApi.ImageApi
 import com.example.ingsw_24_25_dietiestates25.data.jwt.parseJwtPayload
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
@@ -25,9 +24,15 @@ class AuthRepositoryImpl @Inject constructor (
 
 
     override suspend fun sendAgencyRequest(email: String, password: String, agencyName: String): ApiResult<Unit> {
+
+        if (!isValidEmail(email)) {
+            return ApiResult.Unauthorized("Email non valida")
+        }
+
         return try {
-            authApi.sendAgencyRequest(AuthRequest(email = email, password = password, agencyName = agencyName))
+            authApi.sendAgencyRequest(AuthRequest(email = email, password = password, agencyName = agencyName, ))
             ApiResult.Success(Unit, "Operation Successfull , You can now log in. You can check the status of your request in your user profile.")
+
         } catch (e: ResponseException) {
             when (e.response.status) {
                 HttpStatusCode.Conflict -> ApiResult.Unauthorized("Reset failed ")
@@ -38,14 +43,14 @@ class AuthRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun signUp(email: String, password: String, profilePicBase64: String): ApiResult<Unit> {
+    override suspend fun signUp(email: String, password: String): ApiResult<Unit> {
 
         if (!isValidEmail(email)) {
             return ApiResult.Unauthorized("Email non valida")
         }
 
         return try {
-            // Invia la richiesta di registrazione e ricevi il token
+
             val response = authApi.signUp(AuthRequest(email = email, password = password))
             val token = response.token
 

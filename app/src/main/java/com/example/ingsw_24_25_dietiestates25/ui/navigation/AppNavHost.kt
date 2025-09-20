@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.navigation
 
+import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,8 +22,10 @@ import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.AddPropertyListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.PropertyListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminAgencyScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminFormSuppScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminHomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminInboxScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminSupportsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminViewModel
 
 
@@ -37,7 +40,9 @@ enum class Screen {
     PROFILEDETAILS,
     PROFILEEDITDETAILS,
     SYSADMINAGENCY,
-    INBOX
+    INBOX,
+    SYSADMINSUPP,
+    SYSFORMADMINSUPP
 }
 sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
@@ -51,6 +56,8 @@ sealed class NavigationItem(val route: String) {
     object ProfileEditDetails : NavigationItem(Screen.PROFILEEDITDETAILS.name)
     object Inbox : NavigationItem(Screen.INBOX.name)
     object SysAdminAgency : NavigationItem(Screen.SYSADMINAGENCY.name)
+    object SysAdminSupp : NavigationItem(Screen.SYSADMINSUPP.name)
+    object SysFormAdminSupp : NavigationItem(Screen.SYSFORMADMINSUPP.name)
 }
 
 
@@ -143,6 +150,21 @@ fun AppNavHost(
 
         }
 
+        composable(NavigationItem.SysAdminSupp.route){
+            SysAdminSupportsScreen(
+                sysAdminVm = systemAdminViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.SysFormAdminSupp.route) {
+            Log.d("NAV", "Entrato in SysAdminFormSuppScreen")
+            SysAdminFormSuppScreen(
+                sysAdminVm = systemAdminViewModel,
+                navController = navController
+            )
+        }
+
         composable(NavigationItem.AgencySignIn.route){
             AgencySignInScreen(
                 am = authViewModel,
@@ -192,7 +214,6 @@ fun AppNavHost(
                 pm = profileViewModel
             )
         }
-
 
         composable(NavigationItem.SysAdminAgency.route) {
             SysAdminAgencyScreen(

@@ -5,7 +5,7 @@ import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
 
 interface AuthRepository {
     suspend fun getLoggedUser() : ApiResult<Unit>
-    suspend fun signUp(email: String, password: String, profilePicBase64 : String): ApiResult<Unit>
+    suspend fun signUp(email: String, password: String): ApiResult<Unit>
     suspend fun signIn(email:String, password: String): ApiResult<Unit>
     suspend fun authWithThirdParty(email: String, username : String): ApiResult<Unit>
     suspend fun sendAgencyRequest(email: String, password: String, agencyName: String): ApiResult<Unit>

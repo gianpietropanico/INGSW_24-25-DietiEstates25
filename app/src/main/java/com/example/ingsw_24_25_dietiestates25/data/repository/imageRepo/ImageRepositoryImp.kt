@@ -14,15 +14,25 @@ class ImageRepositoryImpl @Inject constructor(
     private val sessionManager: UserSessionManager
 ) : ImageRepository {
 
-    override suspend fun insertProfilePicture(ownerId: String, profilePicture: String): ApiResult<Unit> {
+    override suspend fun insertProfilePicture(ownerIdentifier : String, profilePicture: String): ApiResult<Unit> {
         return try {
             Log.d("ImageRepository", "INSERISCO IMMAGINE")
-            imageApi.insertProfilePicture(
-                ImageRequest(
-                    ownerId = ownerId,
-                    base64Images = listOf(profilePicture),
+
+            if( ownerIdentifier.contains("@")){
+                imageApi.insertProfilePicture(
+                    ImageRequest(
+                        ownerEmail = ownerIdentifier,
+                        base64Images = listOf(profilePicture),
+                    )
                 )
-            )
+            }else{
+                imageApi.insertProfilePicture(
+                    ImageRequest(
+                        ownerId = ownerIdentifier,
+                        base64Images = listOf(profilePicture),
+                    )
+                )
+            }
 
             sessionManager.saveProfilePic(profilePicture)
 
@@ -49,6 +59,7 @@ class ImageRepositoryImpl @Inject constructor(
         return try {
             Log.d("ImageRepository", "PRENDO IMMAGINE")
             val profilePicture = imageApi.getImage(userId)
+
             sessionManager.saveProfilePic(profilePicture)
             ApiResult.Success(Unit, "Operation Successfull")
 

@@ -119,12 +119,26 @@ fun ProfileDetailsScreen(
                 modifier = Modifier.size(150.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    bitmap = bse64ToImageBitmap(user!!.profilePicture!!),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier.fillMaxSize().clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                if (user?.profilePicture != null) {
+                    Image(
+                        bitmap = bse64ToImageBitmap(user!!.profilePicture!!),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }else{
+                    Image(
+                        painter = painterResource(id = R.drawable.defaultprofilepic),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
                     contentDescription = "Change photo",
@@ -146,7 +160,6 @@ fun ProfileDetailsScreen(
             }
 
             Spacer(Modifier.height(64.dp))
-
 
             Column(
                 modifier = Modifier

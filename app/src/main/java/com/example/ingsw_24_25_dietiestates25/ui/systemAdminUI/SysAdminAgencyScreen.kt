@@ -93,7 +93,7 @@ fun SysAdminAgencyScreen (
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Inbox",
+                    text = "Agencies",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = bluPerchEcipiace,
@@ -109,7 +109,6 @@ fun SysAdminAgencyScreen (
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                //.padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
 
                 Text(
@@ -141,26 +140,25 @@ fun SysAdminAgencyScreen (
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                //.padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 SearchableList(
                     modifier = Modifier.fillMaxWidth(),
                     items = state.agencies,
                     query = query,
                     onQueryChange = { query = it },
-                    extraFilter = { agency ->  !agency.pending },
+                    extraFilter = { _ -> true}, //mostra tutto se esempio solo pending {agency -> agency.pending}
                     searchFilter = { agency, text ->
                         agency.name.contains(text, ignoreCase = true) ||
                                 agency.agencyEmail.contains(text, ignoreCase = true)
                     }
                 ) { agency ->
                     GenericListItem(
-                        false,
+                        agency.pending,
                         icon = painterResource(id = R.drawable.agency),
                         title = agency.name,
                         subtitle = agency.agencyEmail,
-                        onAccept = { /*todo*/ },
-                        onReject = { /*todo*/ }
+                        onAccept = { sysAdminVm.acceptRequest(sysAdminVm.user.value!!.email, agency.agencyEmail) },
+                        onReject = { sysAdminVm.rejectRequest(sysAdminVm.user.value!!.email, agency.agencyEmail) }
                     )
                 }
             }

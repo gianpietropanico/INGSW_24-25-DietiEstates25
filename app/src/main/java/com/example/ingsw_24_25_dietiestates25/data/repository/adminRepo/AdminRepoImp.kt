@@ -3,6 +3,8 @@ package com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo
 import com.example.ingsw_24_25_dietiestates25.data.api.adminApi.AdminApi
 
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.Agency
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.model.request.AdminRequest
 import com.example.ingsw_24_25_dietiestates25.model.request.UserInfoRequest
 
 import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
@@ -20,6 +22,50 @@ class AdminRepoImp  @Inject constructor(
 
             if (response.success && response.data != null) {
                 ApiResult.Success(response.data)
+            } else {
+                ApiResult.UnknownError(response.message ?: "Errore sconosciuto")
+            }
+
+        } catch (e: ClientRequestException) {
+            when (e.response.status) {
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
+                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+            }
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
+    override suspend fun getAllSuppAdmins(): ApiResult<List<User>> {
+        return try {
+            val response = adminApi.getAllSuppAdmins(UserInfoRequest("sysadmin@system.com", typeRequest = "filtered", value = "SUPPORT_ADMIN"))
+
+            if (response.success && response.data != null) {
+                ApiResult.Success(response.data)
+            } else {
+                ApiResult.UnknownError(response.message ?: "Errore sconosciuto")
+            }
+
+        } catch (e: ClientRequestException) {
+            when (e.response.status) {
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
+                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+            }
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
+
+
+    override suspend fun addSuppAdmin(adminEmail: String , adminId: String , recipientEmail: String, username: String): ApiResult<Unit> {
+
+        if ( recipientEmail.isEmpty() || username.isEmpty() )  return ApiResult.UnknownError("Devi compilare tutti i campi")
+
+        return try {
+
+            val response = adminApi.addSuppAdmin(AdminRequest(adminEmail = adminEmail, adminId = adminId, suppAdminEmail = recipientEmail, usernameSuppAdmin = username))
+
+            if (response is ApiResult.Success) {
+                ApiResult.Success(Unit, response.message ?: "Operazione completata")
             } else {
                 ApiResult.UnknownError(response.message ?: "Errore sconosciuto")
             }

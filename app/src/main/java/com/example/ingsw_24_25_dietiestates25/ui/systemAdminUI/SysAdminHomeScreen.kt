@@ -49,6 +49,7 @@ fun SysAdminHomeScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val user = sysAdminVm.user
+    val isAdmin = sysAdminVm.getAdminRole() == "SUPER_ADMIN"
 
     val errorMsg = false
     Scaffold(
@@ -97,7 +98,9 @@ fun SysAdminHomeScreen(
                         )
                     )
                     Text(
-                        text = "Here you can create support admins to help you manage the platform. You can also review, accept, and monitor agency requests to ensure they meet the required standards",
+                        text = if( isAdmin )
+                            "Here you can create support admins to help you manage the platform. You can also review, accept, and monitor agency requests to ensure they meet the required standards"
+                            else "Here you can review, accept, and monitor agency requests to ensure they meet the required standards",
                         lineHeight = 20.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 8.dp),
@@ -111,39 +114,42 @@ fun SysAdminHomeScreen(
                 }
                 Spacer(modifier = Modifier.height(28.dp))
 
-                Button(
-                    onClick = {/* todo */},
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFEFF9FA), // sfondo azzurrino
-                        contentColor = Color(0xFF004C77)    // testo e icona blu
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, Color(0xFF3A7CA5)), // bordo blu
-                    modifier = Modifier
-                        .height(48.dp)
-                        .width(350.dp)
-                        .shadow(
-                            elevation = 8.dp, // più marcata
-                            shape = RoundedCornerShape(16.dp),
-                            clip = true,
-                            ambientColor = Color.Black,
-                            spotColor = Color.Black
+                if(isAdmin){
+                    Button(
+                        onClick = {  navController.navigate(NavigationItem.SysAdminSupp.route)},
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFEFF9FA), // sfondo azzurrino
+                            contentColor = Color(0xFF004C77)    // testo e icona blu
+                        ),
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, Color(0xFF3A7CA5)), // bordo blu
+                        modifier = Modifier
+                            .height(48.dp)
+                            .width(350.dp)
+                            .shadow(
+                                elevation = 8.dp, // più marcata
+                                shape = RoundedCornerShape(16.dp),
+                                clip = true,
+                                ambientColor = Color.Black,
+                                spotColor = Color.Black
+                            )
+                    )  {
+                        Icon(
+                            painter = painterResource(id = R.drawable.supp_admin),
+                            contentDescription = null,
+                            tint = Color(0xFF3A7CA5),
+                            modifier = Modifier.size(28.dp)
                         )
-                )  {
-                    Icon(
-                        painter = painterResource(id = R.drawable.supp_admin),
-                        contentDescription = null,
-                        tint = Color(0xFF3A7CA5),
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "View support Admins",
-                        color = Color(0xFF3A7CA5),
-                        style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
-                    )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "View support Admins",
+                            color = Color(0xFF3A7CA5),
+                            style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(18.dp))
                 }
-                Spacer(modifier = Modifier.height(18.dp))
+
                 Button(
 
                     onClick = { navController.navigate(NavigationItem.SysAdminAgency.route)},
