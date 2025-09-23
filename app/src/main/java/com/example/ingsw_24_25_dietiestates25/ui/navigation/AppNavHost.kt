@@ -14,8 +14,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.HomeViewModel
 import com.example.ingsw_24_25_dietiestates25.ResultsViewModel
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Role
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.ui.HomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.ResultsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.*
@@ -56,7 +56,6 @@ enum class Screen {
     SYSADMINAGENCY,
     INBOX,
     SYSADMINSUPP,
-    SYSFORMADMINSUPP,
     RESULTS,
     FORMUSER,
     AGENTLISTINGS,
@@ -76,7 +75,6 @@ sealed class NavigationItem(val route: String) {
     object Inbox : NavigationItem(Screen.INBOX.name)
     object SysAdminAgency : NavigationItem(Screen.SYSADMINAGENCY.name)
     object SysAdminSupp : NavigationItem(Screen.SYSADMINSUPP.name)
-    object SysFormAdminSupp : NavigationItem(Screen.SYSFORMADMINSUPP.name)
     object Results : NavigationItem(Screen.RESULTS.name)
     object FormUser : NavigationItem(Screen.FORMUSER.name)
     object AgentListings : NavigationItem(Screen.AGENTLISTINGS.name)

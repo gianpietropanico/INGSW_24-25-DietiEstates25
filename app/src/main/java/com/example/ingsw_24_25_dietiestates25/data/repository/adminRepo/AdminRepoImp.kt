@@ -1,31 +1,51 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo
 
-import com.example.ingsw_24_25_dietiestates25.data.api.adminApi.AdminApi
-
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Agency
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
-import com.example.ingsw_24_25_dietiestates25.model.request.AdminRequest
-import com.example.ingsw_24_25_dietiestates25.model.request.UserInfoRequest
-
-import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Agency
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.request.AdminRequest
+import com.example.ingsw_24_25_dietiestates25.data.model.request.UserInfoRequest
+import com.example.ingsw_24_25_dietiestates25.data.model.response.ListResponse
+import io.ktor.client.call.body
+import io.ktor.client.request.accept
+import io.ktor.client.request.get
+import io.ktor.http.ContentType
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
+import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
 
 class AdminRepoImp  @Inject constructor(
-    private val adminApi: AdminApi
+    private val httpClient: HttpClient
 ) : AdminRepo {
+
+    private val baseURL = "http://10.0.2.2:8080"
 
     override suspend fun getAllAgencies(): ApiResult<List<Agency>> {
         return try {
-            val response = adminApi.getAllAgencies()
-
-            if (response.success && response.data != null) {
-                ApiResult.Success(response.data)
-            } else {
-                ApiResult.UnknownError(response.message ?: "Errore sconosciuto")
+            val response = httpClient.get("$baseURL/agency/agencies") {
+                accept(ContentType.Application.Json)
             }
 
+            return when (response.status) {
+                HttpStatusCode.OK -> {
+                    val body: ListResponse<List<Agency>> = response.body()
+                    if (body.success && body.data != null) {
+                        ApiResult.Success(body.data)
+                    } else {
+                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto")
+                    }
+                }
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status}: $err")
+                }
+            }
         } catch (e: ClientRequestException) {
             when (e.response.status) {
                 HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
@@ -35,16 +55,31 @@ class AdminRepoImp  @Inject constructor(
             ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
+
     override suspend fun getAllSuppAdmins(): ApiResult<List<User>> {
         return try {
-            val response = adminApi.getAllSuppAdmins(UserInfoRequest("sysadmin@system.com", typeRequest = "super_admin", value = "SUPPORT_ADMIN"))
+            val request = UserInfoRequest("sysadmin@system.com", typeRequest = "super_admin", value = "SUPPORT_ADMIN")
 
-            if (response.success && response.data != null) {
-                ApiResult.Success(response.data)
-            } else {
-                ApiResult.UnknownError(response.message ?: "Errore sconosciuto")
+            val response = httpClient.get("$baseURL/admin/users") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(request)
             }
 
+            return when (response.status) {
+                HttpStatusCode.OK -> {
+                    val body: ListResponse<List<User>> = response.body()
+                    if (body.success && body.data != null) {
+                        ApiResult.Success(body.data)
+                    } else {
+                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto")
+                    }
+                }
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status}: $err")
+                }
+            }
         } catch (e: ClientRequestException) {
             when (e.response.status) {
                 HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
@@ -56,28 +91,32 @@ class AdminRepoImp  @Inject constructor(
     }
 
 
-    override suspend fun addSuppAdmin(admin : User , recipientEmail: String, username: String): ApiResult<Unit> {
-
-        if ( recipientEmail.isEmpty() || username.isEmpty() )  return ApiResult.UnknownError("Devi compilare tutti i campi")
+    override suspend fun addSuppAdmin(admin: User, recipientEmail: String, userEmail: String): ApiResult<Unit> {
+        if (recipientEmail.isEmpty() || userEmail.isEmpty()) {
+            return ApiResult.UnknownError("Devi compilare tutti i campi")
+        }
 
         return try {
-
-            val response = adminApi.addSuppAdmin(
-                AdminRequest(
-                    adminEmail = admin.email,
-                    adminId = admin.id,
-                    suppAdminEmail = recipientEmail,
-                    usernameSuppAdmin = username,
-                    emailDomain = "@system.com"
-                )
+            val request = AdminRequest(
+                adminEmail = admin.email,
+                adminId = admin.id,
+                suppAdminEmail = recipientEmail,
+                email = userEmail
             )
 
-            if (response is ApiResult.Success) {
-                ApiResult.Success(Unit, response.message ?: "Operazione completata")
-            } else {
-                ApiResult.UnknownError(response.message ?: "Errore sconosciuto")
+            val response = httpClient.post("$baseURL/admin/users") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(request)
             }
 
+            return if (response.status.isSuccess()) {
+                val msg = response.bodyAsText()
+                ApiResult.Success(Unit, msg.ifEmpty { "Operazione completata" })
+            } else {
+                val err = response.bodyAsText()
+                ApiResult.UnknownError("Errore HTTP ${response.status}: $err")
+            }
         } catch (e: ClientRequestException) {
             when (e.response.status) {
                 HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
@@ -87,20 +126,41 @@ class AdminRepoImp  @Inject constructor(
             ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
+
 
     override suspend fun decideRequest(adminEmail: String, agencyEmail: String, typeRequest: String): ApiResult<Unit> {
         return try {
-            val response = adminApi.decideRequest(UserInfoRequest(adminEmail, typeRequest = typeRequest, value = agencyEmail))
+            val request = UserInfoRequest(
+                adminEmail,
+                typeRequest = typeRequest,
+                value = agencyEmail
+            )
 
-            if (response.success) {
-                ApiResult.Success(Unit, response.message ?: "Operazione completata")
-            } else {
-                ApiResult.UnknownError(response.message ?: "Errore sconosciuto")
+            val response = httpClient.post("$baseURL/agency/request-decision") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(request)
+            }
+
+            return when (response.status) {
+                HttpStatusCode.OK -> {
+                    val body: ListResponse<Unit> = response.body()
+                    if (body.success) {
+                        ApiResult.Success(Unit, body.message ?: "Operazione completata")
+                    } else {
+                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto")
+                    }
+                }
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status}: $err")
+                }
             }
         } catch (e: Exception) {
             ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
+
 
 
 }

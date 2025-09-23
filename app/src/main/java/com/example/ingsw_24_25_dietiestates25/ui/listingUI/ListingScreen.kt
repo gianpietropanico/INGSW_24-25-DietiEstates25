@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.PropertyListing
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import androidx.compose.foundation.lazy.items
 
 

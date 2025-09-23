@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.model.result
+package com.example.ingsw_24_25_dietiestates25.data.model.result
 
 sealed class ApiResult<T>(val data: T? = null, val message: String? = null) {
 

@@ -1,10 +1,10 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo
 
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
-import com.example.ingsw_24_25_dietiestates25.model.request.AdminRequest
-import com.example.ingsw_24_25_dietiestates25.model.request.UserInfoRequest
-import com.example.ingsw_24_25_dietiestates25.model.response.ListResponse
-import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.request.AdminRequest
+import com.example.ingsw_24_25_dietiestates25.data.model.request.UserInfoRequest
+import com.example.ingsw_24_25_dietiestates25.data.model.response.ListResponse
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.accept
@@ -55,10 +55,47 @@ class AgentRepoImp @Inject constructor(
         }
     }
 
+    override suspend fun getUserIdByEmail(email: String): ApiResult<String> {
+        return try {
+            val response = httpClient.get("$baseURL/admin/users/by-email") {
+                url {
+                    parameters.append("email", email)
+                }
+                accept(ContentType.Application.Json)
+            }
 
-    override suspend fun addUserBySendingEmail(user : User,recipientEmail: String,username: String, emailDomain: String): ApiResult<Unit> {
+            return when (response.status) {
+                HttpStatusCode.OK -> {
+                    val body: Map<String, String> = response.body()
+                    val userId = body["id"]
 
-        if (recipientEmail.isBlank() || username.isBlank()) {
+                    if (userId != null) {
+                        ApiResult.Success(userId, "ID recuperato con successo")
+                    } else {
+                        ApiResult.UnknownError("Risposta server senza campo 'id'")
+                    }
+                }
+                HttpStatusCode.NotFound -> {
+                    ApiResult.UnknownError("Nessun utente trovato per l'email $email")
+                }
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                }
+            }
+        } catch (e: ClientRequestException) {
+            when (e.response.status) {
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
+                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+            }
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun addUserBySendingEmail(user : User, recipientEmail: String, userEmail: String): ApiResult<Unit> {
+
+        if (recipientEmail.isBlank() || userEmail.isBlank()) {
             return ApiResult.UnknownError("Devi compilare tutti i campi")
         }
 
@@ -67,8 +104,7 @@ class AgentRepoImp @Inject constructor(
                 adminEmail = user.email,
                 adminId = user.id,
                 suppAdminEmail = recipientEmail,
-                usernameSuppAdmin = username,
-                emailDomain = emailDomain
+                email = userEmail
             )
 
             val response = httpClient.post("$baseURL/admin/users") {

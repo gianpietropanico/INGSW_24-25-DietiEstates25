@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.model.state
+package com.example.ingsw_24_25_dietiestates25.ui.authUI
 
 data class AuthState(
     val email: String = "",

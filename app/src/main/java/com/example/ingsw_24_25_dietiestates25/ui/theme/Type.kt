@@ -27,6 +27,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp
     ),
+
     labelLarge = TextStyle(
         fontFamily = Gabarito,
         fontWeight = FontWeight.Medium,

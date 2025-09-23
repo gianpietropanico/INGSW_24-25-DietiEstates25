@@ -1,6 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo
 
-import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 
 interface ProfileRepo {
     suspend fun resetPassword( oldPassword: String , newPassword: String): ApiResult<Unit>

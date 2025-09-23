@@ -1,7 +1,6 @@
-package com.example.ingsw_24_25_dietiestates25.data.jwt
+package com.example.ingsw_24_25_dietiestates25.data.model.dataclass
 
 import android.util.Base64
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Role
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

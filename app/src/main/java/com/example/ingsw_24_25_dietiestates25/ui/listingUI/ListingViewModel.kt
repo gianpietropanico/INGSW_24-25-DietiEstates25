@@ -7,10 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.EnergyClass
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Property
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.PropertyListing
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Type
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentState
 import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,8 +65,22 @@ class ListingViewModel  @Inject constructor(
     fun loadMyListings() {
         viewModelScope.launch {
             user.value?.email?.let { email ->
-                val listings = listingsRepo.getPropertiesListingByAgent(email)
-                _myListings.value = listings
+                when (val result = listingsRepo.getPropertiesListingByAgent(email)) {
+                    is ApiResult.Success -> {
+                        _myListings.value = result.data ?: emptyList()
+                    }
+                    is ApiResult.Unauthorized -> {
+
+                        ListingState.Error( result.message ?: "Accesso non autorizzato")
+                    }
+                    is ApiResult.UnknownError -> {
+
+                        ListingState.Error( result.message ?: "Errore sconosciuto")
+                    }
+                    else -> {
+                        ListingState.Error ( result.message ?: "Errore inatteso")
+                    }
+                }
             }
         }
     }
@@ -118,11 +133,13 @@ class ListingViewModel  @Inject constructor(
                 base64Images.forEach { base64 ->
                     imageRepo.insertHouseImages(agentEmail, base64)
                 }
-                val succes = listingsRepo.addPropertyListing(listing)
-                _uiState.value =
-                    if (succes) ListingState.Success else ListingState.Error(
-                        "Error in the process of saving the listing"
-                    )
+                val result = listingsRepo.addPropertyListing(listing)
+                _uiState.value = when (result) {
+                    is ApiResult.Success -> ListingState.Success
+                    is ApiResult.Unauthorized -> ListingState.Error(result.message ?: "Non autorizzato")
+                    is ApiResult.UnknownError -> ListingState.Error(result.message ?: "Errore sconosciuto")
+                    else -> ListingState.Error("Errore inatteso")
+                }
             } catch (e: Exception) {
 
                 _uiState.value = ListingState.Error("Unknown Error")

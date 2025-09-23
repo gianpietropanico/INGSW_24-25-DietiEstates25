@@ -63,7 +63,7 @@ fun SendEmailFormScreen(
     var showResultMessage by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // sfondo blu
+
         Image(
             painter = painterResource(id = R.drawable.rectangleblu),
             contentDescription = "Background Image",
@@ -110,13 +110,14 @@ fun SendEmailFormScreen(
                         .size(28.dp)
                         .clickable {
                             showResultMessage = false
-                            val profilePicBase64 =
-                                drawableToBase64(context, R.drawable.account_circle_blue)
+                            val profilePicBase64 = drawableToBase64(context, R.drawable.account_circle_blue)
+
                             mailerSenderVm.addUserBySendingEmail(
                                 recipientEmail,
                                 username,
                                 profilePicBase64!!
                             )
+
                             if (state.resultMessage != null) {
                                 showResultMessage = true
                             }

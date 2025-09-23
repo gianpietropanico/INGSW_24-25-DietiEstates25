@@ -30,9 +30,7 @@ import com.facebook.CallbackManager
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Role
-import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
-import com.example.ingsw_24_25_dietiestates25.model.state.AuthState
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.ui.utils.downloadImageAsBase64
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential

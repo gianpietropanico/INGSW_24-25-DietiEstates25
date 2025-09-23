@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepo
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
-import com.example.ingsw_24_25_dietiestates25.model.state.AuthState
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

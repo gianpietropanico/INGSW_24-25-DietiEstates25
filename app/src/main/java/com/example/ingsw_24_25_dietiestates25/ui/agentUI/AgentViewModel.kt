@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo.AdminRepo
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.EnergyClass
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Property
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.PropertyListing
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Type
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
 import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,9 +20,9 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepo
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepository
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Agency
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
-import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Agency
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

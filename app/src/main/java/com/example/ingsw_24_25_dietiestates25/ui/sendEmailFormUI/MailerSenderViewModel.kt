@@ -7,7 +7,7 @@ import com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo.AdminRep
 import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepo
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,30 +34,29 @@ class MailerSenderViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
+            val finalEmail = if(user.value?.role?.name == "SUPER_ADMIN") "$username@system.com" else "$username@${agency.value?.name}.com"
+
             val result = agentRepo.addUserBySendingEmail(
                 user = user.value!!,
-                recipientEmail,
-                username,
-                emailDomain = if(user.value?.role?.name == "SUPER_ADMIN") "@system.com" else "@${agency.value?.name}.com"
+                recipientEmail = recipientEmail,
+                userEmail = finalEmail
             )
-            Log.d(
-                "Sending Email",
-                "Tipo result dopo adduserBySendingEmail: ${result::class.simpleName}, valore=$result"
-            )
+
+            Log.d("Sending Email","Tipo result dopo adduserBySendingEmail: ${result::class.simpleName}, valore=$result")
 
             when (result) {
                 is ApiResult.Success -> {
 
-                    if (user.value?.role?.name == "SUPER_ADMIN") {
-                        imageRepo.insertProfilePicture("$username@system.com", pictureBase64,"user")
+                    val addedUserId = agentRepo.getUserIdByEmail(finalEmail)
+
+                    if (finalEmail.contains("system")) {
+                        imageRepo.insertProfilePicture(addedUserId.data.toString(), pictureBase64,"user")
                     } else {
 
-                        agentRepo.addAgent(agencyEmail = agency.value!!.agencyEmail, agentEmail = "$username@${agency.value?.name}.com")
-                        Log.d(
-                            "Sending Email",
-                            "Tipo result dopo adduserBySendingEmail: ${result::class.simpleName}, valore=$result"
-                        )
-                        imageRepo.insertProfilePicture("$username@${agency.value?.name}.com", pictureBase64,"user")
+                        agentRepo.addAgent(agencyEmail = agency.value!!.agencyEmail, agentEmail = finalEmail)
+                        Log.d("Sending Email","Tipo result dopo adduserBySendingEmail: ${result::class.simpleName}, valore=$result")
+
+                        imageRepo.insertProfilePicture(addedUserId.data.toString(), pictureBase64,"user")
                     }
 
                     _state.update {

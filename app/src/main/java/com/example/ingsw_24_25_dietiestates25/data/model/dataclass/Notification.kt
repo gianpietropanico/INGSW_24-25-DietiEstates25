@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.model.dataclass
+package com.example.ingsw_24_25_dietiestates25.data.model.dataclass
 
 data class Notification(
     val id: String,

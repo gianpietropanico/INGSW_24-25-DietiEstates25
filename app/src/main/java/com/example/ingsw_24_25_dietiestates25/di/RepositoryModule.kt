@@ -1,6 +1,8 @@
 package com.example.ingsw_24_25_dietiestates25.di
 
 import com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo.*
+import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepo
+import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepoImp
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepositoryImpl
@@ -21,28 +23,31 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindAdminRepository(
-        adminImpl: AdminRepoImp
+        impl: AdminRepoImp
     ): AdminRepo
 
     @Binds
     abstract fun bindAuthRepository(
-        authImpl: AuthRepositoryImpl
+        impl: AuthRepositoryImpl
     ): AuthRepository
 
     @Binds
     abstract fun bindPropertyRepository(
-        propImpl: PropertyListingRepositoryImpl
+        impl: PropertyListingRepositoryImpl
     ): PropertyListingRepository
 
     @Binds
     abstract fun bindImageRepository(
-        imageImpl: ImageRepositoryImpl
+        impl: ImageRepositoryImpl
     ): ImageRepository
 
     @Binds
     abstract fun bindProfileRepository(
-        profileImpl: ProfileRepoImp
+        impl: ProfileRepoImp
     ): ProfileRepo
 
-
+    @Binds
+    abstract fun bindAgentRepository(
+        impl: AgentRepoImp
+    ): AgentRepo
 }

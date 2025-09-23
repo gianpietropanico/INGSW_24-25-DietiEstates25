@@ -1,7 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25
 
 import androidx.lifecycle.ViewModel
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Property
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

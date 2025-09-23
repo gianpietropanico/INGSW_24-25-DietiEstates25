@@ -3,16 +3,12 @@ package com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo.AdminRepo
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
-import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepo
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.Agency
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
-import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
-import com.example.ingsw_24_25_dietiestates25.model.state.AuthState
-import com.example.ingsw_24_25_dietiestates25.ui.utils.drawableToBase64
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Agency
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -82,7 +78,7 @@ class SysAdminViewModel @Inject constructor(
             val result = adminRepo.decideRequest(adminEmail, agencyEmail, "accepted")
             handleResult(result)
 
-            // dopo l'accettazione aggiorno la lista
+
             loadAgencies()
         }
 

@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.model.request
+package com.example.ingsw_24_25_dietiestates25.data.model.request
 import kotlinx.serialization.Serializable
 
 @Serializable
