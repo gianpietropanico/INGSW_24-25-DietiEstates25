@@ -7,7 +7,8 @@ data class Agency(
     val id: String, //id agenzia
     val name: String, //nome agenzia
     val pending: Boolean,
-    val agencyEmail: String //email dell'admin dell'agenzia
+    val agencyEmail: String ,//email d,ell'admin dell'agenzia
+    val profilePic: String? = null
 )
 
 // per controllare i dati di un agenzia bisogna

@@ -4,8 +4,8 @@ import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
 
 interface ImageRepository {
 
-    suspend fun insertProfilePicture(ownerIdentifier: String , profilePicture : String) : ApiResult<Unit>
+    suspend fun insertProfilePicture(ownerIdentifier: String , profilePicture : String, type: String) : ApiResult<Unit>
     suspend fun insertHouseImages(ownerId: String, propertyPicture :String)
-    suspend fun getImage(userId: String): ApiResult<Unit>
+    suspend fun getImage(userId: String, type : String): ApiResult<Unit>
 
 }

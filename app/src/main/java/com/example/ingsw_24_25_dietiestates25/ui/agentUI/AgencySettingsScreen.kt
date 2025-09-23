@@ -1,7 +1,9 @@
-package com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI
+package com.example.ingsw_24_25_dietiestates25.ui.agentUI
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,14 +14,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,9 +38,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,25 +51,38 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.profileUI.rememberImagePicker
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.utils.GenericListItem
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.SearchableList
+import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
+import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64
 
 @Composable
-fun SysAdminSupportsScreen(
-    navController: NavController,
-    sysAdminVm: SysAdminViewModel
-) {
-
+fun AgencySettingsScreen(
+    agentVm: AgentViewModel,
+    navController: NavController
+){
+    val agency by  agentVm.agency.collectAsState()
     val errorMsg = false
-    val state by sysAdminVm.state.collectAsState()
+    val state by agentVm.state.collectAsState()
+    val context = LocalContext.current
 
     var query by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        sysAdminVm.loadSuppAdmins()
+        agentVm.loadAgents()
+    }
+
+    val openGallery = rememberImagePicker { uri ->
+        uri?.let {
+            val base64 = uriToBase64(context, it)
+            if (base64 != null) {
+                agentVm.updateProfilePicture(base64)
+            }
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -76,13 +100,13 @@ fun SysAdminSupportsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 10.dp),
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 48.dp),
+                    .padding(top = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -91,27 +115,60 @@ fun SysAdminSupportsScreen(
                     tint = bluPerchEcipiace,
                     modifier = Modifier
                         .size(28.dp)
-                        .clickable { navController.popBackStack() }
+                        .clickable {
+                            agentVm.clearResultMessage()
+                            navController.popBackStack()
+                        }
                 )
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 3.dp),
-                verticalAlignment = Alignment.CenterVertically
+
+            Spacer(Modifier.height(60.dp))
+
+            Box(
+                modifier = Modifier.size(150.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Support Admins",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = bluPerchEcipiace,
-                    modifier = Modifier.weight(1f), // prende lo spazio rimanente
-                    textAlign = TextAlign.Center     // centra dentro allo spazio
+                if (agency?.profilePic != null) {
+                    Image(
+                        bitmap = bse64ToImageBitmap(agency!!.profilePic!!),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }else{
+                    Image(
+                        painter = painterResource(id = R.drawable.defaultprofilepic),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = "Change photo",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = (-6).dp, y = (-6).dp)
+                        .size(24.dp)
+                        .background(
+                            Color.Black.copy(alpha = 0.6f),
+                            RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomStart = 8.dp, bottomEnd = 8.dp)
+                        )
+                        .padding(2.dp)
+                        .clickable {
+                            agentVm.clearResultMessage()
+                            openGallery()
+                        }
                 )
             }
 
-
-            Spacer(Modifier.height(82.dp))
+            Spacer(Modifier.height(32.dp))
 
 
             Column(
@@ -120,12 +177,13 @@ fun SysAdminSupportsScreen(
             ) {
 
                 Text(
-                    text = "Here you can review all incoming agency requests. You have the option to accept them and grant access, or reject them if they don’t meet the requirements.",
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    text = agency!!.name,
+                    fontSize = 30.sp,
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
+
 
                 if (errorMsg) {
 
@@ -151,20 +209,20 @@ fun SysAdminSupportsScreen(
             ) {
                 SearchableList(
                     modifier = Modifier.fillMaxWidth(),
-                    items = state.suppAdmins,
+                    items = state.agents,
                     query = query,
                     onQueryChange = { query = it },
                     extraFilter = { _ -> true},
-                    searchFilter = { supadmins, text ->
-                        (supadmins.name ?: "").contains(text, ignoreCase = true) ||
-                                (supadmins.email ?: "").contains(text, ignoreCase = true)
+                    searchFilter = { agents, text ->
+                        (agents.name ?: "").contains(text, ignoreCase = true) ||
+                                (agents.email ?: "").contains(text, ignoreCase = true)
                     }
-                ) { supadmins ->
+                ) { agents ->
                     GenericListItem(
                         false,
                         icon = painterResource(id = R.drawable.supp_admin),
-                        title = supadmins.name ?: "N/D",
-                        subtitle = supadmins.email,
+                        title = agents.name ?: "N/D",
+                        subtitle = agents.email,
                         onAccept = {  },
                         onReject = {  }
                     )
@@ -175,7 +233,7 @@ fun SysAdminSupportsScreen(
 
         FloatingActionButton(
             onClick = {
-                sysAdminVm.clearResultMessage()
+                agentVm.clearResultMessage()
                 navController.navigate(NavigationItem.FormUser.route)
             },
             containerColor = Color(0xFF0097A7),

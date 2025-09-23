@@ -53,6 +53,7 @@ class AuthViewModel @Inject constructor (
 ) : ViewModel() {
 
     val user = userSessionManager.currentUser
+    val agency = userSessionManager.currentAgency
 
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -71,8 +72,15 @@ class AuthViewModel @Inject constructor (
 
                     result = authRepository.getLoggedUser()
 
-                    if ( result is ApiResult.Authorized<*>)
-                        imageRepository.insertProfilePicture(user.value!!.id,defaultProfilePic )
+                    if ( result is ApiResult.Authorized<*>){
+
+                        imageRepository.insertProfilePicture(user.value!!.id,defaultProfilePic , "user")
+
+                        if (user.value!!.role.name.contains("AGENT")){
+                            authRepository.setUpAgency(user.value!!.id)
+                        }
+                    }
+
                 }
 
                 handleResult(result)
@@ -93,19 +101,16 @@ class AuthViewModel @Inject constructor (
                 Log.d("sendAgencyRequest", "Inizio richiesta con email=$email, agencyName=$agencyName")
 
                 _authState.update { it.copy(isLoading = true, resultMessage = null) }
-                var result = authRepository.sendAgencyRequest(email, password, agencyName)
-                Log.d("sendAgencyRequest", "Risultato sendAgencyRequest: $result")
-                Log.d("sendAgencyRequest", "Tipo result dopo sendAgencyRequest: ${result::class.simpleName}, valore=$result")
+                val result = authRepository.sendAgencyRequest(email, password, agencyName)
 
-                if (result is ApiResult.Success<*>) {
-                    Log.d("sendAgencyRequest", "sendAgencyRequest autorizzato, chiamo getLoggedUser()")
+                if ( result is ApiResult.Success ){
+                    val data = result.data
 
+                    imageRepository.insertProfilePicture(data!!.userId, defaultProfilePic, "user")
+                    imageRepository.insertProfilePicture(data.agencyId, defaultProfilePic, "agency")
 
-                    Log.d("sendAgencyRequest", "Utente loggato, inserisco immagine di default con userId=${user.value?.id}")
-                    result = imageRepository.insertProfilePicture(email, defaultProfilePic )
                 }
 
-                Log.d("sendAgencyRequest", "handleResult con risultato: $result")
                 handleResult(result)
             }
         } else {
@@ -125,8 +130,15 @@ class AuthViewModel @Inject constructor (
 
                 result = authRepository.getLoggedUser()
 
-                if ( result is  ApiResult.Authorized<*>)
-                    imageRepository.getImage(user.value!!.id)
+                if ( result is  ApiResult.Authorized<*>){
+                    imageRepository.getImage(user.value!!.id, "user")
+                }
+
+                if (user.value!!.role.name.contains("AGENT")){
+                    authRepository.setUpAgency(user.value!!.id)
+                    imageRepository.getImage(agency.value!!.id, "agency")
+                }
+
             }
 
             handleResult(result)
@@ -146,12 +158,16 @@ class AuthViewModel @Inject constructor (
 
                     result = authRepository.getLoggedUser()
 
-                    if( user.value?.profilePicture == null){
+                    if (user.value!!.role.name.contains("AGENT")){
+                        authRepository.setUpAgency(user.value!!.id)
+                        imageRepository.getImage(agency.value!!.id, "agency")
+                    }
 
-                        imageRepository.insertProfilePicture(user.value!!.id, defaultProfilePic )
+                    if( user.value?.profilePicture == null){
+                        imageRepository.insertProfilePicture(user.value!!.id, defaultProfilePic,"user" )
 
                     }else{
-                        imageRepository.getImage(user.value!!.id)
+                        imageRepository.getImage(user.value!!.id, "user")
                     }
 
                 }
@@ -164,7 +180,7 @@ class AuthViewModel @Inject constructor (
         }
     }
 
-    private fun handleResult(result: ApiResult<Unit>) {
+    private fun handleResult(result: ApiResult<*>) {
         when (result) {
             is ApiResult.Authorized -> {
                 _authState.update{ it.copy(isLoading = false,isAuthenticated = true,resultMessage = null,localError = false)}
@@ -249,7 +265,14 @@ class AuthViewModel @Inject constructor (
 
             val result = authRepository.githubOauth(code, state)
 
-            if (result is ApiResult.Authorized<*>) imageRepository.getImage(user.value!!.id)
+            if (result is ApiResult.Authorized<*>) {
+                imageRepository.getImage(user.value!!.id, "user")
+            }
+
+            if (user.value!!.role.name.contains("AGENT")){
+                authRepository.setUpAgency(user.value!!.id)
+                imageRepository.getImage(agency.value!!.id, "agency")
+            }
 
             handleResult(result)
         }

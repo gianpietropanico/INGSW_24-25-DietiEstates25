@@ -10,6 +10,9 @@ import com.example.ingsw_24_25_dietiestates25.data.api.imageApi.ImageApiImpl
 import com.example.ingsw_24_25_dietiestates25.data.api.propertyListingApi.PropertyListingApiImpl
 import com.example.ingsw_24_25_dietiestates25.data.api.profileApi.ProfileApi
 import com.example.ingsw_24_25_dietiestates25.data.api.profileApi.ProfileApiImp
+import com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo.AdminRepo
+import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepo
+import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepoImp
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,6 +53,11 @@ object NetworkModule {
                 connectTimeoutMillis = 30_000
             }
         }
+
+    @Provides
+    @Singleton
+    fun provideAgentRepo( httpClient: HttpClient): AgentRepo =
+        AgentRepoImp(httpClient)
 
 
     @Provides

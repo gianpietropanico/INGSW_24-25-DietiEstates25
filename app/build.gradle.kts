@@ -132,6 +132,8 @@ dependencies {
     // Google Maps
     implementation("com.google.maps.android:maps-compose:2.0.0")
     implementation(libs.play.services.maps)
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // Webview / network
     implementation("com.squareup.okhttp3:okhttp:4.11.0")

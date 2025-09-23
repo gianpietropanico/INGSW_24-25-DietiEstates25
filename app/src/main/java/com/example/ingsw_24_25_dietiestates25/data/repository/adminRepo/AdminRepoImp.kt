@@ -37,7 +37,7 @@ class AdminRepoImp  @Inject constructor(
     }
     override suspend fun getAllSuppAdmins(): ApiResult<List<User>> {
         return try {
-            val response = adminApi.getAllSuppAdmins(UserInfoRequest("sysadmin@system.com", typeRequest = "filtered", value = "SUPPORT_ADMIN"))
+            val response = adminApi.getAllSuppAdmins(UserInfoRequest("sysadmin@system.com", typeRequest = "super_admin", value = "SUPPORT_ADMIN"))
 
             if (response.success && response.data != null) {
                 ApiResult.Success(response.data)
@@ -56,13 +56,21 @@ class AdminRepoImp  @Inject constructor(
     }
 
 
-    override suspend fun addSuppAdmin(adminEmail: String , adminId: String , recipientEmail: String, username: String): ApiResult<Unit> {
+    override suspend fun addSuppAdmin(admin : User , recipientEmail: String, username: String): ApiResult<Unit> {
 
         if ( recipientEmail.isEmpty() || username.isEmpty() )  return ApiResult.UnknownError("Devi compilare tutti i campi")
 
         return try {
 
-            val response = adminApi.addSuppAdmin(AdminRequest(adminEmail = adminEmail, adminId = adminId, suppAdminEmail = recipientEmail, usernameSuppAdmin = username))
+            val response = adminApi.addSuppAdmin(
+                AdminRequest(
+                    adminEmail = admin.email,
+                    adminId = admin.id,
+                    suppAdminEmail = recipientEmail,
+                    usernameSuppAdmin = username,
+                    emailDomain = "@system.com"
+                )
+            )
 
             if (response is ApiResult.Success) {
                 ApiResult.Success(Unit, response.message ?: "Operazione completata")

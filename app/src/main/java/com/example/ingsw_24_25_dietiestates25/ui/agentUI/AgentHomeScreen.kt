@@ -1,144 +1,204 @@
 package com.example.ingsw_24_25_dietiestates25.ui.agentUI
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.PropertyListing
-import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.PropertyListingViewModel
-import androidx.compose.foundation.lazy.items
-
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
+import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
+import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
 
 @Composable
 fun AgentHomeScreen(
-    plm: PropertyListingViewModel,
-    navController: NavController
-) {
+    navController : NavController,
+    agentVm : AgentViewModel
+){
 
-    LaunchedEffect(Unit) {
-        plm.loadMyListings()
-    }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val user = agentVm.user
+    val isAdmin = agentVm.getAdminRole() == "AGENT_ADMIN"
 
-
-    val listings by plm.myListings.collectAsState(initial = emptyList())  //recupera, se ci sono, gli annunci precedenti
+    val errorMsg = false
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate("PROPERTYLISTING") // va alla schermata AddPropertyListingScreen
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "PROPERTYLISTING")
-            }
-        }
-    ) { padding ->
-        if (listings.isEmpty()) {
-            // Schermata vuota
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp),
-                    tint = Color.Gray
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = "Nessun annuncio ancora",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Aggiungi il tuo primo immobile con il + in basso",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
-                )
-            }
-        } else {
-            // Lista con annunci
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                items(listings) { propertyListing ->
-                    PropertyCard(propertyListing) {
-                        navController.navigate("propertyDetail/${propertyListing.id}")
+        bottomBar = {
+            DietiNavBar(
+                currentRoute = currentRoute ?: Screen.Home.route,
+                onRouteSelected = { newRoute ->
+                    navController.navigate(newRoute) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun PropertyCard(
-    propertyListing: PropertyListing,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Row(modifier = Modifier.height(120.dp)) {
-            Image(
-                painter = rememberAsyncImagePainter(propertyListing.property.propertyPicture),
-                contentDescription = propertyListing.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.width(150.dp).fillMaxHeight()
             )
-            Column(
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
+                .padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Spacer(modifier = Modifier.height(4.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Icona personalizzata",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(210.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Text(
+                    text = "Welcome back " + (user.value?.username ?: "N/D"),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        color = Color.DarkGray
+                    )
+                )
+                Text(
+                    text = if( isAdmin )
+                        "here you can easily manage your property listings and add new support agents to your team.\n" +
+                                "Keep everything under control in one place, so you can focus on what really matters: growing your business."
+                    else "Here you can create and manage property listings with ease.\n" +
+                            "Focus on keeping the catalog updated and helping clients find their perfect home",
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        color = Color.DarkGray
+                    )
+                )
+                Spacer(modifier = Modifier.height(21.dp))
+
+            }
+            Spacer(modifier = Modifier.height(28.dp))
+
+            if(isAdmin){
+                Button(
+                    onClick = { navController.navigate(NavigationItem.AgentAgency.route) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFEFF9FA), // sfondo azzurrino
+                        contentColor = Color(0xFF004C77)    // testo e icona blu
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, Color(0xFF3A7CA5)), // bordo blu
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(350.dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(16.dp),
+                            clip = true,
+                            ambientColor = Color.Black,
+                            spotColor = Color.Black
+                        )
+                )  {
+                    Icon(
+                        painter = painterResource(id = R.drawable.agency),
+                        contentDescription = null,
+                        tint = Color(0xFF3A7CA5),
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "View your Agency",
+                        color = Color(0xFF3A7CA5),
+                        style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(18.dp))
+            }
+
+            Button(
+
+                onClick = { navController.navigate(NavigationItem.AgentListings.route) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFEFF9FA), // sfondo azzurrino
+                    contentColor = Color(0xFF004C77)    // testo e icona blu
+                ),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, Color(0xFF3A7CA5)), // bordo blu
                 modifier = Modifier
-                    .padding(12.dp)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .width(350.dp)
+                    .height(48.dp)
+                    .shadow(
+                        elevation = 8.dp, // più marcata
+                        shape = RoundedCornerShape(16.dp),
+                        clip = true,
+                        ambientColor = Color.Black,
+                        spotColor = Color.Black
+                    )
             ) {
-                Text(propertyListing.title, fontWeight = FontWeight.Bold)
-                Text("${propertyListing.property.city}, ${propertyListing.property.province}")
-                Text("${propertyListing.price} €", color = MaterialTheme.colorScheme.primary)
+                Icon(
+                    painter = painterResource(id = R.drawable.annuncio),
+                    contentDescription = null,
+                    tint = Color(0xFF3A7CA5),
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "View Your Listings",
+                    color = Color(0xFF3A7CA5),
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
+                )
+            }
+
+
+            if (errorMsg) {
+                val color = false
+
+                Text(
+                    text = "SIAMO FORTISSIMI",
+                    color = if (color) Color.Green else DarkRed,
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                )
             }
         }
+
+        //Funzione per mettere a schermo il caricamento
+        //LoadingOverlay(isVisible = state.isLoading)
     }
 }

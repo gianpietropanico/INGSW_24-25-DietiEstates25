@@ -65,7 +65,7 @@ class ProfileViewModel @Inject constructor (
 
         viewModelScope.launch {
             _authState.update { it.copy(isLoading = true, resultMessage = null) }
-            val result = imageRepository.insertProfilePicture(user.value!!.id, base64)
+            val result = imageRepository.insertProfilePicture(user.value!!.id, base64, "user")
             handleResult(result)
 
         }

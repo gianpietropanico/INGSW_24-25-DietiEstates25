@@ -1,6 +1,8 @@
 package com.example.ingsw_24_25_dietiestates25.data.api.authApi
 
 import android.util.Log
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.Agency
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.AgencyUser
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
 import com.example.ingsw_24_25_dietiestates25.model.response.TokenResponse
@@ -10,6 +12,7 @@ import io.ktor.client.plugins.ResponseException
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -106,7 +109,7 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
         }
     }
 
-    override suspend fun sendAgencyRequest(request: AuthRequest) {
+    override suspend fun sendAgencyRequest(request: AuthRequest): AgencyUser {
         Log.d("AuthApiImpl", "Invio richiesta AgencySignIn con email: ${request.email}")
 
         val response = httpClient.post("http://10.0.2.2:8080/agency/request") {
@@ -115,11 +118,11 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
             setBody(request)
         }
 
-        when (response.status) {
+        return when (response.status) {
             HttpStatusCode.OK, HttpStatusCode.Created -> {
-                val body = response.bodyAsText()
-                Log.d("AuthApiImpl", "Richiesta inviata con successo: $body")
-
+                val agencyUser = response.body<AgencyUser>()
+                Log.d("AuthApiImpl", "Richiesta inviata con successo: $agencyUser")
+                agencyUser
             }
 
             HttpStatusCode.Conflict, HttpStatusCode.BadRequest, HttpStatusCode.Unauthorized -> {
@@ -204,6 +207,26 @@ class AuthApiImpl @Inject constructor (private val httpClient: HttpClient) : Aut
                 val err = response.bodyAsText()
                 Log.e("AuthApiImpl", "Errore HTTP ${response.status}: $err")
                 throw ResponseException(response, "Errore HTTP ${response.status}")
+            }
+        }
+    }
+
+    override suspend fun getAgency(userId: String): Agency? {
+        val response = httpClient.get("http://10.0.2.2:8080/agency") {
+            accept(ContentType.Application.Json)
+            parameter("userId", userId)
+        }
+
+        return when (response.status) {
+            HttpStatusCode.OK -> response.body<Agency>()
+            HttpStatusCode.NotFound -> {
+                println("Nessuna agenzia trovata per userId=$userId")
+                null
+            }
+            else -> {
+                val err = response.bodyAsText()
+                println("Errore HTTP ${response.status.value}: $err")
+                null
             }
         }
     }

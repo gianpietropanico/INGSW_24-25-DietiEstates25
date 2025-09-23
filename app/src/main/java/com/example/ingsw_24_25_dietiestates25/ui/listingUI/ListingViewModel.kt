@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI
+package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 
 import android.content.Context
 import android.net.Uri
@@ -11,34 +11,27 @@ import com.example.ingsw_24_25_dietiestates25.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.Type
+import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentState
 import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @HiltViewModel
-class PropertyListingViewModel @Inject constructor(
-    private val repository: PropertyListingRepository,
-    userSessionManager: UserSessionManager,
-    private val imageRepository: ImageRepository
-) : ViewModel() {
+class ListingViewModel  @Inject constructor(
+    private val userSessionManager: UserSessionManager,
+    private val imageRepo : ImageRepository,
+    private val listingsRepo: PropertyListingRepository,
+): ViewModel()  {
 
-    val user = userSessionManager.currentUser
+    private val _uiState = MutableStateFlow<ListingState>(ListingState.Idle)
+    val uiState: StateFlow<ListingState> = _uiState
 
-
+    var user = userSessionManager.currentUser
     private val _myListings = MutableStateFlow<List<PropertyListing>>(emptyList())
     val myListings: StateFlow<List<PropertyListing>> = _myListings
 
-    fun loadMyListings() {
-        viewModelScope.launch {
-            user.value?.email?.let { email ->
-                val listings = repository.getPropertiesListingByAgent(email)
-                _myListings.value = listings
-            }
-        }
-    }
     // Stati per i campi del form
     val title = MutableStateFlow("")
 
@@ -66,13 +59,21 @@ class PropertyListingViewModel @Inject constructor(
     val airConditioning = MutableStateFlow(false)
     val heatingSystem = MutableStateFlow(false)
     val description = MutableStateFlow("")
-    private val _uiState = MutableStateFlow<AddPropertyListingUiState>(AddPropertyListingUiState.Idle)
-    val uiState: StateFlow<AddPropertyListingUiState> = _uiState
 
 
-    fun addPropertyListing(agentEmail: String, imageUris: List<Uri>, context: Context){
+    fun loadMyListings() {
         viewModelScope.launch {
-            _uiState.value = AddPropertyListingUiState.Loading
+            user.value?.email?.let { email ->
+                val listings = listingsRepo.getPropertiesListingByAgent(email)
+                _myListings.value = listings
+            }
+        }
+    }
+
+    fun addPropertyListing(agentEmail: String, imageUris: List<Uri>, context: Context) {
+        viewModelScope.launch {
+
+            _uiState.value = ListingState.Loading
 
             try {
                 val property = Property(
@@ -115,23 +116,24 @@ class PropertyListingViewModel @Inject constructor(
 
                 // Salvataggio immagini
                 base64Images.forEach { base64 ->
-                    imageRepository.insertHouseImages(agentEmail, base64)
+                    imageRepo.insertHouseImages(agentEmail, base64)
                 }
-                val succes = repository.addPropertyListing(listing)
-                _uiState.value = if (succes) AddPropertyListingUiState.Success else AddPropertyListingUiState.Error("Error in the process of saving the listing")
+                val succes = listingsRepo.addPropertyListing(listing)
+                _uiState.value =
+                    if (succes) ListingState.Success else ListingState.Error(
+                        "Error in the process of saving the listing"
+                    )
             } catch (e: Exception) {
 
-                _uiState.value = AddPropertyListingUiState.Error("Unknown Error")
+                _uiState.value = ListingState.Error("Unknown Error")
             }
         }
     }
-
-
-    sealed class AddPropertyListingUiState{
-        object Idle : AddPropertyListingUiState()
-        object Loading : AddPropertyListingUiState()
-        object Success : AddPropertyListingUiState()
-        data class Error(val message: String) : AddPropertyListingUiState()
+    sealed class ListingState{
+        object Idle : ListingState()
+        object Loading : ListingState()
+        object Success : ListingState()
+        data class Error(val message: String) : ListingState()
     }
-
 }
+

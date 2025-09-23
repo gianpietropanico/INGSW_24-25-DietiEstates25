@@ -1,4 +1,5 @@
-package com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI
+package com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
@@ -36,11 +38,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
@@ -48,24 +52,18 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.MinimalTextField
 import com.example.ingsw_24_25_dietiestates25.ui.utils.drawableToBase64
 
 @Composable
-fun SysAdminFormSuppScreen(
+fun SendEmailFormScreen(
     navController: NavController,
-    sysAdminVm : SysAdminViewModel
+    mailerSenderVm: MailerSenderViewModel
 ) {
     val context = LocalContext.current
-    val state by sysAdminVm.state.collectAsState()
+    val state by mailerSenderVm.state.collectAsState()
     var username by remember { mutableStateOf("") }
     var recipientEmail by remember { mutableStateOf("") }
-    var showErrorMessage by remember { mutableStateOf(false) }
-
-
-    LaunchedEffect(state.success) {
-        if (state.success) {
-            navController.popBackStack()
-        }
-    }
+    var showResultMessage by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // sfondo blu
         Image(
             painter = painterResource(id = R.drawable.rectangleblu),
             contentDescription = "Background Image",
@@ -83,13 +81,14 @@ fun SysAdminFormSuppScreen(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
+            // topbar con icone agli estremi
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 48.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Cancel",
@@ -97,17 +96,11 @@ fun SysAdminFormSuppScreen(
                     modifier = Modifier
                         .size(28.dp)
                         .clickable {
-                            sysAdminVm.clearResultMessage()
                             navController.popBackStack()
                         }
                 )
 
-                Text(
-                    text = "Insert Support Admin",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = bluPerchEcipiace
-                )
+                Spacer(modifier = Modifier.weight(1f))
 
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -116,28 +109,65 @@ fun SysAdminFormSuppScreen(
                     modifier = Modifier
                         .size(28.dp)
                         .clickable {
-                            sysAdminVm.clearResultMessage()
-                            showErrorMessage = false
-
-                            val profilePicBase64 = drawableToBase64(context, R.drawable.account_circle_blue)
-                            sysAdminVm.addSuppAdmin(recipientEmail, username, profilePicBase64!!)
-
-                            if (!state.success && state.resultMessage != null) {
-                                showErrorMessage = true
+                            showResultMessage = false
+                            val profilePicBase64 =
+                                drawableToBase64(context, R.drawable.account_circle_blue)
+                            mailerSenderVm.addUserBySendingEmail(
+                                recipientEmail,
+                                username,
+                                profilePicBase64!!
+                            )
+                            if (state.resultMessage != null) {
+                                showResultMessage = true
                             }
-
                         }
                 )
             }
-            Text(
-                text = "In these fields you can add a support admin. Enter the admin’s email address to send them the login credentials along with a default username for setting up their account." ,
-                color = Color.Gray,
-                textAlign = TextAlign.Center,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-            Spacer(modifier = Modifier.height(150.dp))
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // titolo
+            Text(
+                text = "Create An Account",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = bluPerchEcipiace,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(42.dp))
+
+            // descrizione e messaggi
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "In these fields you can add a new user. Enter their email address to send login credentials along with a default username for setting up the account",
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+
+                if (showResultMessage) {
+                    Text(
+                        text = state.resultMessage ?: "",
+                        color = if (state.success) Color.Green else DarkRed,
+                        style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                    )
+                }
+
+                Spacer(Modifier.height(46.dp))
+            }
+
+            Spacer(modifier = Modifier.height(54.dp))
+
+            // campo email
             MinimalTextField(
                 value = recipientEmail,
                 onValueChange = { recipientEmail = it },
@@ -148,34 +178,21 @@ fun SysAdminFormSuppScreen(
                 onError = false
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(42.dp))
 
+            // campo username
             MinimalTextField(
                 value = username,
                 onValueChange = { username = it },
                 label = "Username",
                 leadingIcon = null,
-                placeholder = "Insert your username",
+                placeholder = "Insert username",
                 modifier = Modifier.width(320.dp),
                 onError = false
             )
-
-            if (showErrorMessage) {
-
-                androidx.compose.material3.Text(
-                    text = state.resultMessage ?: "",
-                    color = if (state.success) Color.Green else DarkRed,
-                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                )
-
-            }
-
         }
 
+        // overlay caricamento
         LoadingOverlay(isVisible = state.isLoading)
     }
 }

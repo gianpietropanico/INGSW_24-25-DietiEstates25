@@ -8,6 +8,5 @@ interface AdminRepo {
     suspend fun getAllAgencies(): ApiResult<List<Agency>>
     suspend fun getAllSuppAdmins(): ApiResult<List<User>>
     suspend fun decideRequest(adminEmail: String, agencyEmail: String, typeRequest: String): ApiResult<Unit>
-    suspend fun addSuppAdmin(adminEmail: String , adminId: String , recipientEmail: String, username: String): ApiResult<Unit>
-
+    suspend fun addSuppAdmin(admin : User , recipientEmail: String, username: String): ApiResult<Unit>
 }

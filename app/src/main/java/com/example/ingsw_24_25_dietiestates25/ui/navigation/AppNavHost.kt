@@ -2,6 +2,7 @@ package com.example.ingsw_24_25_dietiestates25.ui.navigation
 
 import android.net.Uri
 import android.util.Log
+import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,6 +21,25 @@ import com.example.ingsw_24_25_dietiestates25.ui.HomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.ResultsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.*
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentHomeScreen
+
+import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileDetailsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileEditDetailsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
+import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
+
+import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgencySettingsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingScreen
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.SendEmailFormScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminAgencyScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminFormSuppScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminHomeScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminInboxScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminSupportsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminViewModel
+
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.*
 import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.AddPropertyListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.PropertyListingViewModel
@@ -39,9 +59,11 @@ enum class Screen {
     INBOX,
     SYSADMINSUPP,
     SYSFORMADMINSUPP,
-    RESULTS
+    RESULTS,
+    FORMUSER,
+    AGENTLISTINGS,
+    AGENTAGENCY
 }
-
 sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
     object SignIn : NavigationItem(Screen.SIGNIN.name)
@@ -57,13 +79,17 @@ sealed class NavigationItem(val route: String) {
     object SysAdminSupp : NavigationItem(Screen.SYSADMINSUPP.name)
     object SysFormAdminSupp : NavigationItem(Screen.SYSFORMADMINSUPP.name)
     object Results : NavigationItem(Screen.RESULTS.name)
+    object FormUser : NavigationItem(Screen.FORMUSER.name)
+    object AgentListings : NavigationItem(Screen.AGENTLISTINGS.name)
+    object AgentAgency : NavigationItem(Screen.AGENTAGENCY.name)
 }
+
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = NavigationItem.Results.route
+    startDestination: String = NavigationItem.Welcome.route
 ) {
 
     val authViewModel: AuthViewModel = hiltViewModel()
@@ -71,6 +97,11 @@ fun AppNavHost(
     val propertyListingViewModel: PropertyListingViewModel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
     val systemAdminViewModel: SysAdminViewModel = hiltViewModel()
+    val profileViewModel : ProfileViewModel = hiltViewModel()
+    val systemAdminViewModel : SysAdminViewModel = hiltViewModel()
+    val agentViewModel : AgentViewModel = hiltViewModel()
+    val mailerSenderViewModel : MailerSenderViewModel = hiltViewModel()
+    val listingViewModel : ListingViewModel = hiltViewModel()
 
     NavHost(
         modifier = modifier,
@@ -78,122 +109,129 @@ fun AppNavHost(
         startDestination = startDestination
     ) {
 
-        composable(NavigationItem.Welcome.route) {
+        composable(NavigationItem.Welcome.route){
             WelcomeScreen(
                 am = authViewModel,
                 navController = navController
             )
         }
 
-        composable(NavigationItem.Results.route) {
+        composable(NavigationItem.Home.route){
 
-            val user = User(
-                id = "fehyfhiwp",
-                username = "cacca",
-                name = "gianni",
-                surname = "peppe",
-                email = "gian@gmail,com",
-                role = Role.LOCAL_USER,
-                profilePicture = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/w8AAn8B9pye4QAAAABJRU5ErkJggg=="
-            )
+            val userRole = authViewModel.getUserRole()
 
-            val sessionManager: UserSessionManager = UserSessionManager()
-            sessionManager.saveUser(user, "ciao")
-
-            when (user.role.name) {
+            when (userRole){
                 "SUPER_ADMIN" -> {
                     SysAdminHomeScreen(
                         navController = navController,
                         sysAdminVm = systemAdminViewModel
                     )
                 }
-
                 "SUPPORT_ADMIN" -> {
                     SysAdminHomeScreen(
                         navController = navController,
                         sysAdminVm = systemAdminViewModel
                     )
                 }
-
-                "AGENCY_ADMIN" -> {
+                "AGENT_ADMIN" -> {
                     AgentHomeScreen(
-                        plm = propertyListingViewModel,
+                        agentVm = agentViewModel,
                         navController = navController
                     )
                 }
-
-                "AGENT_USER" -> {
+                "AGENT_USER" ->{
                     AgentHomeScreen(
-                        plm = propertyListingViewModel,
+                        agentVm = agentViewModel,
                         navController = navController
                     )
                 }
-
                 else -> {
                     HomeScreen(
-                        hm = homeViewModel,
                         navController = navController
-
                     )
                 }
             }
+
         }
 
-        composable(NavigationItem.Inbox.route) {
+        composable(NavigationItem.Inbox.route){
+
             val userRole = authViewModel.getUserRole()
 
-            when (userRole) {
+            when (userRole){
                 "SUPER_ADMIN" -> {
                     SysAdminInboxScreen(
                         navController = navController,
                         sysAdminVm = systemAdminViewModel
                     )
                 }
-
-                "SUPPORT_ADMIN" -> { /*TODO*/ }
-                "AGENCY_ADMIN" -> { /*TODO*/ }
-                "AGENT_USER" -> { /*TODO*/ }
-                else -> { /*TODO*/ }
+                "SUPPORT_ADMIN" -> {
+                    /*TODO*/
+                }
+                "AGENT_ADMIN" -> {
+                    /*TODO*/
+                }
+                "AGENT_USER" ->{
+                    /*TODO*/
+                }
+                else -> {
+                    /*TODO*/
+                }
             }
+
         }
 
-        composable(NavigationItem.SysAdminSupp.route) {
+        composable(NavigationItem.AgentAgency.route){
+            AgencySettingsScreen(
+                agentVm = agentViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.AgentListings.route){
+            ListingScreen(
+                listingVm = listingViewModel,
+                navController = navController
+            )
+        }
+
+
+        composable(NavigationItem.SysAdminSupp.route){
             SysAdminSupportsScreen(
                 sysAdminVm = systemAdminViewModel,
                 navController = navController
             )
         }
 
-        composable(NavigationItem.SysFormAdminSupp.route) {
-            Log.d("NAV", "Entrato in SysAdminFormSuppScreen")
-            SysAdminFormSuppScreen(
-                sysAdminVm = systemAdminViewModel,
+        composable(NavigationItem.FormUser.route) {
+            SendEmailFormScreen(
+                mailerSenderVm = mailerSenderViewModel,
                 navController = navController
             )
         }
 
-        composable(NavigationItem.AgencySignIn.route) {
+        composable(NavigationItem.AgencySignIn.route){
             AgencySignInScreen(
                 am = authViewModel,
                 navController = navController
             )
         }
 
-        composable(NavigationItem.SignIn.route) {
+        composable(NavigationItem.SignIn.route){
             SignInScreen(
                 am = authViewModel,
                 navController = navController
             )
         }
 
-        composable(NavigationItem.ProfileEditDetails.route) {
+        composable(NavigationItem.ProfileEditDetails.route){
             ProfileEditDetailsScreen(
                 pm = profileViewModel,
                 navController = navController
             )
         }
 
-        composable(NavigationItem.SignUp.route) {
+        composable(NavigationItem.SignUp.route){
             SignUpScreen(
                 am = authViewModel,
                 navController = navController
@@ -207,12 +245,11 @@ fun AppNavHost(
             )
         }
 
-        composable(NavigationItem.PropertyListing.route) {
-            AddPropertyListingScreen(
-                navController = navController,
-                plm = propertyListingViewModel,
-                onBack = { navController.popBackStack() }
-            )
+        composable(NavigationItem.PropertyListing.route){
+//            AddListingScreen(
+//                navController = navController,
+//                agentVm = agentViewModel
+//            )
         }
 
         composable(NavigationItem.ProfileDetails.route) {
