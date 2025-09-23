@@ -34,15 +34,14 @@ import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.SendEmailFormScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminAgencyScreen
-import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminFormSuppScreen
+
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminHomeScreen
-import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminInboxScreen
+
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminSupportsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminViewModel
 
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.*
-import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.AddPropertyListingScreen
-import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.PropertyListingViewModel
+
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.*
 
 enum class Screen {
@@ -93,10 +92,7 @@ fun AppNavHost(
 ) {
 
     val authViewModel: AuthViewModel = hiltViewModel()
-    val profileViewModel: ProfileViewModel = hiltViewModel()
-    val propertyListingViewModel: PropertyListingViewModel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val systemAdminViewModel: SysAdminViewModel = hiltViewModel()
     val profileViewModel : ProfileViewModel = hiltViewModel()
     val systemAdminViewModel : SysAdminViewModel = hiltViewModel()
     val agentViewModel : AgentViewModel = hiltViewModel()
@@ -147,7 +143,8 @@ fun AppNavHost(
                 }
                 else -> {
                     HomeScreen(
-                        navController = navController
+                        navController = navController,
+                        hm = homeViewModel
                     )
                 }
             }
@@ -160,10 +157,8 @@ fun AppNavHost(
 
             when (userRole){
                 "SUPER_ADMIN" -> {
-                    SysAdminInboxScreen(
-                        navController = navController,
-                        sysAdminVm = systemAdminViewModel
-                    )
+
+
                 }
                 "SUPPORT_ADMIN" -> {
                     /*TODO*/
