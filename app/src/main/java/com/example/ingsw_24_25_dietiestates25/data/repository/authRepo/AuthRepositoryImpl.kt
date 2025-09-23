@@ -4,11 +4,14 @@ import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.api.authApi.AuthApi
 import com.example.ingsw_24_25_dietiestates25.data.jwt.parseJwtPayload
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.Agency
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.AgencyUser
 import com.example.ingsw_24_25_dietiestates25.model.request.AuthRequest
 import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
 
@@ -23,19 +26,22 @@ class AuthRepositoryImpl @Inject constructor (
     }
 
 
-    override suspend fun sendAgencyRequest(email: String, password: String, agencyName: String): ApiResult<Unit> {
+    override suspend fun sendAgencyRequest( email: String, password: String, agencyName: String): ApiResult<AgencyUser> {
 
         if (!isValidEmail(email)) {
             return ApiResult.Unauthorized("Email non valida")
         }
 
         return try {
-            authApi.sendAgencyRequest(AuthRequest(email = email, password = password, agencyName = agencyName, ))
-            ApiResult.Success(Unit, "Operation Successfull , You can now log in. You can check the status of your request in your user profile.")
+            val agencyUser = authApi.sendAgencyRequest(
+                AuthRequest(email = email, password = password, agencyName = agencyName)
+            )
+
+            ApiResult.Success(agencyUser, "Operazione completata con successo")
 
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Reset failed ")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Richiesta agency fallita")
                 else -> ApiResult.UnknownError("Errore")
             }
         } catch (e: Exception) {
@@ -136,6 +142,26 @@ class AuthRepositoryImpl @Inject constructor (
             ApiResult.Authorized()
         } catch (e: Exception) {
             ApiResult.UnknownError("Errore nel recupero profilo: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun setUpAgency(userId: String): ApiResult<Unit> {
+        return try {
+            val response = authApi.getAgency(userId)
+
+            if (response != null) {
+                sessionManager.saveAgency(response)
+
+                ApiResult.Success(Unit, "Agenzia caricata e salvata correttamente")
+
+            } else {
+                ApiResult.UnknownError("Nessuna agenzia trovata per userId=$userId")
+            }
+
+        } catch (e: ClientRequestException) {
+            ApiResult.UnknownError("Errore HTTP ${e.response.status.value}: ${e.response.bodyAsText()}")
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Errore nel recupero agenzia: ${e.localizedMessage}")
         }
     }
 

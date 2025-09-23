@@ -5,5 +5,6 @@ data class AdminRequest(
     val adminEmail: String,
     val adminId: String,
     val suppAdminEmail: String,
-    val usernameSuppAdmin: String
+    val usernameSuppAdmin: String,
+    val emailDomain: String
 )

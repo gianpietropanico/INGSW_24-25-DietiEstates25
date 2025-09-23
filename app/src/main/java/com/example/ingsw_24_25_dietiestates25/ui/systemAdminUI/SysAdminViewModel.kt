@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.R
@@ -106,16 +107,18 @@ class SysAdminViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            val result = adminRepo.addSuppAdmin(user.value!!.email, user.value!!.id ,recipientEmail, username)
+            val result = adminRepo.addSuppAdmin(user.value!!,recipientEmail, username)
+            Log.d("addSuppAdmin", "Tipo result dopo addSuppAdmin: ${result::class.simpleName}, valore=$result")
 
             if (result is ApiResult.Success<*>) {
 
-                imageRepo.insertProfilePicture("$username@system.com",pictureBase64)
+                imageRepo.insertProfilePicture("$username@system.com",pictureBase64, "user")
 
             }
 
             handleResult(result)
         }
+
     }
 
     private fun handleResult(result: ApiResult<*>) {

@@ -22,8 +22,8 @@ enum class Role {
     @SerialName("SUPPORT_ADMIN")
     SUPPORT_ADMIN,
 
-    @SerialName("AGENCY_ADMIN")
-    AGENCY_ADMIN,
+    @SerialName("AGENT_ADMIN")
+    AGENT_ADMIN,
 
     @SerialName("AGENT_USER")
     AGENT_USER,
@@ -34,6 +34,6 @@ enum class Role {
     @SerialName("THIRDPARTY_USER")
     THIRDPARTY_USER,
 
-    @SerialName("PENDING_AGENCY_ADMIN")
-    PENDING_AGENCY_ADMIN
+    @SerialName("PENDING_AGENT_ADMIN")
+    PENDING_AGENT_ADMIN
 }

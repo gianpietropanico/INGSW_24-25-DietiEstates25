@@ -14,7 +14,7 @@ class ImageRepositoryImpl @Inject constructor(
     private val sessionManager: UserSessionManager
 ) : ImageRepository {
 
-    override suspend fun insertProfilePicture(ownerIdentifier : String, profilePicture: String): ApiResult<Unit> {
+    override suspend fun insertProfilePicture(ownerIdentifier : String, profilePicture: String, type : String): ApiResult<Unit> {
         return try {
             Log.d("ImageRepository", "INSERISCO IMMAGINE")
 
@@ -34,7 +34,14 @@ class ImageRepositoryImpl @Inject constructor(
                 )
             }
 
-            sessionManager.saveProfilePic(profilePicture)
+            if(type == "agency"){
+                Log.d("ImageRepository", "SALVO IMMAGINE AGENCY")
+                sessionManager.saveAgencyProfilePic(profilePicture)
+            }else{
+                Log.d("ImageRepository", "SALVO IMMAGINE USER")
+                sessionManager.saveProfilePic(profilePicture)
+            }
+
 
             ApiResult.Success(Unit, "Operation Successfull")
 
@@ -55,12 +62,20 @@ class ImageRepositoryImpl @Inject constructor(
                 base64Images = listOf(propertyPicture)))
     }
 
-    override suspend fun getImage(userId: String): ApiResult<Unit> {
+    override suspend fun getImage(userId: String, type : String): ApiResult<Unit> {
         return try {
             Log.d("ImageRepository", "PRENDO IMMAGINE")
             val profilePicture = imageApi.getImage(userId)
 
-            sessionManager.saveProfilePic(profilePicture)
+
+            if(type == "agency"){
+                Log.d("ImageRepository", "SALVO IMMAGINE AGENCY")
+                sessionManager.saveAgencyProfilePic(profilePicture)
+            }else{
+                Log.d("ImageRepository", "SALVO IMMAGINE USER")
+                sessionManager.saveProfilePic(profilePicture)
+            }
+
             ApiResult.Success(Unit, "Operation Successfull")
 
         } catch (e: ResponseException) {

@@ -15,12 +15,18 @@ import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignInScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.SignUpScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.WelcomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentHomeScreen
+
+import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileDetailsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileEditDetailsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
-import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.AddPropertyListingScreen
-import com.example.ingsw_24_25_dietiestates25.ui.propertyListingUI.PropertyListingViewModel
+
+import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgencySettingsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingScreen
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.SendEmailFormScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminAgencyScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminFormSuppScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminHomeScreen
@@ -42,7 +48,9 @@ enum class Screen {
     SYSADMINAGENCY,
     INBOX,
     SYSADMINSUPP,
-    SYSFORMADMINSUPP
+    FORMUSER,
+    AGENTLISTINGS,
+    AGENTAGENCY
 }
 sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
@@ -57,7 +65,9 @@ sealed class NavigationItem(val route: String) {
     object Inbox : NavigationItem(Screen.INBOX.name)
     object SysAdminAgency : NavigationItem(Screen.SYSADMINAGENCY.name)
     object SysAdminSupp : NavigationItem(Screen.SYSADMINSUPP.name)
-    object SysFormAdminSupp : NavigationItem(Screen.SYSFORMADMINSUPP.name)
+    object FormUser : NavigationItem(Screen.FORMUSER.name)
+    object AgentListings : NavigationItem(Screen.AGENTLISTINGS.name)
+    object AgentAgency : NavigationItem(Screen.AGENTAGENCY.name)
 }
 
 
@@ -70,8 +80,10 @@ fun AppNavHost(
 
     val authViewModel: AuthViewModel = hiltViewModel()
     val profileViewModel : ProfileViewModel = hiltViewModel()
-    val propertyListingViewModel : PropertyListingViewModel = hiltViewModel()
     val systemAdminViewModel : SysAdminViewModel = hiltViewModel()
+    val agentViewModel : AgentViewModel = hiltViewModel()
+    val mailerSenderViewModel : MailerSenderViewModel = hiltViewModel()
+    val listingViewModel : ListingViewModel = hiltViewModel()
 
     NavHost(
         modifier = modifier,
@@ -103,14 +115,15 @@ fun AppNavHost(
                         sysAdminVm = systemAdminViewModel
                     )
                 }
-                "AGENCY_ADMIN" -> {
-                    HomeScreen(
+                "AGENT_ADMIN" -> {
+                    AgentHomeScreen(
+                        agentVm = agentViewModel,
                         navController = navController
                     )
                 }
                 "AGENT_USER" ->{
                     AgentHomeScreen(
-                        plm = propertyListingViewModel,
+                        agentVm = agentViewModel,
                         navController = navController
                     )
                 }
@@ -137,7 +150,7 @@ fun AppNavHost(
                 "SUPPORT_ADMIN" -> {
                     /*TODO*/
                 }
-                "AGENCY_ADMIN" -> {
+                "AGENT_ADMIN" -> {
                     /*TODO*/
                 }
                 "AGENT_USER" ->{
@@ -150,6 +163,21 @@ fun AppNavHost(
 
         }
 
+        composable(NavigationItem.AgentAgency.route){
+            AgencySettingsScreen(
+                agentVm = agentViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.AgentListings.route){
+            ListingScreen(
+                listingVm = listingViewModel,
+                navController = navController
+            )
+        }
+
+
         composable(NavigationItem.SysAdminSupp.route){
             SysAdminSupportsScreen(
                 sysAdminVm = systemAdminViewModel,
@@ -157,10 +185,9 @@ fun AppNavHost(
             )
         }
 
-        composable(NavigationItem.SysFormAdminSupp.route) {
-            Log.d("NAV", "Entrato in SysAdminFormSuppScreen")
-            SysAdminFormSuppScreen(
-                sysAdminVm = systemAdminViewModel,
+        composable(NavigationItem.FormUser.route) {
+            SendEmailFormScreen(
+                mailerSenderVm = mailerSenderViewModel,
                 navController = navController
             )
         }
@@ -201,11 +228,10 @@ fun AppNavHost(
         }
 
         composable(NavigationItem.PropertyListing.route){
-            AddPropertyListingScreen(
-                navController = navController,
-                plm = propertyListingViewModel,
-                onBack = { navController.popBackStack() }
-            )
+//            AddListingScreen(
+//                navController = navController,
+//                agentVm = agentViewModel
+//            )
         }
 
         composable(NavigationItem.ProfileDetails.route) {
