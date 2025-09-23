@@ -1,7 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.navigation
 
-import android.net.Uri
-import android.util.Log
+
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -63,6 +62,7 @@ enum class Screen {
     AGENTLISTINGS,
     AGENTAGENCY
 }
+
 sealed class NavigationItem(val route: String) {
     object Home : NavigationItem(Screen.HOME.name)
     object SignIn : NavigationItem(Screen.SIGNIN.name)
@@ -157,8 +157,7 @@ fun AppNavHost(
 
             when (userRole){
                 "SUPER_ADMIN" -> {
-
-
+                    /*TODO*/
                 }
                 "SUPPORT_ADMIN" -> {
                     /*TODO*/
