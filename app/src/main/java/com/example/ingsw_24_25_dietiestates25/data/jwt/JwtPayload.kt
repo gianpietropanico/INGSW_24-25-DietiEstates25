@@ -1,6 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.data.jwt
 
 import android.util.Base64
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.Role
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -13,7 +14,10 @@ data class JwtPayload(
     val exp: Long?   = null,
     val username: String? = null,
     val email: String? = null,
-    val type: String? = null
+    val type: String? = null,
+    val name: String? = null,
+    val surname: String? = null,
+    val role: Role? = null,
 )
 
 fun parseJwtPayload(jwt: String): JwtPayload {

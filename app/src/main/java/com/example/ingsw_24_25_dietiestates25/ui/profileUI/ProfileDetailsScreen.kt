@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
@@ -35,24 +38,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
+
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
-import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
-import com.example.ingsw_24_25_dietiestates25.ui.utils.MinimalClickableField
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64
 
@@ -65,7 +63,7 @@ fun ProfileDetailsScreen(
     val user by pm.user.collectAsState()
     val context = LocalContext.current
 
-    val fullName by remember { mutableStateOf((user?.name ?: "" )+ (user?.surname ?: "") ) }
+    val fullName by remember { mutableStateOf((user?.name ?: "" ) +  " " + (user?.surname ?: "") ) }
     val username by remember { mutableStateOf(user?.username ?: "") }
     val state by pm.authState.collectAsState()
 
@@ -91,71 +89,84 @@ fun ProfileDetailsScreen(
         )
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = bluPerchEcipiace,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clickable {
+                            pm.clearResultMessage()
+                            navController.popBackStack()
+                        }
+                )
+            }
+
+            Spacer(Modifier.height(60.dp))
+
+            Box(
+                modifier = Modifier.size(150.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (user?.profilePicture != null) {
+                    Image(
+                        bitmap = bse64ToImageBitmap(user!!.profilePicture!!),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }else{
+                    Image(
+                        painter = painterResource(id = R.drawable.defaultprofilepic),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = "Change photo",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = (-6).dp, y = (-6).dp)
+                        .size(24.dp)
+                        .background(
+                            Color.Black.copy(alpha = 0.6f),
+                            RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomStart = 8.dp, bottomEnd = 8.dp)
+                        )
+                        .padding(2.dp)
+                        .clickable {
+                            pm.clearResultMessage()
+                            openGallery()
+                        }
+                )
+            }
+
+            Spacer(Modifier.height(64.dp))
+
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                //.padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, top = 16.dp)
-                        .clickable { navController.popBackStack() },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = bluPerchEcipiace,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clickable {
-                                pm.clearResultMessage()
-                                navController.popBackStack()
-                            }
-                    )
-                }
-                Spacer(modifier = Modifier.height(60.dp))
-
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (user?.profilePicture != null) {
-                        Image(
-                            bitmap = bse64ToImageBitmap(user!!.profilePicture!!),
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-
-                    Icon(
-                        imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "Change photo",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .size(24.dp)
-                            .background(Color.Black.copy(alpha = 0.6f), CircleShape)
-                            .padding(4.dp)
-                            .clickable {
-                                pm.clearResultMessage()
-                                openGallery()
-                            }
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
                 if (state.resultMessage != null) {
 
                     Text(
@@ -170,46 +181,67 @@ fun ProfileDetailsScreen(
 
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
-                MinimalClickableField(
-                    value = username,
-                    label = "Username",
-                    placeholder = user?.username ?: "Inserisci Il tuo username",
-                    modifier = Modifier.width(320.dp),
-                    onEditIconClick = {
-                        pm.clearResultMessage()
-                        navController.navigate(NavigationItem.ProfileEditDetails.route)
-                        pm.setEditDetails(
-                            label = "Username",
-                            value = username,
-                            description = "The Username in a real estate app is used to identify a user in a simple and recognizable way," +
-                                    " without displaying sensitive information like their full name."
-                        )
-                    }
-                )
+                Spacer(Modifier.height(46.dp))
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp) // margine esterno
+                        .background(Color(0xFFECF2F6), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .clickable {
+                            pm.clearResultMessage()
+                            navController.navigate(NavigationItem.ProfileEditDetails.route)
+                            pm.setEditDetails(
+                                label = "Username",
+                                value = username,
+                                description = "The Username in a real estate app is used to identify a user in a simple and recognizable way," +
+                                        " without displaying sensitive information like their full name."
+                            )
+                        },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Username", style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 15.sp, fontWeight = FontWeight.Medium
+                    ))
+                    Text(user!!.username, style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.Gray
+                    ))
+                }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(Modifier.height(46.dp))
 
-                MinimalClickableField(
-                    value = fullName,
-                    label = "Full Name",
-                    placeholder = if (pm.checkNullUserInfo()) "Inserisci Il tuo nome completo " else fullName,
-                    modifier = Modifier.width(320.dp),
-                    onEditIconClick = {
-                        pm.clearResultMessage()
-                        navController.navigate(NavigationItem.ProfileEditDetails.route)
-                        pm.setEditDetails(
-                            label = "Full Name",
-                            value = fullName,
-                            description = "Full Name is the user's complete name (first and last). It's used for identification in profiles, listings, and interactions within the Dieti Estates platform."
-                        )
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp) // margine esterno
+                        .background(Color(0xFFECF2F6), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .clickable {
+                            pm.clearResultMessage()
+                            navController.navigate(NavigationItem.ProfileEditDetails.route)
+                            pm.setEditDetails(
+                                label = "Name And Surname",
+                                value = fullName,
+                                description = "You can set your personal name and surname. It's used for identification in profiles, listings, and interactions within the Dieti Estates platform."
+                            )
+                        },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Name and Surname", style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 15.sp, fontWeight = FontWeight.Medium
+                    ))
+                    Text(if (fullName.isEmpty()) "N/D" else fullName, style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.Gray
+                    ))
+                }
             }
+
         }
+
+
     }
 }
 
@@ -225,3 +257,14 @@ fun rememberImagePicker(onImageSelected: (Uri?) -> Unit): () -> Unit {
 }
 
 
+//@Preview(
+//    showBackground = true,
+//    showSystemUi = true,
+//    name = "Profile MockUp Preview"
+//)
+//@Composable
+//fun ProfileMockUpPreview() {
+//    MaterialTheme {
+//        ProfileMockUp()
+//    }
+//}

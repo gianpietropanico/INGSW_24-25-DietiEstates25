@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.model.result.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +30,8 @@ import com.facebook.CallbackManager
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
+import com.example.ingsw_24_25_dietiestates25.model.dataclass.Role
+import com.example.ingsw_24_25_dietiestates25.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.model.state.AuthState
 import com.example.ingsw_24_25_dietiestates25.ui.utils.downloadImageAsBase64
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -64,13 +65,13 @@ class AuthViewModel @Inject constructor (
             viewModelScope.launch {
                 _authState.update { it.copy(isLoading = true, resultMessage = null) }
 
-                var result = authRepository.signUp(email, password, defaultProfilePic)
+                var result = authRepository.signUp(email, password)
 
-                if (result is AuthResult.Authorized) {
+                if (result is ApiResult.Authorized<*>) {
 
                     result = authRepository.getLoggedUser()
 
-                    if ( result is  AuthResult.Authorized)
+                    if ( result is ApiResult.Authorized<*>)
                         imageRepository.insertProfilePicture(user.value!!.id,defaultProfilePic )
                 }
 
@@ -82,6 +83,37 @@ class AuthViewModel @Inject constructor (
         }
     }
 
+    fun sendAgencyRequest(agencyName: String , email: String , password: String, defaultProfilePic : String) {
+
+        clearResultMessage()
+
+        if ( password == _authState.value.confirmPassword) {
+
+            viewModelScope.launch {
+                Log.d("sendAgencyRequest", "Inizio richiesta con email=$email, agencyName=$agencyName")
+
+                _authState.update { it.copy(isLoading = true, resultMessage = null) }
+                var result = authRepository.sendAgencyRequest(email, password, agencyName)
+                Log.d("sendAgencyRequest", "Risultato sendAgencyRequest: $result")
+                Log.d("sendAgencyRequest", "Tipo result dopo sendAgencyRequest: ${result::class.simpleName}, valore=$result")
+
+                if (result is ApiResult.Success<*>) {
+                    Log.d("sendAgencyRequest", "sendAgencyRequest autorizzato, chiamo getLoggedUser()")
+
+
+                    Log.d("sendAgencyRequest", "Utente loggato, inserisco immagine di default con userId=${user.value?.id}")
+                    result = imageRepository.insertProfilePicture(email, defaultProfilePic )
+                }
+
+                Log.d("sendAgencyRequest", "handleResult con risultato: $result")
+                handleResult(result)
+            }
+        } else {
+            Log.d("sendAgencyRequest", "Password e conferma NON combaciano")
+            _authState.update { it.copy(isLoading = false, resultMessage = "Le password non combaciano", localError = true) }
+        }
+    }
+
     fun signInUser(email: String, password: String) {
         clearResultMessage()
 
@@ -89,11 +121,11 @@ class AuthViewModel @Inject constructor (
             _authState.update { it.copy(isLoading = true, resultMessage = null) }
             var result = authRepository.signIn(email, password)
 
-            if (result is AuthResult.Authorized) {
+            if (result is ApiResult.Authorized<*>) {
 
                 result = authRepository.getLoggedUser()
 
-                if ( result is  AuthResult.Authorized)
+                if ( result is  ApiResult.Authorized<*>)
                     imageRepository.getImage(user.value!!.id)
             }
 
@@ -110,7 +142,7 @@ class AuthViewModel @Inject constructor (
 
                 var result = authRepository.authWithThirdParty(email, username)
 
-                if (result is AuthResult.Authorized) {
+                if (result is ApiResult.Authorized<*>) {
 
                     result = authRepository.getLoggedUser()
 
@@ -132,25 +164,23 @@ class AuthViewModel @Inject constructor (
         }
     }
 
-
-
-    private fun handleResult(result: AuthResult<Unit>) {
+    private fun handleResult(result: ApiResult<Unit>) {
         when (result) {
-            is AuthResult.Authorized -> {
+            is ApiResult.Authorized -> {
                 _authState.update{ it.copy(isLoading = false,isAuthenticated = true,resultMessage = null,localError = false)}
             }
 
-            is AuthResult.Unauthorized -> {
+            is ApiResult.Unauthorized -> {
 
                 _authState.update { it.copy(isLoading = false, resultMessage = result.message, isAuthenticated = false, localError = true) }
 
             }
 
-            is AuthResult.UnknownError -> {
+            is ApiResult.UnknownError -> {
                 _authState.update { it.copy(isLoading = false, resultMessage = result.message, isAuthenticated = false, localError = true) }
             }
 
-            is AuthResult.Success -> {
+            is ApiResult.Success -> {
                 _authState.update { it.copy(isLoading = false, resultMessage = result.message, isAuthenticated = false, success = true) }
             }
         }
@@ -216,33 +246,25 @@ class AuthViewModel @Inject constructor (
 
         viewModelScope.launch {
             _authState.update { it.copy(isLoading = true, resultMessage = null) }
-            val result = authRepository.exchangeGitHubCode(code, state)
+
+            val result = authRepository.githubOauth(code, state)
+
+            if (result is ApiResult.Authorized<*>) imageRepository.getImage(user.value!!.id)
+
             handleResult(result)
         }
     }
 
     private suspend fun fetchState(): String? =
         runCatching {
-            (authRepository.fetchState() as? AuthResult.Success)?.data
-                .takeIf { it.isNullOrBlank().not() }
+            val result = authRepository.fetchState()
+            if (result is ApiResult.Success<*> && !result.data.isNullOrBlank()) {
+                result.data
+            } else {
+                null
+            }
         }.getOrNull()
 
-    fun sendAgencyRequest(agencyName: String , email: String , password: String) {
-
-        clearResultMessage()
-
-        if ( password == _authState.value.confirmPassword) {
-
-            viewModelScope.launch {
-                _authState.update { it.copy(isLoading = true, resultMessage = null) }
-                val result = authRepository.sendAgencyRequest(email, password, agencyName)
-                handleResult(result)
-            }
-        } else {
-            _authState.update { it.copy(isLoading = false, resultMessage = "Le password non combaciano", localError = true) }
-        }
-
-    }
 
     fun startFacebookLogin(activity: Activity) {
         val callbackManager = CallbackManager.Factory.create()
@@ -289,6 +311,7 @@ class AuthViewModel @Inject constructor (
         )
 
         val registryOwner = activity as? ActivityResultRegistryOwner
+
         if (registryOwner != null) {
             loginManager.logIn(
                 registryOwner,
@@ -355,6 +378,10 @@ class AuthViewModel @Inject constructor (
 
     fun clearState() {
         _authState.update{ it.copy(isLoading = false,isAuthenticated = false,resultMessage = null,localError = false)}
+    }
+
+    fun getUserRole() : String{
+        return user.value!!.role.name
     }
 
 }

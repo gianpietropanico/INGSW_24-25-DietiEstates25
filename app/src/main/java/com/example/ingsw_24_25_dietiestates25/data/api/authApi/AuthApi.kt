@@ -12,7 +12,7 @@ interface AuthApi {
     suspend fun getLoggedUser(authHeader: String): User
 
     suspend fun fetchGitHubState() : String
-    suspend fun exchangeGitHubCode(code: String?, state: String?): TokenResponse
+    suspend fun githubOauth(code: String?, state: String?): TokenResponse
 
 
 

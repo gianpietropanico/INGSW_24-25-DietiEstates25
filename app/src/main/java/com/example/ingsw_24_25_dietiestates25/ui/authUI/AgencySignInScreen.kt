@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +53,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.GradientButton
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MinimalPasswordField
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MinimalTextField
+import com.example.ingsw_24_25_dietiestates25.ui.utils.drawableToBase64
 
 @Composable
 fun  AgencySignInScreen (
@@ -60,7 +62,7 @@ fun  AgencySignInScreen (
 ) {
 
     val state by am.authState.collectAsState()
-
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -160,9 +162,9 @@ fun  AgencySignInScreen (
             GradientButton(
                 text = "Send Request",
                 onClick = {
+                    val profilePicBase64 = drawableToBase64(context, R.drawable.account_circle_blue)
                     state.confirmPassword = confirmPassword
-
-                    am.sendAgencyRequest(agencyName, email, password)
+                    am.sendAgencyRequest(agencyName, email, password, profilePicBase64!!)
                 }
             )
 

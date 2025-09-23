@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.di
 
+import com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo.*
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepositoryImpl
@@ -12,10 +13,16 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+
+    @Binds
+    abstract fun bindAdminRepository(
+        adminImpl: AdminRepoImp
+    ): AdminRepo
 
     @Binds
     abstract fun bindAuthRepository(
@@ -36,5 +43,6 @@ abstract class RepositoryModule {
     abstract fun bindProfileRepository(
         profileImpl: ProfileRepoImp
     ): ProfileRepo
+
 
 }

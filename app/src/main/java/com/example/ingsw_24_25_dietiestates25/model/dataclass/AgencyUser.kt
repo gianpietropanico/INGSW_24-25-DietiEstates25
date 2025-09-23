@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AgencyUser(
-    val id: String, //id dell'utente
+    val userId: String, //id dell'utente
     val agencyId: String, //id della agenzia
 )

@@ -104,6 +104,15 @@ fun ProfileScreen(
                                         .clip(CircleShape),
                                     contentScale = ContentScale.Crop
                                 )
+                            }else{
+                                Image(
+                                    painter = painterResource(id = R.drawable.defaultprofilepic),
+                                    contentDescription = "Profile Picture",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
                             }
                         }
 

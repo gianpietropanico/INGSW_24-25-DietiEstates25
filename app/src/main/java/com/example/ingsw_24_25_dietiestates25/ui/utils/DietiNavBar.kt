@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -19,12 +18,20 @@ import androidx.compose.ui.unit.dp
 import com.example.ingsw_24_25_dietiestates25.ui.theme.BlueGray
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.R
+
+/*
+COME FUNZIONA LA NAVIGAZIONE NELLA NAVBAR
+GLI ITEMS INDICANO LE ROUTE CHE LA NAVIGATION SEGUE, QUESTI ITEM SONO PRESENTI NELLA SEALED CLASS SCREEN
+NEI PARAMETRI DI QUEI OGETTI C'è ROUTE CHE SERVE A FAR CAPIRE ALL'APP NAVHOST DOVE DEVE ANDARE
+SI NOTA CHE SONO SCRITTI IN MINUSCOLO POICHE C'è UNA FUNZIONE CHE VA A TROVARE LA ROUTE NELLA NAVHOST E
+USA LO RENDE MINUSCOLO COSI CHE VIENE INDIRIZZATO LI
+ */
 @Composable
 fun DietiNavBar(
     currentRoute: String,
     onRouteSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    items: List<Screen> = listOf(Screen.Chat, Screen.Home, Screen.Profile),
+    items: List<Screen> = listOf(Screen.Inbox, Screen.Home, Screen.Profile),
 ) {
     val selectedColor = primaryBlu
     val unselectedColor = BlueGray
@@ -75,7 +82,7 @@ fun DietiNavBar(
 }
 
 sealed class Screen(val route: String, val icon: Int, val label: String) {
-    object Chat     : Screen("chat",     R.drawable.chat_icon,     "CHAT")
-    object Home   : Screen("home",   R.drawable.search_icon,   "HOME")
-    object Profile : Screen("profile", R.drawable.profile_icon, "PROFILE")
+    object Inbox     : Screen("inbox",     R.drawable.notification,     "INBOX")
+    object Home      : Screen("home",   R.drawable.home,   "HOME")
+    object Profile   : Screen("profile", R.drawable.profile_icon, "PROFILE")
 }
