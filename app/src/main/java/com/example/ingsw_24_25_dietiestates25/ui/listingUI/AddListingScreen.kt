@@ -390,17 +390,17 @@ fun AddPropertyListingScreen(
 
 }
 
-//@Composable
-//fun TypeToggle(label: String, selected: Boolean, onClick: () -> Unit) {
-//    Button(
-//        onClick = onClick,
-//        colors = ButtonDefaults.buttonColors(
-//            containerColor = if (selected) Color(0xFF4FC3F7) else Color.LightGray
-//        )
-//    ) {
-//        Text(label)
-//    }
-//}
+@Composable
+fun TypeToggle(label: String, selected: Boolean, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (selected) Color(0xFF4FC3F7) else Color.LightGray
+        )
+    ) {
+        Text(label)
+    }
+}
 @Composable
 fun CounterRow(label: String, value: String, onValueChange: (Int) -> Unit) {
     Row(
@@ -423,20 +423,20 @@ fun CounterRow(label: String, value: String, onValueChange: (Int) -> Unit) {
     }
 }
 
-//@Composable
-//fun FacilityChip(label: String, selected: Boolean, onClick: () -> Unit) {
-//    FilterChip(
-//        selected = selected,
-//        onClick = onClick,
-//        label = { Text(label) },
-//        colors = FilterChipDefaults.filterChipColors(
-//            selectedContainerColor = Color(0xFF4CAF50),
-//            selectedLabelColor = Color.White,
-//            containerColor = Color.LightGray,
-//            labelColor = Color.Black
-//        )
-//    )
-//}
+@Composable
+fun FacilityChip(label: String, selected: Boolean, onClick: () -> Unit) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(label) },
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = Color(0xFF4CAF50),
+            selectedLabelColor = Color.White,
+            containerColor = Color.LightGray,
+            labelColor = Color.Black
+        )
+    )
+}
 
 @Composable
 fun EnergyClassDropdown(listingVm: ListingViewModel) {

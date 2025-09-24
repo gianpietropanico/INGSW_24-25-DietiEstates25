@@ -66,8 +66,6 @@ fun ActivitiesScreen(
     navController: NavController
 ){
 
-    val errorMsg = false
-
     val state by profileVm.state.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -127,11 +125,11 @@ fun ActivitiesScreen(
                 )
 
 
-                if (errorMsg) {
+                if (state.localError) {
 
                     Text(
                         text = "ERROR",
-                        color = if (errorMsg) Color.Green else DarkRed,
+                        color = if (state.success) Color.Green else DarkRed,
                         style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp),
                         textAlign = TextAlign.Center,
                         modifier = Modifier

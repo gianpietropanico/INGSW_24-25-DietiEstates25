@@ -164,6 +164,7 @@ fun ProfileScreen(
                             Icons.Default.History,
                             "Your activities",
                             onClick = {
+                                pm.clearResultMessage()
                                 navController.navigate(NavigationItem.UserActivities.route)
                             }
                         )
