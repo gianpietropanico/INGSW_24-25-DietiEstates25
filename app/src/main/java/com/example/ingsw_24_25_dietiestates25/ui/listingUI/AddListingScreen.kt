@@ -110,12 +110,6 @@ fun AddPropertyListingScreen(
         )
     }
 
-    LaunchedEffect(mapReady) {
-        if (mapReady) {
-            listingVm.setIdle() // toglie overlay
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()

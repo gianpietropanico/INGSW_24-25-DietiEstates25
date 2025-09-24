@@ -96,13 +96,7 @@ fun ListingScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    Log.d("ListingScreen","HAI CLICCATO SUL BOTTONE TI STO PORTANDO ALLA SCHERMATA ADDPROPERTYLISTINGSCREEN")
-                    //MapsInitializer.initialize(context)
-                    listingVm.setLoading()
-                    scope.launch {
-                        delay(300) // dai tempo al composable di ridisegnarsi
-                        navController.navigate(NavigationItem.AddPropertyListings.route)
-                    }
+                    navController.navigate(NavigationItem.AddPropertyListings.route)
                 },
 
                 containerColor = Color(0xFF0097A7),
