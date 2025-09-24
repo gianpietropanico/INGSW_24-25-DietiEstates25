@@ -91,11 +91,23 @@ fun AddPropertyListingScreen(
     val description by listingVm.description.collectAsState()
     val lat by listingVm.latitude.collectAsState()
     val lng by listingVm.longitude.collectAsState()
+    var mapReady by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
             LatLng(lat.toDoubleOrNull() ?: 0.0, lng.toDoubleOrNull() ?: 0.0), 15f
         )
+    }
+
+
+    LaunchedEffect(Unit) {
+        listingVm.setLoading()
+    }
+
+    LaunchedEffect(mapReady) {
+        if (mapReady) {
+            listingVm.setIdle()
+        }
     }
 
     Column(
@@ -218,7 +230,8 @@ fun AddPropertyListingScreen(
                 onMapClick = { latLng ->
                     // Sposta il marker al click sulla mappa
                     markerState.position = latLng
-                }
+                },
+                onMapLoaded = { mapReady = true }
 
             ) {
                 Marker(
@@ -387,6 +400,11 @@ fun AddPropertyListingScreen(
         )
         else->{}
     }
+
+    if (uiState is ListingViewModel.ListingState.Loading) {
+        LoadingOverlay(isVisible = true)
+    }
+
 
 }
 

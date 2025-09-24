@@ -47,7 +47,6 @@ fun AgentHomeScreen(
     val user = agentVm.user
     val isAdmin = agentVm.getAdminRole() == "AGENT_ADMIN"
 
-    val errorMsg = false
     Scaffold(
         bottomBar = {
             DietiNavBar(
@@ -182,20 +181,6 @@ fun AgentHomeScreen(
                 )
             }
 
-
-            if (errorMsg) {
-                val color = false
-
-                Text(
-                    text = "SIAMO FORTISSIMI",
-                    color = if (color) Color.Green else DarkRed,
-                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                )
-            }
         }
 
         //Funzione per mettere a schermo il caricamento

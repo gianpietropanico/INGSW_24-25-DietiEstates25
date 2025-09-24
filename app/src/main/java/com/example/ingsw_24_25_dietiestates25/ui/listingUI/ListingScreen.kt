@@ -1,8 +1,10 @@
 package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +41,17 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.FabPosition
+import androidx.compose.ui.draw.shadow
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel.ListingState
+import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
+import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
+import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
+import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
 
 
 @Composable
@@ -46,6 +59,10 @@ fun ListingScreen(
     listingVm: ListingViewModel,
     navController: NavController
 ) {
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val state by listingVm.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         listingVm.loadMyListings()
@@ -55,58 +72,102 @@ fun ListingScreen(
 
 
     Scaffold(
+        bottomBar = {
+            DietiNavBar(
+                currentRoute = currentRoute ?: Screen.Home.route,
+                onRouteSelected = { newRoute ->
+                    navController.navigate(newRoute) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                    }
+                }
+            )
+        },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate("PROPERTYLISTING")
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "PROPERTYLISTING")
-            }
-        }
-    ) { padding ->
-        if (listings.isEmpty()) {
-            // Schermata vuota
-            Column(
+            FloatingActionButton(
+                onClick = {
+                    Log.d("ListingScreen","HAI CLICCATO SUL BOTTONE TI STO PORTANDO ALLA SCHERMATA ADDPROPERTYLISTINGSCREEN")
+                    listingVm.setLoading()
+                    navController.navigate(NavigationItem.AddPropertyListings.route)
+                },
+                containerColor = Color(0xFF0097A7),
+                contentColor = Color.White,
+                shape = CircleShape,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .size(60.dp)
+                    .shadow(
+                        elevation = 12.dp,
+                        shape = CircleShape,
+                        clip = false
+                    )
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp),
-                    tint = Color.Gray
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = "Nessun annuncio ancora",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Aggiungi il tuo primo immobile con il + in basso",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
+                    contentDescription = "Add",
+                    modifier = Modifier.size(32.dp)
                 )
             }
-        } else {
-            // Lista con annunci
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                items(listings) { propertyListing ->
-                    PropertyCard(propertyListing) {
-                        navController.navigate("propertyDetail/${propertyListing.id}")
+        },
+        floatingActionButtonPosition = FabPosition.End
+    ) { padding ->
+
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            if (listings.isEmpty()) {
+                // Schermata vuota
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.size(120.dp),
+                        tint = Color.Gray
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = "Nessun annuncio ancora",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Aggiungi il tuo primo immobile con il + in basso",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                // Lista con annunci
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    items(listings) { propertyListing ->
+                        PropertyCard(propertyListing) {
+                            navController.navigate("propertyDetail/${propertyListing.id}")
+                        }
                     }
                 }
             }
+
+            if (state is ListingViewModel.ListingState.Loading) {
+                LoadingOverlay(isVisible = true)
+            }
         }
+
+
     }
+
 }
 
 @Composable

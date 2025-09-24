@@ -146,6 +146,19 @@ class ListingViewModel  @Inject constructor(
             }
         }
     }
+
+    fun setLoading() {
+        _uiState.value = ListingState.Loading
+    }
+
+    fun setIdle() {
+        _uiState.value = ListingState.Idle
+    }
+
+    fun enterAddListingScreen() {
+        _uiState.value = ListingState.Loading
+    }
+
     sealed class ListingState{
         object Idle : ListingState()
         object Loading : ListingState()

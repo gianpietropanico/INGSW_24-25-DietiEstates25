@@ -28,6 +28,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgencySettingsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.AddPropertyListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
@@ -61,6 +62,7 @@ enum class Screen {
     AGENTLISTINGS,
     AGENTAGENCY,
     USERACTIVITIES,
+    ADDPROPERTYLISTING
 }
 
 sealed class NavigationItem(val route: String) {
@@ -81,6 +83,7 @@ sealed class NavigationItem(val route: String) {
     object AgentListings : NavigationItem(Screen.AGENTLISTINGS.name)
     object AgentAgency : NavigationItem(Screen.AGENTAGENCY.name)
     object UserActivities : NavigationItem(Screen.USERACTIVITIES.name)
+    object AddPropertyListings : NavigationItem(Screen.ADDPROPERTYLISTING.name)
 }
 
 
@@ -99,6 +102,7 @@ fun AppNavHost(
     val mailerSenderViewModel : MailerSenderViewModel = hiltViewModel()
     val listingViewModel : ListingViewModel = hiltViewModel()
 
+
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -115,6 +119,13 @@ fun AppNavHost(
         composable(NavigationItem.UserActivities.route){
             ActivitiesScreen(
                 profileVm = profileViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.AddPropertyListings.route){
+            AddPropertyListingScreen(
+                listingVm = listingViewModel,
                 navController = navController
             )
         }
@@ -143,8 +154,8 @@ fun AppNavHost(
                     )
                 }
                 "AGENT_USER" ->{
-                    AgentHomeScreen(
-                        agentVm = agentViewModel,
+                    ListingScreen(
+                        listingVm = listingViewModel,
                         navController = navController
                     )
                 }
