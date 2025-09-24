@@ -1,6 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.data.model.dataclass
 
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -31,12 +32,20 @@ data class Property(
     val description: String
 )
 
+@Serializable
 enum class EnergyClass(val label: String) {
+    @SerialName("A")
     A("A"),
+    @SerialName("B")
     B("B"),
+    @SerialName("C")
     C("C"),
+    @SerialName("D")
     D("D"),
+    @SerialName("E")
     E("E"),
+    @SerialName("F")
     F("F"),
+    @SerialName("G")
     G("G")
 }

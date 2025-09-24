@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
@@ -61,6 +62,8 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 
@@ -132,9 +135,9 @@ fun AddPropertyListingScreen(
         Text("Listing Type", fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(8.dp))
         Row {
-            TypeToggle("Rent", selected = type == Type.A) { listingVm.type.value = Type.A }
+            TypeToggle("Rent", selected = type == Type.RENT) { listingVm.type.value = Type.RENT }
             Spacer(Modifier.width(8.dp))
-            TypeToggle("Sell", selected = type == Type.B) { listingVm.type.value = Type.B }
+            TypeToggle("Sell", selected = type == Type.SELL) { listingVm.type.value = Type.SELL }
         }
 
 
@@ -297,19 +300,25 @@ fun AddPropertyListingScreen(
         // Aggiorna campi indirizzo quando il marker cambia posizione
         LaunchedEffect(markerState.position) {
             val position = markerState.position
-            listingVm.latitude.value = position.latitude.toString()
-            listingVm.longitude.value = position.longitude.toString()
+            val currentLat = listingVm.latitude.value.toDoubleOrNull()
+            val currentLng = listingVm.longitude.value.toDoubleOrNull()
 
-            val geocoder = Geocoder(context, Locale.getDefault())
-            val addresses = geocoder.getFromLocation(position.latitude, position.longitude, 1)
-            if (!addresses.isNullOrEmpty()) {
-                val address = addresses[0]
-                listingVm.city.value = address.locality ?: ""
-                listingVm.province.value = address.subAdminArea ?: ""
-                listingVm.street.value = address.thoroughfare ?: ""
-                listingVm.civicNumber.value = address.subThoroughfare ?: ""
-                listingVm.cap.value = address.postalCode ?: ""
-                listingVm.country.value = address.countryName ?: ""
+            if (position.latitude != currentLat || position.longitude != currentLng) {
+                listingVm.latitude.value = position.latitude.toString()
+                listingVm.longitude.value = position.longitude.toString()
+
+                // Geocoder in IO
+                val addresses = withContext(Dispatchers.IO) {
+                    Geocoder(context, Locale.getDefault()).getFromLocation(position.latitude, position.longitude, 1)
+                }
+                addresses?.firstOrNull()?.let { address ->
+                    listingVm.city.value = address.locality ?: ""
+                    listingVm.province.value = address.subAdminArea ?: ""
+                    listingVm.street.value = address.thoroughfare ?: ""
+                    listingVm.civicNumber.value = address.subThoroughfare ?: ""
+                    listingVm.cap.value = address.postalCode ?: ""
+                    listingVm.country.value = address.countryName ?: ""
+                }
             }
         }
 
@@ -323,7 +332,7 @@ fun AddPropertyListingScreen(
             imageUris.forEach { uri ->
                 Box {
                     Image(
-                        painter = painterResource(id = R.drawable.default_house),
+                        painter = rememberAsyncImagePainter(model = uri),
                         contentDescription = null,
                         modifier = Modifier
                             .size(100.dp)
@@ -342,13 +351,15 @@ fun AddPropertyListingScreen(
                 }
                 Spacer(Modifier.width(8.dp))
             }
-            IconButton(
-                onClick = pickImage,
-                modifier = Modifier
-                    .size(80.dp)
-                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add photo", tint = primaryBlueWithOpacity)
+            if (imageUris.size < 2) {
+                IconButton(
+                    onClick = pickImage,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add photo", tint = primaryBlueWithOpacity)
+                }
             }
         }
 
@@ -398,7 +409,6 @@ fun AddPropertyListingScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Facilities", fontWeight = FontWeight.Bold)
             FacilityChip("Parking", parking) { listingVm.parking.value = !parking }
             FacilityChip("Garden", garden) { listingVm.garden.value = !garden }
             FacilityChip("Elevator", elevator) { listingVm.elevator.value = !elevator }
@@ -412,7 +422,7 @@ fun AddPropertyListingScreen(
         Spacer(Modifier.height(16.dp))
 
         // Price
-        Text(if (type == Type.B) "Sell price" else "Rent price")
+        Text(if (type == Type.SELL) "Sell price" else "Rent price")
         Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
@@ -453,16 +463,24 @@ fun AddPropertyListingScreen(
 
 // UI State
     when (uiState) {
-        is ListingViewModel.ListingState.Loading -> LoadingOverlay(isVisible = true)
-        is ListingViewModel.ListingState.Success -> Text(
-            "Immobile aggiunto con successo!",
-            color = MaterialTheme.colorScheme.primary
-        )
-        is ListingViewModel.ListingState.Error -> Text(
-            text = (uiState as ListingViewModel.ListingState.Error).message,
-            color = MaterialTheme.colorScheme.error
-        )
-        else->{}
+        is ListingViewModel.ListingState.Loading -> {
+            LoadingOverlay(isVisible = true)
+        }
+        is ListingViewModel.ListingState.Success -> {
+            Text("Immobile aggiunto con successo!", color = MaterialTheme.colorScheme.primary)
+            // magari resetti lo stato dopo un po’
+            LaunchedEffect(Unit) {
+                listingVm.setIdle()
+                navController.popBackStack() // torni alla lista
+            }
+        }
+        is ListingViewModel.ListingState.Error -> {
+            Text(
+                text = (uiState as ListingViewModel.ListingState.Error).message,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+        is ListingViewModel.ListingState.Idle -> {}
     }
 
 }

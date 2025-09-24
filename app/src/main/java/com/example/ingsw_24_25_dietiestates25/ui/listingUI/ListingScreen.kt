@@ -89,8 +89,6 @@ fun ListingScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    Log.d("ListingScreen","HAI CLICCATO SUL BOTTONE TI STO PORTANDO ALLA SCHERMATA ADDPROPERTYLISTINGSCREEN")
-                    listingVm.setLoading()
                     navController.navigate(NavigationItem.AddPropertyListings.route)
                 },
                 containerColor = Color(0xFF0097A7),
