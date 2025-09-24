@@ -21,6 +21,8 @@ val testColor = Color(0xFF2F6690)
 val primaryBlueWithOpacity: Color = primaryBlu.copy(alpha = 0.1f)
 val DarkRed = Color(0xFFC62828)
 val bluPerchEcipiace = Color(0xFF2F6690)
+val unselectedFacility = Color(0xFFF5F4F8)
+
 
 val ColorScheme.myFocusedTextFieldText: Color
     @Composable
@@ -33,3 +35,4 @@ val ColorScheme.unFocusedTextFieldText: Color
 val ColorScheme.textFieldContainer: Color
     @Composable
     get() = if (isSystemInDarkTheme()) Color.White else Color.Black
+

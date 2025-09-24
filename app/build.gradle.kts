@@ -75,9 +75,9 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.5.4")
     implementation("androidx.compose.material:material:1.5.4")
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
-    implementation("androidx.compose.material:material-icons-extended:1.5.4")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
+    implementation("androidx.compose.material3:material3:1.2.0") // o versione più recente
+    implementation("androidx.compose.material:material-icons-extended")
+
 
     // DA RIMUOVERE duplicati Compose
      implementation ("androidx.compose.ui:ui:1.5.4")
@@ -128,8 +128,6 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    implementation(libs.ui.tooling.preview)
-    debugImplementation(libs.ui.tooling)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
