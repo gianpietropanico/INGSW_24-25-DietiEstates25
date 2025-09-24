@@ -65,7 +65,7 @@ fun ProfileDetailsScreen(
 
     val fullName by remember { mutableStateOf((user?.name ?: "" ) +  " " + (user?.surname ?: "") ) }
     val username by remember { mutableStateOf(user?.username ?: "") }
-    val state by pm.authState.collectAsState()
+    val state by pm.state.collectAsState()
 
     val openGallery = rememberImagePicker { uri ->
         uri?.let {

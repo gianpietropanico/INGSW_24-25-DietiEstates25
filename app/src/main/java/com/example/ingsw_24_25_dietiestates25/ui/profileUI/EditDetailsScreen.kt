@@ -53,7 +53,7 @@ fun ProfileEditDetailsScreen(
     pm: ProfileViewModel
 ) {
 
-    val state by pm.authState.collectAsState()
+    val state by pm.state.collectAsState()
     var value by remember { mutableStateOf(pm.value) }
 
     var name by remember { mutableStateOf(( pm.getName() )) }

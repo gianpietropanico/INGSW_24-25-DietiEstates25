@@ -1,6 +1,9 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo
 
+import android.app.Activity
 import android.util.Log
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.UserActivity
 import io.ktor.client.request.accept
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -10,9 +13,13 @@ import io.ktor.http.contentType
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.data.model.request.AuthRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.request.UserInfoRequest
+import com.example.ingsw_24_25_dietiestates25.data.model.response.ListResponse
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
 
@@ -87,6 +94,35 @@ class ProfileRepoImp @Inject constructor(
         }
     }
 
+    override suspend fun getActivities(id: String): ApiResult<List<UserActivity>> {
+        return try {
+            val response = httpClient.get("$baseURL/user/profile/activities") {
+                url {
+                    parameters.append("userId", id)
+                }
+                accept(ContentType.Application.Json)
+            }
+
+            if (response.status == HttpStatusCode.OK) {
+                val body: ListResponse<List<UserActivity>> = response.body()
+                if (body.success && body.data != null) {
+                    ApiResult.Success(body.data)
+                } else {
+                    ApiResult.UnknownError(body.message ?: "Errore sconosciuto dal server")
+                }
+            } else {
+                ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+            }
+
+        } catch (e: ClientRequestException) {
+            when (e.response.status) {
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
+                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+            }
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
 
 
     override suspend fun resetPassword(oldPassword: String, newPassword: String): ApiResult<Unit> {

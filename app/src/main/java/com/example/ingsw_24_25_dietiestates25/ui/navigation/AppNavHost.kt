@@ -59,7 +59,8 @@ enum class Screen {
     RESULTS,
     FORMUSER,
     AGENTLISTINGS,
-    AGENTAGENCY
+    AGENTAGENCY,
+    USERACTIVITIES,
 }
 
 sealed class NavigationItem(val route: String) {
@@ -79,6 +80,7 @@ sealed class NavigationItem(val route: String) {
     object FormUser : NavigationItem(Screen.FORMUSER.name)
     object AgentListings : NavigationItem(Screen.AGENTLISTINGS.name)
     object AgentAgency : NavigationItem(Screen.AGENTAGENCY.name)
+    object UserActivities : NavigationItem(Screen.USERACTIVITIES.name)
 }
 
 
@@ -106,6 +108,13 @@ fun AppNavHost(
         composable(NavigationItem.Welcome.route){
             WelcomeScreen(
                 am = authViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.UserActivities.route){
+            ActivitiesScreen(
+                profileVm = profileViewModel,
                 navController = navController
             )
         }
