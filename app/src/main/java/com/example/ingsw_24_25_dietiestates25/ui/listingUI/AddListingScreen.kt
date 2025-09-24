@@ -97,6 +97,12 @@ fun AddPropertyListingScreen(
     val description by listingVm.description.collectAsState()
     val lat by listingVm.latitude.collectAsState()
     val lng by listingVm.longitude.collectAsState()
+    val city by listingVm.city.collectAsState()
+    val province by listingVm.province.collectAsState()
+    val street by listingVm.street.collectAsState()
+    val civicNumber by listingVm.civicNumber.collectAsState()
+    val cap by listingVm.cap.collectAsState()
+    val country by listingVm.country.collectAsState()
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -160,7 +166,13 @@ fun AddPropertyListingScreen(
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                "Jl. Gerungsari, Bulusan, Kec. Tembalang, Kota Semarang, Jawa Tengah 50277",
+                text = listOfNotNull(
+                    street.takeIf { it.isNotBlank() }?.plus(" $civicNumber"),
+                    city.takeIf { it.isNotBlank() },
+                    province.takeIf { it.isNotBlank() },
+                    cap.takeIf { it.isNotBlank() },
+                    country.takeIf { it.isNotBlank() }
+                ).joinToString(", "),
                 style = MaterialTheme.typography.bodySmall
             )
         }
