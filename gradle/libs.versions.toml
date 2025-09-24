@@ -45,6 +45,8 @@ navigationComposeAndroid = "2.9.0"
 foundation = "1.8.3"
 espressoCoreVersion = "3.7.0"
 roomCompiler = "2.7.2"
+uiToolingPreview = "1.9.1"
+uiTooling = "1.9.1"
 
 [libraries]
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
@@ -102,6 +104,8 @@ androidx-material3-android = { group = "androidx.compose.material3", name = "mat
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
+ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
