@@ -76,7 +76,7 @@ fun AddPropertyListingScreen(
 
     val currentUser by listingVm.user.collectAsState()
     val uiState by listingVm.uiState.collectAsState()
-
+    var mapReady by remember { mutableStateOf(false) }
     var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
     val pickImage = rememberImagePicker { uri -> uri?.let { imageUris = imageUris + it } }
 
@@ -260,7 +260,8 @@ fun AddPropertyListingScreen(
                 onMapClick = { latLng ->
                     // Sposta il marker al click sulla mappa
                     markerState.position = latLng
-                }
+                },
+                onMapLoaded = { mapReady = true }
 
             ) {
                 Marker(

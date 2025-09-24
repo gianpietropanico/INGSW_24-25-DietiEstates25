@@ -44,7 +44,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.FabPosition
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel.ListingState
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
@@ -52,6 +54,9 @@ import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
+import com.google.android.gms.maps.MapsInitializer
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -63,6 +68,8 @@ fun ListingScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val state by listingVm.uiState.collectAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         listingVm.loadMyListings()
@@ -91,6 +98,7 @@ fun ListingScreen(
                 onClick = {
                     navController.navigate(NavigationItem.AddPropertyListings.route)
                 },
+
                 containerColor = Color(0xFF0097A7),
                 contentColor = Color.White,
                 shape = CircleShape,

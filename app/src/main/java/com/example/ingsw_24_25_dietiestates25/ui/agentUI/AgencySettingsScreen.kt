@@ -214,14 +214,14 @@ fun AgencySettingsScreen(
                     onQueryChange = { query = it },
                     extraFilter = { _ -> true},
                     searchFilter = { agents, text ->
-                        (agents.name ?: "").contains(text, ignoreCase = true) ||
+                        (agents.username ?: "").contains(text, ignoreCase = true) ||
                                 (agents.email ?: "").contains(text, ignoreCase = true)
                     }
                 ) { agents ->
                     GenericListItem(
                         false,
                         icon = painterResource(id = R.drawable.supp_admin),
-                        title = agents.name ?: "N/D",
+                        title = agents.username ?: "N/D",
                         subtitle = agents.email,
                         onAccept = {  },
                         onReject = {  }
