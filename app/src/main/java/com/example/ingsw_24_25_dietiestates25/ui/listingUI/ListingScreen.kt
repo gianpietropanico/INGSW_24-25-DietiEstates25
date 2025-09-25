@@ -68,9 +68,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
-import com.google.android.gms.maps.MapsInitializer
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+
 
 
 @Composable
@@ -173,7 +171,7 @@ fun ListingScreen(
                         .padding(padding)
                 ) {
                     items(listings) { propertyListing ->
-                        PropertyCard(propertyListing) { //passare lista foto
+                        PropertyCard(propertyListing) {
                             navController.navigate("propertyDetail/${propertyListing.id}")
                         }
                     }
@@ -191,7 +189,7 @@ fun ListingScreen(
 }
 
 @Composable
-fun PropertyCard( //passare lista foto
+fun PropertyCard(
     propertyListing: PropertyListing,
     onClick: () -> Unit
 ) {
@@ -257,7 +255,7 @@ fun PropertyCard( //passare lista foto
                     Text(
                         text = "Delete",
                         color = primaryBlu,
-                        style = MaterialTheme.typography.labelLarge, // stile uguale al bottone
+                        style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -283,7 +281,7 @@ fun PropertyCard( //passare lista foto
                         Text(
                             "Edit Property",
                             color = Color.White,
-                            style = MaterialTheme.typography.labelLarge, // stesso stile
+                            style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Medium
                         )
                     }
