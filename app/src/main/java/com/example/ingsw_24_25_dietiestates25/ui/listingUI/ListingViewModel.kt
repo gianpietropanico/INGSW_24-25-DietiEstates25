@@ -37,6 +37,10 @@ class ListingViewModel  @Inject constructor(
     private val _myListings = MutableStateFlow<List<PropertyListing>>(emptyList())
     val myListings: StateFlow<List<PropertyListing>> = _myListings
 
+    val _myListing = MutableStateFlow<PropertyListing?>(null)
+
+    val myListing: StateFlow<PropertyListing?> = _myListing
+
     // Stati per i campi del form
     val title = MutableStateFlow("")
 
@@ -222,8 +226,25 @@ class ListingViewModel  @Inject constructor(
         description.value = ""
     }
 
-    fun getListingById(id: String): PropertyListing? {
-        val result = listingsRepo.getListingById(id)
+    fun getListingById(id: String) {
+        viewModelScope.launch {
+
+            val result = listingsRepo.getListingById(id)
+            when (result) {
+                is ApiResult.Success -> {
+                    _myListing.value = result.data
+                }
+                is ApiResult.Unauthorized -> {
+                    _uiState.value = ListingState.Error(result.message ?: "Accesso non autorizzato")
+                }
+                is ApiResult.UnknownError -> {
+                    _uiState.value = ListingState.Error(result.message ?: "Errore sconosciuto")
+                }
+                else -> {
+                    _uiState.value = ListingState.Error(result.message ?: "Errore inatteso")
+                }
+            }
+        }
     }
 
 
