@@ -233,7 +233,7 @@ class ListingViewModel  @Inject constructor(
             when (result) {
                 is ApiResult.Success -> {
                     _myListing.value = result.data
-                    _uiState.value = ListingState.Idle
+                    _uiState.value = ListingState.Success
                 }
                 is ApiResult.Unauthorized -> {
                     _uiState.value = ListingState.Error(result.message ?: "Accesso non autorizzato")

@@ -108,7 +108,7 @@ class PropertyListingRepositoryImpl @Inject constructor(
 
     override suspend fun getListingById(id: String): ApiResult<PropertyListing> {
         return try {
-            val response = httpClient.get("$baseURL/getpropertylistingbyid") {
+            val response = httpClient.get("$baseURL/propertylisting/getpropertieslistingbyid") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
                 setBody(id)
