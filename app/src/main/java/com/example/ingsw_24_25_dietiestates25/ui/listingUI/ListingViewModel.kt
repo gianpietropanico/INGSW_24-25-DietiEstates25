@@ -109,7 +109,7 @@ class ListingViewModel  @Inject constructor(
                     latitude = latitude.value.toDoubleOrNull() ?: 0.0,
                     longitude = longitude.value.toDoubleOrNull() ?: 0.0,
                     indicators = emptyList(),
-                    propertyPicture = null,
+                    images = emptyList(),
                     numberOfRooms = numberOfRooms.value.toIntOrNull() ?: 0,
                     numberOfBathrooms = numberOfBathrooms.value.toIntOrNull() ?: 0,
                     size = size.value.toFloatOrNull() ?: 0f,

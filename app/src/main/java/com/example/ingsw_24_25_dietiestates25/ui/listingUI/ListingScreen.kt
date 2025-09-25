@@ -55,7 +55,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel.ListingState
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
@@ -64,6 +66,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
+import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 import com.google.android.gms.maps.MapsInitializer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -169,7 +172,7 @@ fun ListingScreen(
                         .padding(padding)
                 ) {
                     items(listings) { propertyListing ->
-                        PropertyCard(propertyListing) {
+                        PropertyCard(propertyListing) { //passare lista foto
                             navController.navigate("propertyDetail/${propertyListing.id}")
                         }
                     }
@@ -187,7 +190,7 @@ fun ListingScreen(
 }
 
 @Composable
-fun PropertyCard(
+fun PropertyCard( //passare lista foto
     propertyListing: PropertyListing,
     onClick: () -> Unit
 ) {
@@ -201,14 +204,27 @@ fun PropertyCard(
     ) {
         Column {
             Row(modifier = Modifier.height(120.dp)) {
-                Image(
-                    painter = rememberAsyncImagePainter(propertyListing.property.propertyPicture),
-                    contentDescription = propertyListing.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .width(150.dp)
-                        .fillMaxHeight()
-                )
+                val firstImage = propertyListing.property.images.firstOrNull()
+                if (firstImage != null) {
+                    Image(
+                        bitmap = bse64ToImageBitmap(firstImage),
+                        contentDescription = propertyListing.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(150.dp)
+                            .fillMaxHeight()
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.default_house),
+                        contentDescription = propertyListing.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(150.dp)
+                            .fillMaxHeight()
+                    )
+                }
+
                 Column(
                     modifier = Modifier
                         .padding(12.dp)
