@@ -21,9 +21,14 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListi
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 
@@ -33,6 +38,8 @@ fun ListingDetailScreen(
     listingVm: ListingViewModel,
     navController: NavHostController
 ) {
+
+
     val listing by listingVm.myListing.collectAsState()
     val uiState by listingVm.uiState.collectAsState()
 
@@ -70,10 +77,19 @@ fun ListingDetailScreen(
 @Composable
 fun ListingDetailContent(propertyListing: PropertyListing) {
 
+    // Scroll verticale dell'intera schermata
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp
+            )
+            .padding(WindowInsets.statusBars.asPaddingValues())
+            .verticalScroll(scrollState)
     ) {
 
         Text(

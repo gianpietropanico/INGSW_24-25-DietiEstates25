@@ -136,8 +136,13 @@ fun AddPropertyListingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp
+            )
+            .padding(WindowInsets.statusBars.asPaddingValues())
             .verticalScroll(scrollState)
-            .padding(16.dp)
     ) {
         // -------------------- Back Button --------------------
         Icon(
