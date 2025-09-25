@@ -106,6 +106,40 @@ class PropertyListingRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getListingById(id: String): ApiResult<PropertyListing> {
+        return try {
+            val response = httpClient.get("$baseURL/propertylisting/$id") {
+                accept(ContentType.Application.Json)
+            }
+
+            return when (response.status) {
+                HttpStatusCode.OK -> {
+                    val body: ListResponse<PropertyListing> = response.body()
+                    if (body.success && body.data != null) {
+                        ApiResult.Success(body.data, "Proprietà recuperata con successo")
+                    } else {
+                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto dal server")
+                    }
+                }
+                HttpStatusCode.NotFound -> {
+                    ApiResult.UnknownError("Proprietà con id $id non trovata")
+                }
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                }
+            }
+        } catch (e: ResponseException) {
+            when (e.response.status) {
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("Proprietà con id $id non trovata")
+                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
+
 
     override suspend fun getAllListings(): ApiResult<List<PropertyListing>> {
         return try {
@@ -174,8 +208,5 @@ class PropertyListingRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getListingById(id: String): ApiResult<PropertyListing> {
-        TODO("Not yet implemented")
-    }
 
 }

@@ -10,5 +10,5 @@ interface PropertyListingRepository {
     suspend fun getPropertiesListingByAgent(agentEmail: String): ApiResult<List<PropertyListing>>
     suspend fun getAllListings(): ApiResult<List<PropertyListing>>
     suspend fun getListingsWithinRadius(lat: Double, lon: Double, radius: Double): ApiResult<List<PropertyListing>>
-    fun getListingById(id: String): ApiResult<PropertyListing>
+    suspend fun getListingById(id: String): ApiResult<PropertyListing>
 }
