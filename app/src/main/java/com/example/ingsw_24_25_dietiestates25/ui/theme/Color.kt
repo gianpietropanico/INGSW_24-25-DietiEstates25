@@ -23,6 +23,8 @@ val DarkRed = Color(0xFFC62828)
 val bluPerchEcipiace = Color(0xFF2F6690)
 val unselectedFacility = Color(0xFFF5F4F8)
 
+val cardBackground = Color(0xFFD9D9D9)
+
 
 val ColorScheme.myFocusedTextFieldText: Color
     @Composable

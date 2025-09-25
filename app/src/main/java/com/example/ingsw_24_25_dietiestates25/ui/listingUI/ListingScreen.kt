@@ -62,6 +62,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel.List
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
+import com.example.ingsw_24_25_dietiestates25.ui.theme.cardBackground
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
@@ -200,7 +201,8 @@ fun PropertyCard( //passare lista foto
             .padding(24.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBackground)
     ) {
         Column {
             Row(modifier = Modifier.height(120.dp)) {
