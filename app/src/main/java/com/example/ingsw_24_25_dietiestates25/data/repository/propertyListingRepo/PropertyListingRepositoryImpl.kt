@@ -174,4 +174,8 @@ class PropertyListingRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getListingById(id: String): ApiResult<PropertyListing> {
+        TODO("Not yet implemented")
+    }
+
 }

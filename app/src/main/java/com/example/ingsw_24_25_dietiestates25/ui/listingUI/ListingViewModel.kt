@@ -222,6 +222,10 @@ class ListingViewModel  @Inject constructor(
         description.value = ""
     }
 
+    fun getListingById(id: String): PropertyListing? {
+        val result = listingsRepo.getListingById(id)
+    }
+
 
     sealed class ListingState{
         object Idle : ListingState()

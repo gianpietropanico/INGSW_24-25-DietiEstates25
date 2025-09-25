@@ -172,7 +172,8 @@ fun ListingScreen(
                 ) {
                     items(listings) { propertyListing ->
                         PropertyCard(propertyListing) {
-                            navController.navigate("propertyDetail/${propertyListing.id}")
+                            navController.navigate("listingDetail/${propertyListing.id}")
+
                         }
                     }
                 }
@@ -185,7 +186,6 @@ fun ListingScreen(
 
 
     }
-
 }
 
 @Composable
