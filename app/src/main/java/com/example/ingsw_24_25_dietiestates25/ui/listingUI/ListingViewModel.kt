@@ -228,11 +228,12 @@ class ListingViewModel  @Inject constructor(
 
     fun getListingById(id: String) {
         viewModelScope.launch {
-
+            _uiState.value = ListingState.Loading
             val result = listingsRepo.getListingById(id)
             when (result) {
                 is ApiResult.Success -> {
                     _myListing.value = result.data
+                    _uiState.value = ListingState.Idle
                 }
                 is ApiResult.Unauthorized -> {
                     _uiState.value = ListingState.Error(result.message ?: "Accesso non autorizzato")
