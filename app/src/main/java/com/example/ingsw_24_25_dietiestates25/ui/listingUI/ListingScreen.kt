@@ -2,10 +2,12 @@ package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -43,14 +45,22 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListi
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel.ListingState
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
+import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
@@ -184,27 +194,82 @@ fun PropertyCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(24.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Row(modifier = Modifier.height(120.dp)) {
-            Image(
-                painter = rememberAsyncImagePainter(propertyListing.property.propertyPicture),
-                contentDescription = propertyListing.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.width(150.dp).fillMaxHeight()
-            )
-            Column(
+        Column {
+            Row(modifier = Modifier.height(120.dp)) {
+                Image(
+                    painter = rememberAsyncImagePainter(propertyListing.property.propertyPicture),
+                    contentDescription = propertyListing.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .fillMaxHeight()
+                )
+                Column(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(propertyListing.title, fontWeight = FontWeight.Bold)
+                    Text("${propertyListing.property.city}, ${propertyListing.property.province}")
+                    Text("${propertyListing.price} €", color = MaterialTheme.colorScheme.primary)
+                }
+            }
+
+            HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
+
+            Row(
                 modifier = Modifier
-                    .padding(12.dp)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(propertyListing.title, fontWeight = FontWeight.Bold)
-                Text("${propertyListing.property.city}, ${propertyListing.property.province}")
-                Text("${propertyListing.price} €", color = MaterialTheme.colorScheme.primary)
+                // Fake button Delete
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp), // stessa altezza
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Delete",
+                        color = primaryBlu,
+                        style = MaterialTheme.typography.labelLarge, // stile uguale al bottone
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Real button Edit
+                Button(
+                    onClick = { }, // futura implementazione
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(brush = AscientGradient, shape = RoundedCornerShape(8.dp))
+                            .fillMaxWidth()
+                            .height(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "Edit Property",
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelLarge, // stesso stile
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
     }
