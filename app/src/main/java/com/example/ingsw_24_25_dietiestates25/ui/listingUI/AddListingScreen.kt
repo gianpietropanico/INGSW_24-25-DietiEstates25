@@ -3,11 +3,13 @@ package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 // Import dei permessi di localizzazione
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.R.attr.rotation
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Looper
+import androidx.compose.animation.core.animateFloatAsState
 
 // Import di Compose e UI
 import androidx.compose.foundation.Image
@@ -31,6 +33,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -223,9 +226,17 @@ fun AddPropertyListingScreen(
         // LocationSource personalizzato per la mappa
         val myLocationSource = object : LocationSource {
             var listener: LocationSource.OnLocationChangedListener? = null
-            override fun activate(l: LocationSource.OnLocationChangedListener) { listener = l }
-            override fun deactivate() { listener = null }
-            fun onLocation(userLocation: Location) { listener?.onLocationChanged(userLocation) }
+            override fun activate(l: LocationSource.OnLocationChangedListener) {
+                listener = l
+            }
+
+            override fun deactivate() {
+                listener = null
+            }
+
+            fun onLocation(userLocation: Location) {
+                listener?.onLocationChanged(userLocation)
+            }
         }
 
         // Callback per aggiornare posizione reale
@@ -242,8 +253,15 @@ fun AddPropertyListingScreen(
 
         // Funzione per avviare aggiornamento posizione
         fun startListeningToLocations() {
-            if (ActivityCompat.checkSelfPermission(context, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 return
             }
             fusedLocationClient.requestLocationUpdates(
@@ -279,11 +297,37 @@ fun AddPropertyListingScreen(
                 Marker(state = markerState, draggable = true)
             }
 
-            // Bottone per ingrandire/ristretta la mappa
-            FloatingActionButton(
-                onClick = { mapHeight = if (mapHeight == 250.dp) 400.dp else 250.dp },
-                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
-            ) { Icon(Icons.Default.ArrowDropDown, contentDescription = "Toggle map size") }
+            val rotation by animateFloatAsState(if (mapHeight == 250.dp) 0f else 180f)
+//            // Bottone per ingrandire/ristretta la mappa
+//            FloatingActionButton(
+//                onClick = { mapHeight = if (mapHeight == 250.dp) 400.dp else 250.dp },
+//                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
+//                containerColor = AscientGradient
+//            ) { Icon(Icons.Default.ArrowDropDown,
+//                //modifier = Modifier.rotate(if (mapHeight == 250.dp) 0f else 180f),
+//                modifier = Modifier.rotate(rotation),
+//                contentDescription = "Toggle map size")
+//            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .size(56.dp) // dimensione FAB
+                    .clip(CircleShape)
+                    .background(AscientGradient) // qui il gradiente
+                    .clickable {
+                        mapHeight = if (mapHeight == 250.dp) 400.dp else 250.dp
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.ArrowDropDown,
+                    modifier = Modifier.rotate(rotation),
+                    contentDescription = "Toggle map size",
+                    tint = Color.White
+                )
+            }
 
             // Bottone posizione corrente
             FloatingActionButton(
@@ -291,7 +335,9 @@ fun AddPropertyListingScreen(
                     if (locationPermissions.allPermissionsGranted) startListeningToLocations()
                     else locationPermissions.launchMultiplePermissionRequest()
                 },
-                modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp),
                 containerColor = Color.White
             ) {
                 Icon(
@@ -313,7 +359,11 @@ fun AddPropertyListingScreen(
 
                 // Geocoder in background
                 val addresses = withContext(Dispatchers.IO) {
-                    Geocoder(context, Locale.getDefault()).getFromLocation(position.latitude, position.longitude, 1)
+                    Geocoder(context, Locale.getDefault()).getFromLocation(
+                        position.latitude,
+                        position.longitude,
+                        1
+                    )
                 }
 
                 addresses?.firstOrNull()?.let { address ->
@@ -365,7 +415,11 @@ fun AddPropertyListingScreen(
                         .size(80.dp)
                         .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add photo", tint = primaryBlueWithOpacity)
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Add photo",
+                        tint = primaryBlueWithOpacity
+                    )
                 }
             }
         }
@@ -448,8 +502,15 @@ fun AddPropertyListingScreen(
         Spacer(Modifier.height(20.dp))
 
         // -------------------- Publish Button --------------------
+        // -------------------- Publish Button --------------------
         Button(
-            onClick = { listingVm.addPropertyListing(currentUser?.email ?: "", imageUris, context) },
+            onClick = {
+                listingVm.addPropertyListing(
+                    currentUser?.email ?: "",
+                    imageUris,
+                    context
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
@@ -458,7 +519,10 @@ fun AddPropertyListingScreen(
         ) {
             Text("Publish")
         }
+
+        Spacer(Modifier.height(16.dp))
     }
+
 
     // -------------------- UI State --------------------
     when (uiState) {
@@ -470,12 +534,14 @@ fun AddPropertyListingScreen(
                 navController.popBackStack()
             }
         }
+
         is ListingViewModel.ListingState.Error -> {
             Text(
                 text = (uiState as ListingViewModel.ListingState.Error).message,
                 color = MaterialTheme.colorScheme.error
             )
         }
+
         is ListingViewModel.ListingState.Idle -> {}
     }
 }
@@ -486,12 +552,23 @@ fun TypeToggle(label: String, selected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(25.dp))
-            .background(if (selected) AscientGradient else Brush.linearGradient(listOf(Color.LightGray, Color.LightGray)))
+            .background(
+                if (selected) AscientGradient else Brush.linearGradient(
+                    listOf(
+                        Color.LightGray,
+                        Color.LightGray
+                    )
+                )
+            )
             .clickable(onClick = onClick)
             .padding(horizontal = 24.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(label, color = if (selected) Color.White else Color.Black, fontWeight = FontWeight.Medium)
+        Text(
+            label,
+            color = if (selected) Color.White else Color.Black,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
@@ -499,7 +576,9 @@ fun TypeToggle(label: String, selected: Boolean, onClick: () -> Unit) {
 fun CounterRow(label: String, count: Int, onValueChange: (Int) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(label, fontWeight = FontWeight.Medium)
@@ -519,7 +598,11 @@ fun CircleButton(text: String, onClick: () -> Unit) {
         modifier = Modifier
             .size(20.dp)
             .background(brush = AscientGradient, shape = CircleShape)
-            .clickable(onClick = onClick, interactionSource = remember { MutableInteractionSource() }, indication = null),
+            .clickable(
+                onClick = onClick,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(text, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -532,18 +615,31 @@ fun FacilityChip(label: String, selected: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .clickable(onClick = onClick)
-            .background(if (selected) AscientGradient else Brush.linearGradient(listOf(unselectedFacility, unselectedFacility)))
+            .background(
+                if (selected) AscientGradient else Brush.linearGradient(
+                    listOf(
+                        unselectedFacility,
+                        unselectedFacility
+                    )
+                )
+            )
             .padding(horizontal = 16.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(label, color = if (selected) Color.White else Color.Black, fontWeight = FontWeight.Medium)
+        Text(
+            label,
+            color = if (selected) Color.White else Color.Black,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
 @Composable
 fun EnergyClassDropdown(listingVm: ListingViewModel) {
     val energyClass by listingVm.energyClass.collectAsState()
-    EnergyClassRow(selectedClass = energyClass, onClassSelected = { listingVm.energyClass.value = it })
+    EnergyClassRow(
+        selectedClass = energyClass,
+        onClassSelected = { listingVm.energyClass.value = it })
 }
 
 @Composable
@@ -551,7 +647,9 @@ fun EnergyClassRow(selectedClass: EnergyClass, onClassSelected: (EnergyClass) ->
     var expanded by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text("Energy Class", fontWeight = FontWeight.Medium)
@@ -560,7 +658,9 @@ fun EnergyClassRow(selectedClass: EnergyClass, onClassSelected: (EnergyClass) ->
                 value = selectedClass.label,
                 onValueChange = {},
                 readOnly = true,
-                modifier = Modifier.width(80.dp).height(50.dp),
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(50.dp),
                 singleLine = true,
                 trailingIcon = {
                     IconButton(onClick = { expanded = true }) {
@@ -570,7 +670,9 @@ fun EnergyClassRow(selectedClass: EnergyClass, onClassSelected: (EnergyClass) ->
             )
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 EnergyClass.values().forEach { option ->
-                    DropdownMenuItem(text = { Text(option.label) }, onClick = { onClassSelected(option); expanded = false })
+                    DropdownMenuItem(
+                        text = { Text(option.label) },
+                        onClick = { onClassSelected(option); expanded = false })
                 }
             }
         }

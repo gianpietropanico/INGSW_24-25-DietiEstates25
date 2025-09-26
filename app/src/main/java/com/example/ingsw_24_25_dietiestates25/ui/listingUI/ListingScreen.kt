@@ -262,7 +262,7 @@ fun PropertyCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Real button Edit
+                // Fake button Edit
                 Button(
                     onClick = { }, // futura implementazione
                     modifier = Modifier.weight(1f),

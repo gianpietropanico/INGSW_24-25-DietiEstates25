@@ -15,7 +15,7 @@ data class Property(
     val civicNumber: String,
     val latitude: Double,
     val longitude: Double,
-    val indicators: List<String> = emptyList(),
+    val pois: List<POI> = emptyList(),
     val images: List<String> = emptyList(),
     val numberOfRooms: Int,
     val numberOfBathrooms: Int,
