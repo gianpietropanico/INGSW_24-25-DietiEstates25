@@ -23,12 +23,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import javax.inject.Inject
+
 @HiltViewModel
-class ListingViewModel  @Inject constructor(
+class ListingViewModel @Inject constructor(
     private val userSessionManager: UserSessionManager,
-    private val imageRepo : ImageRepository,
+    private val imageRepo: ImageRepository,
     private val listingsRepo: PropertyListingRepository,
-): ViewModel()  {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ListingState>(ListingState.Idle)
     val uiState: StateFlow<ListingState> = _uiState
@@ -73,23 +74,28 @@ class ListingViewModel  @Inject constructor(
     fun loadMyListings() {
         viewModelScope.launch {
 
+            _uiState.value = ListingState.Loading
             val result = listingsRepo.getPropertiesListingByAgent(user.value!!.email)
-                when (result) {
-                    is ApiResult.Success -> {
-                        _myListings.value = result.data ?: emptyList()
-                    }
-                    is ApiResult.Unauthorized -> {
-
-                        ListingState.Error( result.message ?: "Accesso non autorizzato")
-                    }
-                    is ApiResult.UnknownError -> {
-
-                        ListingState.Error( result.message ?: "Errore sconosciuto")
-                    }
-                    else -> {
-                        ListingState.Error ( result.message ?: "Errore inatteso")
-                    }
+            when (result) {
+                is ApiResult.Success -> {
+                    _myListings.value = result.data ?: emptyList()
+                    _uiState.value = ListingState.Idle
                 }
+
+                is ApiResult.Unauthorized -> {
+
+                    ListingState.Error(result.message ?: "Accesso non autorizzato")
+                }
+
+                is ApiResult.UnknownError -> {
+
+                    ListingState.Error(result.message ?: "Errore sconosciuto")
+                }
+
+                else -> {
+                    ListingState.Error(result.message ?: "Errore inatteso")
+                }
+            }
 
         }
     }
@@ -97,7 +103,6 @@ class ListingViewModel  @Inject constructor(
 
     fun addPropertyListing(agentEmail: String, imageUris: List<Uri>, context: Context) {
         viewModelScope.launch {
-
 
 
             _uiState.value = ListingState.Idle
@@ -160,8 +165,15 @@ class ListingViewModel  @Inject constructor(
                         resetForm()
                         ListingState.Success
                     }
-                    is ApiResult.Unauthorized -> ListingState.Error(result.message ?: "Non autorizzato")
-                    is ApiResult.UnknownError -> ListingState.Error(result.message ?: "Errore sconosciuto")
+
+                    is ApiResult.Unauthorized -> ListingState.Error(
+                        result.message ?: "Non autorizzato"
+                    )
+
+                    is ApiResult.UnknownError -> ListingState.Error(
+                        result.message ?: "Errore sconosciuto"
+                    )
+
                     else -> ListingState.Error("Errore inatteso")
                 }
             } catch (e: Exception) {
@@ -235,12 +247,15 @@ class ListingViewModel  @Inject constructor(
                     _myListing.value = result.data
                     _uiState.value = ListingState.Success
                 }
+
                 is ApiResult.Unauthorized -> {
                     _uiState.value = ListingState.Error(result.message ?: "Accesso non autorizzato")
                 }
+
                 is ApiResult.UnknownError -> {
                     _uiState.value = ListingState.Error(result.message ?: "Errore sconosciuto")
                 }
+
                 else -> {
                     _uiState.value = ListingState.Error(result.message ?: "Errore inatteso")
                 }
@@ -249,7 +264,7 @@ class ListingViewModel  @Inject constructor(
     }
 
 
-    sealed class ListingState{
+    sealed class ListingState {
         object Idle : ListingState()
         object Loading : ListingState()
         object Success : ListingState()
