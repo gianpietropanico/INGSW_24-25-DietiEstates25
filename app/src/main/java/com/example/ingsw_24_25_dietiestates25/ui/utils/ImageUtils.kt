@@ -34,6 +34,7 @@ fun bse64ToImageBitmap(base64: String): ImageBitmap {
     return bitmap.asImageBitmap()
 }
 
+
 suspend fun downloadImageAsBase64(imageUrl: String): String? = withContext(Dispatchers.IO) {
     try {
         val url = URL(imageUrl)
@@ -63,6 +64,32 @@ fun uriToBase64(context: Context, uri: Uri): String? {
         val byteArray = outputStream.toByteArray()
 
         Base64.encodeToString(byteArray, Base64.DEFAULT)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
+fun uriToBase64WithSizeLimit(context: Context, uri: Uri, maxKb: Int = 500): String? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        var bitmap = BitmapFactory.decodeStream(inputStream) ?: return null
+
+        // Ridimensiona bitmap se troppo grande
+        var outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        var byteArray = outputStream.toByteArray()
+
+        // Riduci qualità fino a rientrare nel limite
+        var quality = 90
+        while (byteArray.size / 1024 > maxKb && quality > 10) {
+            outputStream.reset()
+            bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
+            byteArray = outputStream.toByteArray()
+            quality -= 10
+        }
+
+        Base64.encodeToString(byteArray, Base64.NO_WRAP)
     } catch (e: Exception) {
         e.printStackTrace()
         null

@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.HomeViewModel
 import com.example.ingsw_24_25_dietiestates25.ResultsViewModel
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.ui.HomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.ResultsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.*
@@ -125,7 +126,8 @@ fun AppNavHost(
         composable(NavigationItem.AddPropertyListings.route){
             AddPropertyListingScreen(
                 listingVm = listingViewModel,
-                navController = navController
+                navController = navController,
+
             )
         }
 
