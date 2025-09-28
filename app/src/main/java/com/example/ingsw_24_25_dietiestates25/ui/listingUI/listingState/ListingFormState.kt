@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui.listingUI
+package com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState
 
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type

@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 
 
@@ -53,7 +54,7 @@ fun ListingDetailScreen(
         }
 
         is ListingState.Idle -> {
-            // Stato iniziale, non fare nulla
+            // Stato iniziale
         }
     }
 }
