@@ -33,24 +33,35 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.Dp
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
+
 
 
 @Composable
 fun MinimalTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
     leadingIcon: ImageVector? = null,
-    modifier: Modifier = Modifier,
     placeholder: String? = null,
     textStyle: TextStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
     underlineColor: Color = Color(0xFF3A7CA5),
     labelColor: Color = Color.DarkGray,
     iconTint: Color = Color.Gray,
-    onError: Boolean
+    onError: Boolean,
+    underlineLength: Float = 1f,
+    fieldWidth: Dp? = null
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+
+    val appliedModifier = if (fieldWidth != null) {
+        modifier.width(fieldWidth)
+    } else {
+        modifier.fillMaxWidth()
+    }
+
+    Column(appliedModifier) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge.copy(
@@ -98,7 +109,8 @@ fun MinimalTextField(
 
         HorizontalDivider(
             thickness = 1.dp,
-            color = if (onError) DarkRed else underlineColor
+            color = if (onError) DarkRed else underlineColor,
+            modifier = Modifier.fillMaxWidth(underlineLength)
         )
     }
 }

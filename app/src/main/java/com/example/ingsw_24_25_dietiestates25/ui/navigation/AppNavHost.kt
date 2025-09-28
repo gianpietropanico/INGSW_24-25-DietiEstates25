@@ -13,8 +13,6 @@ import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.HomeViewModel
 import com.example.ingsw_24_25_dietiestates25.ResultsViewModel
-import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.ui.HomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.ResultsScreen
@@ -28,6 +26,8 @@ import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgencySettingsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.AddPropertyListingScreen
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingDetailScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
@@ -40,8 +40,6 @@ import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminSupportsS
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminViewModel
 
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.*
-
-import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.*
 
 enum class Screen {
     HOME,
@@ -59,7 +57,11 @@ enum class Screen {
     RESULTS,
     FORMUSER,
     AGENTLISTINGS,
-    AGENTAGENCY
+    AGENTAGENCY,
+    USERACTIVITIES,
+    ADDPROPERTYLISTING,
+
+    LISTINGDETAIL
 }
 
 sealed class NavigationItem(val route: String) {
@@ -79,6 +81,9 @@ sealed class NavigationItem(val route: String) {
     object FormUser : NavigationItem(Screen.FORMUSER.name)
     object AgentListings : NavigationItem(Screen.AGENTLISTINGS.name)
     object AgentAgency : NavigationItem(Screen.AGENTAGENCY.name)
+    object UserActivities : NavigationItem(Screen.USERACTIVITIES.name)
+    object AddPropertyListings : NavigationItem(Screen.ADDPROPERTYLISTING.name)
+    object ListingDetail : NavigationItem("listingDetail/{listingId}")
 }
 
 
@@ -97,6 +102,7 @@ fun AppNavHost(
     val mailerSenderViewModel : MailerSenderViewModel = hiltViewModel()
     val listingViewModel : ListingViewModel = hiltViewModel()
 
+
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -106,6 +112,33 @@ fun AppNavHost(
         composable(NavigationItem.Welcome.route){
             WelcomeScreen(
                 am = authViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.UserActivities.route){
+            ActivitiesScreen(
+                profileVm = profileViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.AddPropertyListings.route){
+            AddPropertyListingScreen(
+                listingVm = listingViewModel,
+                navController = navController,
+
+            )
+        }
+
+        composable(
+            route = "listingDetail/{listingId}",
+            arguments = listOf(navArgument("listingId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val listingId = backStackEntry.arguments?.getString("listingId") ?: ""
+            ListingDetailScreen(
+                listingId = listingId,
+                listingVm = listingViewModel,
                 navController = navController
             )
         }
@@ -134,8 +167,8 @@ fun AppNavHost(
                     )
                 }
                 "AGENT_USER" ->{
-                    AgentHomeScreen(
-                        agentVm = agentViewModel,
+                    ListingScreen(
+                        listingVm = listingViewModel,
                         navController = navController
                     )
                 }
@@ -259,6 +292,8 @@ fun AppNavHost(
         }
 
 
+
+
         composable(
             route = "${NavigationItem.Results.route}?type={type}&location={location}",
             arguments = listOf(
@@ -281,3 +316,4 @@ fun AppNavHost(
         }
     }
 }
+

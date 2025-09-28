@@ -1,0 +1,63 @@
+package com.example.ingsw_24_25_dietiestates25.ui.listingUI
+
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
+
+
+@Composable
+fun ListingDetailScreen(
+    listingId: String,
+    listingVm: ListingViewModel,
+    navController: NavHostController
+) {
+
+    val state by listingVm.state.collectAsState()
+    val uiState = state.uiState
+    val listing = state.myListing
+
+
+    LaunchedEffect(listingId) {
+        listingVm.getListingById(listingId)
+    }
+
+    when (uiState) {
+        is ListingState.Loading -> {
+            LoadingOverlay(isVisible = true)
+        }
+
+        is ListingState.Success -> {
+            listing?.let { propertyListing ->
+                ListingDetailContent(propertyListing = propertyListing)
+            }
+        }
+
+        is ListingState.Error -> {
+            Text(
+                text = (uiState as ListingState.Error).message,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        is ListingState.Idle -> {
+            // Stato iniziale, non fare nulla
+        }
+    }
+}
+
+
+
+
+
+
+

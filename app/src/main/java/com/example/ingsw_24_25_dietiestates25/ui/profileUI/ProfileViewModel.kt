@@ -1,7 +1,10 @@
 package com.example.ingsw_24_25_dietiestates25.ui.profileUI
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.UserActivity
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepo
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
@@ -22,8 +25,9 @@ class ProfileViewModel @Inject constructor (
     private val profileRepo: ProfileRepo
 ) : ViewModel() {
 
-    private val _authState = MutableStateFlow(AuthState())
-    val authState: StateFlow<AuthState> = _authState.asStateFlow()
+    private val _state = MutableStateFlow(ProfileState())
+    val state: StateFlow<ProfileState> = _state.asStateFlow()
+
 
     var user = userSessionManager.currentUser
     var label: String = ""
@@ -57,14 +61,36 @@ class ProfileViewModel @Inject constructor (
     }
 
     fun clearResultMessage() {
-        _authState.update { it.copy(resultMessage = null, success = false, localError = false) }
+        _state.update { it.copy(resultMessage = null, success = false, localError = false) }
     }
+
+    fun loadActivities() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, resultMessage = null) }
+
+            var result: ApiResult<List<UserActivity>> = profileRepo.getActivities(user.value!!.id)
+
+            if (result is ApiResult.Success) {
+                _state.update {
+                    it.copy(
+                        activities = result.data ?: emptyList(),
+                        isLoading = false
+                    )
+                }
+                handleResult(ApiResult.Success(Unit, result.message))
+            } else {
+                _state.update { it.copy(isLoading = false) }
+                handleResult(result = result)
+            }
+        }
+    }
+
 
     fun updateProfilePicture(base64: String) {
         clearResultMessage()
 
         viewModelScope.launch {
-            _authState.update { it.copy(isLoading = true, resultMessage = null) }
+            _state.update { it.copy(isLoading = true, resultMessage = null) }
             val result = imageRepository.insertProfilePicture(user.value!!.id, base64, "user")
             handleResult(result)
 
@@ -75,7 +101,7 @@ class ProfileViewModel @Inject constructor (
         clearResultMessage()
 
         viewModelScope.launch {
-            _authState.update { it.copy(isLoading = true, resultMessage = null) }
+            _state.update { it.copy(isLoading = true, resultMessage = null) }
             val result = profileRepo.resetPassword( oldPassword, newPassword)
             handleResult(result)
         }
@@ -87,7 +113,7 @@ class ProfileViewModel @Inject constructor (
         clearResultMessage()
         viewModelScope.launch {
 
-            _authState.update { it.copy(isLoading = true, resultMessage = null) }
+            _state.update { it.copy(isLoading = true, resultMessage = null) }
             val result = profileRepo.updateUserInfo(value, type)
             handleResult(result)
 
@@ -95,24 +121,24 @@ class ProfileViewModel @Inject constructor (
     }
 
 
-    private fun handleResult(result: ApiResult<Unit>) {
+    private fun handleResult(result: ApiResult<*>) {
         when (result) {
             is ApiResult.Authorized -> {
-                _authState.update{ it.copy(isLoading = false,success = true, resultMessage = null,localError = false)}
+                _state.update{ it.copy(isLoading = false,success = true, resultMessage = null,localError = false)}
                 user = userSessionManager.currentUser
             }
 
             is ApiResult.Unauthorized -> {
-                _authState.update { it.copy(isLoading = false, resultMessage = result.message, success = false, localError = true) }
+                _state.update { it.copy(isLoading = false, resultMessage = result.message, success = false, localError = true) }
 
             }
 
             is ApiResult.UnknownError -> {
-                _authState.update { it.copy(isLoading = false, resultMessage = result.message,success = false, localError = true) }
+                _state.update { it.copy(isLoading = false, resultMessage = result.message,success = false, localError = true) }
             }
 
             is ApiResult.Success -> {
-                _authState.update { it.copy(isLoading = false, resultMessage = result.message, success = true) }
+                _state.update { it.copy(isLoading = false, resultMessage = result.message, success = true) }
                 user = userSessionManager.currentUser
             }
         }
@@ -120,7 +146,7 @@ class ProfileViewModel @Inject constructor (
 
     fun logout() {
         viewModelScope.launch {
-            _authState.update { it.copy(resultMessage = null, success = false,isAuthenticated = false, localError = false) }
+            _state.update { it.copy(resultMessage = null, success = false,isAuthenticated = false, localError = false) }
             profileRepo.logout()
         }
 

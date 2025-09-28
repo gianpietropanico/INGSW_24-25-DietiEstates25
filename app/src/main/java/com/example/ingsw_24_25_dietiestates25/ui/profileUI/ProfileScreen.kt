@@ -160,7 +160,14 @@ fun ProfileScreen(
                                 )
                             })
 
-                        ProfileOption(Icons.Default.History, "Your activities", onClick = {})
+                        ProfileOption(
+                            Icons.Default.History,
+                            "Your activities",
+                            onClick = {
+                                pm.clearResultMessage()
+                                navController.navigate(NavigationItem.UserActivities.route)
+                            }
+                        )
                         ProfileOption(
                             Icons.AutoMirrored.Filled.Logout,
                             "Logout",
