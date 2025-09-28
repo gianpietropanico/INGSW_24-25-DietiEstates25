@@ -1,4 +1,4 @@
-package com.example.ingsw_24_25_dietiestates25.ui.listingUI
+package com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState
 
 sealed class ListingState {
     object Idle : ListingState()

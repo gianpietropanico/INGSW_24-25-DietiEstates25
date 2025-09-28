@@ -3,7 +3,6 @@ package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.R.attr.rotation
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
@@ -16,7 +15,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -34,39 +32,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 
 
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
-import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlueWithOpacity
-import com.example.ingsw_24_25_dietiestates25.ui.theme.unselectedFacility
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils
 import com.example.ingsw_24_25_dietiestates25.ui.utils.rememberImagePicker
-import com.example.ingsw_24_25_dietiestates25.ui.utils.CircleButton
 import com.example.ingsw_24_25_dietiestates25.ui.utils.CounterRow
 import com.example.ingsw_24_25_dietiestates25.ui.utils.EnergyClassDropdown
-import com.example.ingsw_24_25_dietiestates25.ui.utils.EnergyClassRow
 import com.example.ingsw_24_25_dietiestates25.ui.utils.TypeToggle
 import com.example.ingsw_24_25_dietiestates25.ui.utils.FacilityChip
-import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingState
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
 
 
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -82,7 +71,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.*
 
 import kotlinx.coroutines.Dispatchers
@@ -564,7 +552,7 @@ fun AddPropertyListingScreen(
         Button(
             onClick = {
                 listingVm.addPropertyListing(
-                    currentUser?.email ?: "",
+                    currentUser,
                     imageUris,
                     context
                 )

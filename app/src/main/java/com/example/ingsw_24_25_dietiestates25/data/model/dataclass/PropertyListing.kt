@@ -11,7 +11,7 @@ data class PropertyListing(
     val type: Type?,
     val price: Float,
     val property: Property,
-    val agentEmail: String
+    val agent: User?
 )
 
 @Serializable

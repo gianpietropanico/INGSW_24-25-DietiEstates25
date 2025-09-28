@@ -192,7 +192,7 @@ fun MakeOfferScreen(
                 onClick = {
                     inboxVm.makeOffer(
                         propertyId = state.selectedProperty!!.id,
-                        agentEmail = state.selectedProperty!!.agentEmail,
+                        agentEmail = state.selectedProperty!!.agent!!.email,
                         amount = amount
                     )
                 },

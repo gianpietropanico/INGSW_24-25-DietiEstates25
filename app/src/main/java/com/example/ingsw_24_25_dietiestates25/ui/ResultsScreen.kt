@@ -303,7 +303,7 @@ fun PropertyItem(propertyListing: PropertyListing) {
     ) {
         Column {
             // 📷 Immagine (usa propertyPicture se c'è, placeholder altrimenti)
-            propertyListing.property.propertyPicture?.let { base64Image ->
+            propertyListing.property.images.firstOrNull().let { base64Image ->
                 // se hai immagini in base64
                 val imageBytes = Base64.getDecoder().decode(base64Image)
                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
