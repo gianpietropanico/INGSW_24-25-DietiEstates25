@@ -303,9 +303,9 @@ fun PropertyItem(propertyListing: PropertyListing) {
     ) {
         Column {
             // 📷 Immagine (usa propertyPicture se c'è, placeholder altrimenti)
-            propertyListing.property.propertyPicture?.let { base64Image ->
+            val image = propertyListing.property.images
                 // se hai immagini in base64
-                val imageBytes = Base64.getDecoder().decode(base64Image)
+                val imageBytes = Base64.getDecoder().decode(image.toString())
                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                 Image(
                     bitmap = bitmap.asImageBitmap(),
@@ -315,16 +315,7 @@ fun PropertyItem(propertyListing: PropertyListing) {
                         .fillMaxWidth()
                         .height(180.dp)
                 )
-            } ?: Image(
-                painter = painterResource(id = R.drawable.attention), // TODO da cambiare
-                contentDescription = "No image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-            )
 
-            //
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = propertyListing.title,

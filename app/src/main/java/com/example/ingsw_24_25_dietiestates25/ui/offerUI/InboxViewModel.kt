@@ -13,6 +13,7 @@ import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRep
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.offerRepo.OfferRepository
+import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +28,7 @@ import javax.inject.Inject
 class InboxViewModel  @Inject constructor (
     private val userSessionManager: UserSessionManager,
     private val offerRepo : OfferRepository,
-    private val authRepo : AuthRepository
+    private val propertyRepo : PropertyListingRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(InboxState())
@@ -89,6 +90,7 @@ class InboxViewModel  @Inject constructor (
         }
     }
 
+
     fun loadOffers() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
@@ -138,10 +140,34 @@ class InboxViewModel  @Inject constructor (
     }
 
     fun setSelectedOffer (offer : Offer){
-        _state.update { current ->
-            current.copy(selectedOffer = offer)
+
+        viewModelScope.launch {
+
+            _state.update { it.copy(isLoading = true, resultMessage = null) }
+            val result = propertyRepo.getListingById(offer.propertyId)
+
+            if (result is ApiResult.Success) {
+
+                _state.update { current ->
+                    current.copy(
+                        selectedOffer = offer,
+                        selectedProperty = result.data ,
+                        offerMessages = offer.messages
+                    )
+                }
+
+                handleResult(ApiResult.Success(Unit, result.message))
+            } else {
+                handleResult(result)
+            }
         }
 
     }
+
+    fun getChatUser(): String {
+        return if( user.value!!.email == state.value.selectedOffer!!.agentName) state.value.selectedOffer!!.buyerName
+        else state.value.selectedOffer!!.agentName
+    }
+
 
 }

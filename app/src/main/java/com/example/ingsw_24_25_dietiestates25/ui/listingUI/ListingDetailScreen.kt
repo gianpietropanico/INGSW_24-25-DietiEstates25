@@ -37,7 +37,10 @@ fun ListingDetailScreen(
 
         is ListingState.Success -> {
             listing?.let { propertyListing ->
-                ListingDetailContent(propertyListing = propertyListing)
+                ListingDetailContent(
+                    propertyListing = propertyListing,
+                    navController
+                )
             }
         }
 

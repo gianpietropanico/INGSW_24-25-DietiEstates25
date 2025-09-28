@@ -73,7 +73,7 @@ fun MakeOfferScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            androidx.compose.material.Icon(
+            Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Cancel",
                 tint = bluPerchEcipiace,

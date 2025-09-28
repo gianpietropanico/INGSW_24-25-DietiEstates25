@@ -27,7 +27,6 @@ abstract class RepositoryModule {
         impl: OfferRepositoryImp
     ): OfferRepository
 
-
     @Binds
     abstract fun bindAdminRepository(
         impl: AdminRepoImp

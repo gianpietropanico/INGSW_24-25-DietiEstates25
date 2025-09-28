@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferMessage
+import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
@@ -74,7 +75,7 @@ fun InboxScreen(
 
                 LazyColumn {
                     items(state.offers) { offer ->
-                        OfferItem(offer, user!!.username, inboxVm)
+                        OfferItem(offer, user!!.username, inboxVm, navController)
                         HorizontalDivider()
                     }
                 }
@@ -87,7 +88,8 @@ fun InboxScreen(
 fun OfferItem(
     offer: Offer,
     currentUserId: String,
-    inboxVm: InboxViewModel
+    inboxVm: InboxViewModel,
+    navController: NavController
 ) {
     val lastMessage = offer.messages.lastOrNull()
     val otherUser = if (offer.agentName == currentUserId) offer.agentName else offer.buyerName
@@ -97,7 +99,7 @@ fun OfferItem(
             .fillMaxWidth()
             .clickable {
                 inboxVm.setSelectedOffer(offer)
-                //TODO naviga alla chat
+                navController.navigate(NavigationItem.OfferChat.route)
             }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically

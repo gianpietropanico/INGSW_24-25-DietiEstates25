@@ -42,8 +42,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
+import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Chip
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiColors
@@ -62,7 +64,10 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun ListingDetailContent(propertyListing: PropertyListing) {
+fun ListingDetailContent(
+    propertyListing: PropertyListing,
+    navController: NavController
+) {
 
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -81,10 +86,6 @@ fun ListingDetailContent(propertyListing: PropertyListing) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(latLng, 15f)
     }
-
-
-
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -226,12 +227,14 @@ fun ListingDetailContent(propertyListing: PropertyListing) {
             ) {
                 // Pulsante VENDI
                 Button(
-                    onClick = { /* TODO: azione vendita */ },
+                    onClick = {
+                        navController.navigate(NavigationItem.MakeOffer.route)
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("VENDI", color = Color.Black)
+                    Text("OFFRI", color = Color.Black)
                 }
 
                 // Divider centrale
