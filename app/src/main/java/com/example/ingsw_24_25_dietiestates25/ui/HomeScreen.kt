@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -178,16 +179,28 @@ fun HomeScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(FiftySixDp)
+                    .height(FiftySixDp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+                contentPadding = PaddingValues()
             ) {
-                Text(
-                    text = "SEARCH",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 24.sp
-                    ),
-                    color = Color.White
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(AscientGradient)
+                        .clip(MaterialTheme.shapes.medium), // mantiene il shape del Button
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "SEARCH",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 24.sp
+                        ),
+                        color = Color.White
+                    )
+                }
             }
         }
     }

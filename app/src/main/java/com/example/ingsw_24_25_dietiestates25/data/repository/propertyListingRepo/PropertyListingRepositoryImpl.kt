@@ -160,4 +160,36 @@ class PropertyListingRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun searchProperties(type: String, location: String): ApiResult<List<PropertyListing>> {
+        return try {
+            val response = httpClient.get("$baseURL/propertylisting/search") {
+                parameter("type", type)
+                parameter("city", location)
+                accept(ContentType.Application.Json)
+            }
+
+            when (response.status) {
+                HttpStatusCode.OK -> {
+                    val listings: List<PropertyListing> = response.body()
+                    ApiResult.Success(listings, "Proprietà trovate con successo")
+                }
+                HttpStatusCode.NotFound -> {
+                    ApiResult.UnknownError("Nessuna proprietà trovata")
+                }
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                }
+            }
+        } catch (e: ResponseException) {
+            when (e.response.status) {
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata")
+                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
+
 }
