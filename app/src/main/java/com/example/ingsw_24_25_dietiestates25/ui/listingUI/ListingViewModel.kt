@@ -11,18 +11,16 @@ import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
-import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentState
-import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingFormState
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingScreenState
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
 import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64WithSizeLimit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -68,13 +66,13 @@ class ListingViewModel @Inject constructor(
         }
     }
 
-    fun addPropertyListing(agentEmail: String, imageUris: List<Uri>, context: Context) =
+    fun addPropertyListing(agent: User?, imageUris: List<Uri>, context: Context) =
         viewModelScope.launch {
             _state.update { it.copy(uiState = ListingState.Loading) }
 
             try {
                 val property = _state.value.formState.toProperty()
-                val listing = _state.value.formState.toPropertyListing(agentEmail, property)
+                val listing = _state.value.formState.toPropertyListing(agent, property)
 
                 val base64Images =
                     imageUris.mapNotNull { uri -> uriToBase64WithSizeLimit(context, uri) }
@@ -205,14 +203,14 @@ private fun ListingFormState.toProperty() =
         description = description
     )
 
-private fun ListingFormState.toPropertyListing(agentEmail: String, property: Property) =
+private fun ListingFormState.toPropertyListing(agent: User?, property: Property) =
     PropertyListing(
         id = "",
         title = title,
         type = type,
         price = price.toFloatOrNull() ?: 0f,
         property = property,
-        agentEmail = agentEmail
+        agent = agent
     )
 
 

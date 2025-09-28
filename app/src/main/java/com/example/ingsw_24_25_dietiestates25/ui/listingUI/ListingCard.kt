@@ -54,6 +54,7 @@ fun ListingCard(
         colors = CardDefaults.cardColors(containerColor = cardBackground)
     ) {
         Column {
+
             Row(modifier = Modifier.height(120.dp)) {
                 // Primo tentativo di immagine Base64 sicuro
                 val firstImageBitmap = try {

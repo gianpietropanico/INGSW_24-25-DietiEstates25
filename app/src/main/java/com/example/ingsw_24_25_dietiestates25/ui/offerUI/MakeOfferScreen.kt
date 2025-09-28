@@ -73,7 +73,7 @@ fun MakeOfferScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            androidx.compose.material.Icon(
+            Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Cancel",
                 tint = bluPerchEcipiace,
@@ -192,7 +192,7 @@ fun MakeOfferScreen(
                 onClick = {
                     inboxVm.makeOffer(
                         propertyId = state.selectedProperty!!.id,
-                        agentEmail = state.selectedProperty!!.agentEmail,
+                        agentEmail = state.selectedProperty!!.agent!!.email,
                         amount = amount
                     )
                 },

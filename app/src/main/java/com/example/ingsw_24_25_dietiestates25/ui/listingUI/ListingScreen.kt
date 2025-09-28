@@ -53,7 +53,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingState
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
 
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
@@ -178,5 +178,9 @@ fun ListingScreen(
                 }
             }
         }
+
     }
+
+
+
 }
