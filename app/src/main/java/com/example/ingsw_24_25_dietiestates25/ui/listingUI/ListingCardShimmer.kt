@@ -48,7 +48,8 @@ fun ListingCardShimmer() {
                 .drawWithContent {
                     drawContent()
                     drawRect(gradient)
-                })
+                }
+        )
 
         Spacer(Modifier.height(12.dp))
 
@@ -71,6 +72,7 @@ fun ListingCardShimmer() {
                 .drawWithContent {
                     drawContent()
                     drawRect(gradient)
-                })
+                }
+        )
     }
 }

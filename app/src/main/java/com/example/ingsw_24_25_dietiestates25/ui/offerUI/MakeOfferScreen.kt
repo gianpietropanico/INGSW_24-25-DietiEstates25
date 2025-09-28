@@ -96,7 +96,7 @@ fun MakeOfferScreen(
                 .padding(8.dp)
         ) {
 
-            val picture = state.selectedProperty?.property?.propertyPicture
+            val picture = state.selectedProperty?.property?.images?.first()
             if ( picture != null){
 
                 Image(
