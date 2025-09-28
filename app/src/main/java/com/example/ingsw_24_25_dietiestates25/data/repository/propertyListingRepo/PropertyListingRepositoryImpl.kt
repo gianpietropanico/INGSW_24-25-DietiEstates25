@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
+import com.example.ingsw_24_25_dietiestates25.data.model.request.PropertySearchRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.response.ListResponse
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import io.ktor.client.call.body
@@ -221,21 +222,33 @@ class PropertyListingRepositoryImpl @Inject constructor(
                     val listings: List<PropertyListing> = response.body()
                     ApiResult.Success(listings, "Proprietà trovate con successo")
                 }
-                HttpStatusCode.NotFound -> {
-                    ApiResult.UnknownError("Nessuna proprietà trovata")
-                }
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata")
                 else -> {
                     val err = response.bodyAsText()
                     ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
                 }
             }
-        } catch (e: ResponseException) {
-            when (e.response.status) {
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
+
+    override suspend fun searchWithFilters(filters: PropertySearchRequest): ApiResult<List<PropertyListing>> {
+        return try {
+            val response = httpClient.post("$baseURL/propertylisting/searchWithFilters") {
+                contentType(ContentType.Application.Json)
+                setBody(filters)
+                accept(ContentType.Application.Json)
+            }
+            when (response.status) {
+                HttpStatusCode.OK -> {
+                    val listings: List<PropertyListing> = response.body()
+                    ApiResult.Success(listings)
+                }
                 HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                else -> ApiResult.UnknownError("Errore HTTP ${response.status.value}")
             }
         } catch (e: Exception) {
-            e.printStackTrace()
             ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }

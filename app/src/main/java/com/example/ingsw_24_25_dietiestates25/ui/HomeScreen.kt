@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -127,7 +128,7 @@ fun HomeScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             Row {
                 Text(
@@ -166,7 +167,7 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(200.dp))
 
             Button(
                 onClick = {
@@ -236,7 +237,8 @@ fun SegmentedControl(
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     }
                     .background(
-                        color = if (isSelected) testColor else Color.Transparent,
+                        brush = if (isSelected) AscientGradient else Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Transparent),),
                         shape = RoundedCornerShape(50)
                     )
             ) {
