@@ -83,11 +83,11 @@ class ImageRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertHouseImages(ownerId: String, propertyPicture: String): ApiResult<Unit> {
+    override suspend fun insertHouseImages(ownerId: String, propertyPicture: List<String>): ApiResult<Unit> {
         return try {
             val request = ImageRequest(
                 ownerId = ownerId,
-                base64Images = listOf(propertyPicture)
+                base64Images = propertyPicture
             )
 
             val response = httpClient.post("$baseURL/house/image") {

@@ -1,8 +1,10 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo
 
+import android.util.Log
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
+import com.example.ingsw_24_25_dietiestates25.data.model.response.ListResponse
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -29,17 +31,24 @@ class PropertyListingRepositoryImpl @Inject constructor(
 
     private val baseURL = "http://10.0.2.2:8080"
 
-    override suspend fun addPropertyListing(propertyListing: PropertyListing): ApiResult<Unit> {
+    override suspend fun addPropertyListing(propertyListing: PropertyListing): ApiResult<String> {
         return try {
-            val response = httpClient.post("$baseURL/propertiesListing/addpropertylisting") {
+
+
+            val response = httpClient.post("$baseURL/propertylisting/addpropertylisting") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
                 setBody(propertyListing)
             }
 
+
+
             return when (response.status) {
                 HttpStatusCode.OK, HttpStatusCode.Created -> {
-                    ApiResult.Success(Unit, "Property inserita con successo")
+                    val id: String = response.body()
+                    Log.d("ListingRepo", id)
+
+                    ApiResult.Success(id, "Operazione completata con successo")
                 }
                 HttpStatusCode.Conflict -> {
                     val err = response.bodyAsText()
@@ -63,7 +72,7 @@ class PropertyListingRepositoryImpl @Inject constructor(
 
     override suspend fun getPropertiesListingByAgent(agentEmail: String): ApiResult<List<PropertyListing>> {
         return try {
-            val response = httpClient.get("$baseURL/propertiesListing/getpropertieslistingbyemail") {
+            val response = httpClient.get("$baseURL/propertylisting/getpropertieslistingbyemail") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
                 setBody(agentEmail)
@@ -71,8 +80,12 @@ class PropertyListingRepositoryImpl @Inject constructor(
 
             return when (response.status) {
                 HttpStatusCode.OK -> {
-                    val listings: List<PropertyListing> = response.body()
-                    ApiResult.Success(listings, "Lista proprietà recuperata con successo")
+                    val body: ListResponse<List<PropertyListing>> = response.body()
+                    if (body.success && body.data != null) {
+                        ApiResult.Success(body.data)
+                    } else {
+                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto dal server")
+                    }
                 }
                 HttpStatusCode.NotFound -> {
                     ApiResult.UnknownError("Nessuna proprietà trovata per l'agente $agentEmail")
@@ -91,6 +104,43 @@ class PropertyListingRepositoryImpl @Inject constructor(
             ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
+
+    override suspend fun getListingById(id: String): ApiResult<PropertyListing> {
+        return try {
+            val response = httpClient.get("$baseURL/propertylisting/getpropertieslistingbyid") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(id)
+            }
+
+            return when (response.status) {
+                HttpStatusCode.OK -> {
+                    val body: ListResponse<PropertyListing> = response.body()
+                    if (body.success && body.data != null) {
+                        ApiResult.Success(body.data, "Proprietà recuperata con successo")
+                    } else {
+                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto dal server")
+                    }
+                }
+                HttpStatusCode.NotFound -> {
+                    ApiResult.UnknownError("Proprietà con id $id non trovata")
+                }
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                }
+            }
+        } catch (e: ResponseException) {
+            when (e.response.status) {
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("Proprietà con id $id non trovata")
+                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
+
 
     override suspend fun getAllListings(): ApiResult<List<PropertyListing>> {
         return try {
@@ -158,5 +208,6 @@ class PropertyListingRepositoryImpl @Inject constructor(
             ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
+
 
 }

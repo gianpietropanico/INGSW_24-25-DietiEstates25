@@ -1,6 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 
 import android.content.Context
+import android.location.Geocoder
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,159 +12,207 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentState
 import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64
+import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64WithSizeLimit
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Locale
 import javax.inject.Inject
+
 @HiltViewModel
-class ListingViewModel  @Inject constructor(
+class ListingViewModel @Inject constructor(
     private val userSessionManager: UserSessionManager,
-    private val imageRepo : ImageRepository,
-    private val listingsRepo: PropertyListingRepository,
-): ViewModel()  {
+    private val imageRepo: ImageRepository,
+    private val listingsRepo: PropertyListingRepository
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<ListingState>(ListingState.Idle)
-    val uiState: StateFlow<ListingState> = _uiState
+    private val _state = MutableStateFlow(ListingScreenState())
+    val state: StateFlow<ListingScreenState> = _state
 
-    var user = userSessionManager.currentUser
-    private val _myListings = MutableStateFlow<List<PropertyListing>>(emptyList())
-    val myListings: StateFlow<List<PropertyListing>> = _myListings
-
-    // Stati per i campi del form
-    val title = MutableStateFlow("")
-
-    val type = MutableStateFlow<Type>(Type.A)  // default Rent
-    val price = MutableStateFlow("")
-    val city = MutableStateFlow("")
-    val cap = MutableStateFlow("")
-    val country = MutableStateFlow("")
-    val province = MutableStateFlow("")
-    val street = MutableStateFlow("")
-    val civicNumber = MutableStateFlow("")
-    val latitude = MutableStateFlow("")
-    val longitude = MutableStateFlow("")
-    val numberOfRooms = MutableStateFlow("")
-    val numberOfBathrooms = MutableStateFlow("")
-
-    val size = MutableStateFlow("")
-    val energyClass = MutableStateFlow<EnergyClass>(EnergyClass.A)
-    val parking = MutableStateFlow(false)
-    val garden = MutableStateFlow(false)
-    val elevator = MutableStateFlow(false)
-    val gatehouse = MutableStateFlow(false)
-    val balcony = MutableStateFlow(false)
-    val roof = MutableStateFlow(false)
-    val airConditioning = MutableStateFlow(false)
-    val heatingSystem = MutableStateFlow(false)
-    val description = MutableStateFlow("")
+    private val _myListing = MutableStateFlow<PropertyListing?>(null)
+    val myListing: StateFlow<PropertyListing?> = _myListing
 
 
-    fun loadMyListings() {
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+
+
+    val energyClass = MutableStateFlow(EnergyClass.A)
+
+
+    init {
         viewModelScope.launch {
-            user.value?.email?.let { email ->
-                when (val result = listingsRepo.getPropertiesListingByAgent(email)) {
-                    is ApiResult.Success -> {
-                        _myListings.value = result.data ?: emptyList()
-                    }
-                    is ApiResult.Unauthorized -> {
-
-                        ListingState.Error( result.message ?: "Accesso non autorizzato")
-                    }
-                    is ApiResult.UnknownError -> {
-
-                        ListingState.Error( result.message ?: "Errore sconosciuto")
-                    }
-                    else -> {
-                        ListingState.Error ( result.message ?: "Errore inatteso")
-                    }
-                }
+            userSessionManager.currentUser.collect { user ->
+                _currentUser.value = user
             }
         }
     }
 
-    fun addPropertyListing(agentEmail: String, imageUris: List<Uri>, context: Context) {
-        viewModelScope.launch {
 
-            _uiState.value = ListingState.Loading
+    fun loadMyListings() = viewModelScope.launch {
+        _state.update { it.copy(uiState = ListingState.Loading) }
+        val result = listingsRepo.getPropertiesListingByAgent(currentUser.value!!.email)
+        handleApiResult(result) { data ->
+            _state.update { it.copy(myListings = data ?: emptyList(), uiState = ListingState.Idle) }
+        }
+    }
+
+    fun addPropertyListing(agentEmail: String, imageUris: List<Uri>, context: Context) =
+        viewModelScope.launch {
+            _state.update { it.copy(uiState = ListingState.Loading) }
 
             try {
-                val property = Property(
-                    city = city.value,
-                    cap = cap.value,
-                    country = country.value,
-                    province = province.value,
-                    street = street.value,
-                    civicNumber = civicNumber.value,
-                    latitude = latitude.value.toDoubleOrNull() ?: 0.0,
-                    longitude = longitude.value.toDoubleOrNull() ?: 0.0,
-                    indicators = emptyList(),
-                    propertyPicture = null,
-                    numberOfRooms = numberOfRooms.value.toIntOrNull() ?: 0,
-                    numberOfBathrooms = numberOfBathrooms.value.toIntOrNull() ?: 0,
-                    size = size.value.toFloatOrNull() ?: 0f,
-                    energyClass = energyClass.value,
-                    parking = parking.value,
-                    garden = garden.value,
-                    elevator = elevator.value,
-                    gatehouse = gatehouse.value,
-                    balcony = balcony.value,
-                    roof = roof.value,
-                    airConditioning = airConditioning.value,
-                    heatingSystem = heatingSystem.value,
-                    description = description.value
-                )
+                val property = _state.value.formState.toProperty()
+                val listing = _state.value.formState.toPropertyListing(agentEmail, property)
 
-                val listing = PropertyListing(
-                    id = "",
-                    title = title.value,
-                    type = type.value,
-                    price = price.value.toFloatOrNull() ?: 0f,
-                    property = property,
-                    agentEmail = agentEmail
-                )
+                val base64Images =
+                    imageUris.mapNotNull { uri -> uriToBase64WithSizeLimit(context, uri) }
 
-                // Conversione immagini
-                val base64Images = imageUris.mapNotNull { uri -> uriToBase64(context, uri) }
-
-                // Salvataggio immagini
-                base64Images.forEach { base64 ->
-                    imageRepo.insertHouseImages(agentEmail, base64)
-                }
                 val result = listingsRepo.addPropertyListing(listing)
-                _uiState.value = when (result) {
-                    is ApiResult.Success -> ListingState.Success
-                    is ApiResult.Unauthorized -> ListingState.Error(result.message ?: "Non autorizzato")
-                    is ApiResult.UnknownError -> ListingState.Error(result.message ?: "Errore sconosciuto")
-                    else -> ListingState.Error("Errore inatteso")
+
+                if (result is ApiResult.Success && result.data != null) {
+                    base64Images.forEach { base64 ->
+                        imageRepo.insertHouseImages(result.data, base64Images)
+                    }
+                    _state.update {
+                        it.copy(
+                            formState = ListingFormState(),
+                            uiState = ListingState.Success
+                        )
+                    }
+                } else if (result is ApiResult.Unauthorized) {
+                    _state.update {
+                        it.copy(
+                            uiState = ListingState.Error(
+                                result.message ?: "Non autorizzato"
+                            )
+                        )
+                    }
+                } else if (result is ApiResult.UnknownError) {
+                    _state.update {
+                        it.copy(
+                            uiState = ListingState.Error(
+                                result.message ?: "Errore sconosciuto"
+                            )
+                        )
+                    }
+                } else {
+                    _state.update { it.copy(uiState = ListingState.Error("Errore inatteso")) }
                 }
             } catch (e: Exception) {
-
-                _uiState.value = ListingState.Error("Unknown Error")
+                _state.update { it.copy(uiState = ListingState.Error("Unknown Error: ${e.message}")) }
             }
+        }
+
+    fun updateAddressFromCoordinates(context: Context, lat: Double, lng: Double) =
+        viewModelScope.launch(Dispatchers.IO) {
+            val geocoder = Geocoder(context, Locale.getDefault())
+            val addresses = geocoder.getFromLocation(lat, lng, 1)
+            addresses?.firstOrNull()?.let { address ->
+                withContext(Dispatchers.Main) {
+                    _state.update {
+                        it.copy(
+                            formState = it.formState.copy(
+                                city = address.locality ?: "",
+                                province = address.subAdminArea ?: "",
+                                street = address.thoroughfare ?: "",
+                                civicNumber = address.subThoroughfare ?: "",
+                                cap = address.postalCode ?: "",
+                                country = address.countryName ?: ""
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+    fun getListingById(id: String) = viewModelScope.launch {
+        _state.update { it.copy(uiState = ListingState.Loading) }
+        val result = listingsRepo.getListingById(id)
+        handleApiResult(result) { data ->
+            _state.update { it.copy(myListing = data, uiState = ListingState.Success) }
         }
     }
 
-    fun setLoading() {
-        _uiState.value = ListingState.Loading
+    fun resetForm() {
+        _state.update { it.copy(formState = ListingFormState()) }
     }
 
-    fun setIdle() {
-        _uiState.value = ListingState.Idle
+    fun updateForm(update: (ListingFormState) -> ListingFormState) {
+        _state.update { it.copy(formState = update(it.formState)) }
     }
 
-    fun enterAddListingScreen() {
-        _uiState.value = ListingState.Loading
-    }
+    private fun <T> handleApiResult(result: ApiResult<T>, onSuccess: (T?) -> Unit) {
+        when (result) {
+            is ApiResult.Success -> onSuccess(result.data)
+            is ApiResult.Unauthorized -> _state.update {
+                it.copy(
+                    uiState = ListingState.Error(
+                        result.message ?: "Accesso non autorizzato"
+                    )
+                )
+            }
 
-    sealed class ListingState{
-        object Idle : ListingState()
-        object Loading : ListingState()
-        object Success : ListingState()
-        data class Error(val message: String) : ListingState()
+            is ApiResult.UnknownError -> _state.update {
+                it.copy(
+                    uiState = ListingState.Error(
+                        result.message ?: "Errore sconosciuto"
+                    )
+                )
+            }
+
+            else -> _state.update { it.copy(uiState = ListingState.Error("Errore inatteso")) }
+        }
     }
 }
+
+
+private fun ListingFormState.toProperty() =
+    Property(
+        city = city,
+        cap = cap,
+        country = country,
+        province = province,
+        street = street,
+        civicNumber = civicNumber,
+        latitude = latitude.toDoubleOrNull() ?: 0.0,
+        longitude = longitude.toDoubleOrNull() ?: 0.0,
+        numberOfRooms = numberOfRooms.toIntOrNull() ?: 0,
+        numberOfBathrooms = numberOfBathrooms.toIntOrNull() ?: 0,
+        size = size.toFloatOrNull() ?: 0f,
+        energyClass = energyClass,
+        parking = parking,
+        garden = garden,
+        elevator = elevator,
+        gatehouse = gatehouse,
+        balcony = balcony,
+        roof = roof,
+        airConditioning = airConditioning,
+        heatingSystem = heatingSystem,
+        pois = emptyList(),
+        images = emptyList(),
+        description = description
+    )
+
+private fun ListingFormState.toPropertyListing(agentEmail: String, property: Property) =
+    PropertyListing(
+        id = "",
+        title = title,
+        type = type,
+        price = price.toFloatOrNull() ?: 0f,
+        property = property,
+        agentEmail = agentEmail
+    )
+
 

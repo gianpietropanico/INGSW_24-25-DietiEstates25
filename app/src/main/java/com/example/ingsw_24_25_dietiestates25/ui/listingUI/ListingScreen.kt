@@ -2,10 +2,12 @@ package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -42,21 +44,26 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel.ListingState
+import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingState
+
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
+import com.example.ingsw_24_25_dietiestates25.ui.theme.cardBackground
+import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
-import com.google.android.gms.maps.MapsInitializer
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 
 
 @Composable
@@ -64,19 +71,20 @@ fun ListingScreen(
     listingVm: ListingViewModel,
     navController: NavController
 ) {
+    val state by listingVm.state.collectAsState()
+    val uiState = state.uiState
+    val listings = state.myListings
+    val context = LocalContext.current
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val state by listingVm.uiState.collectAsState()
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        listingVm.loadMyListings()
+    LaunchedEffect(listingVm) {
+
+            listingVm.loadMyListings()
+
     }
-
-    val listings by listingVm.myListings.collectAsState(initial = emptyList())
-
 
     Scaffold(
         bottomBar = {
@@ -98,17 +106,12 @@ fun ListingScreen(
                 onClick = {
                     navController.navigate(NavigationItem.AddPropertyListings.route)
                 },
-
-                containerColor = Color(0xFF0097A7),
+                containerColor = primaryBlu,
                 contentColor = Color.White,
                 shape = CircleShape,
                 modifier = Modifier
                     .size(60.dp)
-                    .shadow(
-                        elevation = 12.dp,
-                        shape = CircleShape,
-                        clip = false
-                    )
+                    .shadow(elevation = 12.dp, shape = CircleShape)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -122,7 +125,16 @@ fun ListingScreen(
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-            if (listings.isEmpty()) {
+            if (uiState is ListingState.Loading && listings.isEmpty()) {
+//                LoadingOverlay(isVisible = true)
+                LazyColumn {
+                    items(3) {
+                        ListingCardShimmer()
+                    }
+                }
+            }
+
+            if (listings.isEmpty() && uiState !is ListingState.Loading) {
                 // Schermata vuota
                 Column(
                     modifier = Modifier
@@ -151,7 +163,7 @@ fun ListingScreen(
                         textAlign = TextAlign.Center
                     )
                 }
-            } else {
+            } else if (listings.isNotEmpty()) {
                 // Lista con annunci
                 LazyColumn(
                     modifier = Modifier
@@ -159,52 +171,11 @@ fun ListingScreen(
                         .padding(padding)
                 ) {
                     items(listings) { propertyListing ->
-                        PropertyCard(propertyListing) {
-                            navController.navigate("propertyDetail/${propertyListing.id}")
+                        ListingCard(propertyListing) {
+                            navController.navigate("listingDetail/${propertyListing.id}")
                         }
                     }
                 }
-            }
-
-            if (state is ListingViewModel.ListingState.Loading) {
-                LoadingOverlay(isVisible = true)
-            }
-        }
-
-
-    }
-
-}
-
-@Composable
-fun PropertyCard(
-    propertyListing: PropertyListing,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Row(modifier = Modifier.height(120.dp)) {
-            Image(
-                painter = rememberAsyncImagePainter(propertyListing.property.propertyPicture),
-                contentDescription = propertyListing.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.width(150.dp).fillMaxHeight()
-            )
-            Column(
-                modifier = Modifier
-                    .padding(12.dp)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(propertyListing.title, fontWeight = FontWeight.Bold)
-                Text("${propertyListing.property.city}, ${propertyListing.property.province}")
-                Text("${propertyListing.price} €", color = MaterialTheme.colorScheme.primary)
             }
         }
     }
