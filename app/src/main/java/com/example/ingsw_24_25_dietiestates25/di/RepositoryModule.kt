@@ -8,6 +8,8 @@ import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRep
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepositoryImpl
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepositoryImpl
+import com.example.ingsw_24_25_dietiestates25.data.repository.offerRepo.OfferRepository
+import com.example.ingsw_24_25_dietiestates25.data.repository.offerRepo.OfferRepositoryImp
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepositoryImpl
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepo
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepoImp
@@ -20,6 +22,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+    @Binds
+    abstract fun bindOfferRepository(
+        impl: OfferRepositoryImp
+    ): OfferRepository
+
 
     @Binds
     abstract fun bindAdminRepository(
