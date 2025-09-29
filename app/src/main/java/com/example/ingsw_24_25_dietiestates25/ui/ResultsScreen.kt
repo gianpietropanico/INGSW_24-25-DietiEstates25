@@ -1,23 +1,33 @@
 package com.example.ingsw_24_25_dietiestates25.ui
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -30,6 +40,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.R
@@ -38,9 +49,13 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
+import com.example.ingsw_24_25_dietiestates25.data.model.request.PropertySearchRequest
+import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 import com.example.ingsw_24_25_dietiestates25.ui.theme.Rubik
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.ui.theme.testColor
+import com.example.ingsw_24_25_dietiestates25.ui.theme.unselectedFacility
+import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 import kotlinx.coroutines.launch
 import java.util.Base64
 
@@ -70,10 +85,10 @@ fun ResultsScreen(
         sheetContainerColor = Color.White,
         sheetContent = {
             FiltersSheet(
+                rm = rm,
+                type = type,
+                location = location,
                 onApply = {
-                    scope.launch { scaffoldState.bottomSheetState.partialExpand() }
-                },
-                onDismiss = {
                     scope.launch { scaffoldState.bottomSheetState.partialExpand() }
                 }
             )
@@ -157,7 +172,7 @@ fun ResultsScreen(
                 }
                 state.errorMessage != null -> {
                     Text(
-                        text = "❌ ${state.errorMessage}",
+                        text = " ${state.errorMessage}",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodyLarge
                     )
@@ -228,7 +243,6 @@ fun ResultsScreen(
                                             withStyle(
                                                 style = SpanStyle(
                                                     color = primaryBlu,
-                                                    //color = Color(0xFF252B5C),
                                                     fontFamily = Rubik,
                                                     fontWeight = FontWeight.SemiBold,
                                                     fontSize = 24.sp
@@ -239,7 +253,6 @@ fun ResultsScreen(
                                             withStyle(
                                                 style = SpanStyle(
                                                     color = primaryBlu,
-                                                    //color = Color(0xFF252B5C),
                                                     fontFamily = Rubik,
                                                     fontWeight = FontWeight.ExtraBold,
                                                     fontSize = 24.sp
@@ -255,7 +268,7 @@ fun ResultsScreen(
                                             .padding(horizontal = 24.dp)
                                     )
 
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(20.dp))
 
                                     Text(
                                         text = "Sorry, we can’t find the real estates you are looking for. Maybe, a little spelling mistake?",
@@ -273,13 +286,18 @@ fun ResultsScreen(
                                 }
                             }
                         }else {
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
                             // risultati della lista
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(state.properties) { property ->
-                                    PropertyItem(property)
+                                    PropertyItem(property){
+                                        navController.navigate("listingDetail/${property.id}")
+                                    }
                                 }
                             }
                         }
@@ -291,41 +309,62 @@ fun ResultsScreen(
     }
 }
 
-
 @Composable
-fun PropertyItem(propertyListing: PropertyListing) {
+fun PropertyItem(
+    propertyListing: PropertyListing,
+    onClick: () -> Unit
+
+) {
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(6.dp)
+            .padding(vertical = 8.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
-        Column {
-            // 📷 Immagine (usa propertyPicture se c'è, placeholder altrimenti)
-            propertyListing.property.images.firstOrNull().let { base64Image ->
-                // se hai immagini in base64
-                val imageBytes = Base64.getDecoder().decode(base64Image)
-                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        Column  {
+            //  Immagine principale
+            val firstImageBitmap = try {
+                propertyListing.property.images.firstOrNull() ?. let { base64 ->
+                    bse64ToImageBitmap(base64)
+                }
+            } catch (e: Exception) {
+                Log.e("PropertyItem", "Errore decoding immagine: ${e.message}")
+                null
+            }
+
+            if (firstImageBitmap != null) {
                 Image(
-                    bitmap = bitmap.asImageBitmap(),
+                    bitmap = firstImageBitmap,
                     contentDescription = propertyListing.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp)
+                        .height(200.dp)
                 )
-            } ?: Image(
-                painter = painterResource(id = R.drawable.attention), // TODO da cambiare
-                contentDescription = "No image",
-                contentScale = ContentScale.Crop,
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.default_house),
+                    contentDescription = "No image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
+            }
+
+            // Info testuali
+            // 🔹 Box grigio sotto
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
-            )
-
-            //
-            Column(modifier = Modifier.padding(16.dp)) {
+                    .background(Color(0x73D9D9D9))
+                    .padding(16.dp)
+            ) {
                 Text(
                     text = propertyListing.title,
                     style = MaterialTheme.typography.titleMedium.copy(
@@ -346,61 +385,44 @@ fun PropertyItem(propertyListing: PropertyListing) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                //  icone + dati
+                //  icone
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_bed),
-                            contentDescription = "Bedrooms",
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.Black
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("${propertyListing.property.numberOfRooms} bedroom")
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_bathroom),
-                            contentDescription = "Bathrooms",
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.Black
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("${propertyListing.property.numberOfBathrooms} bathroom")
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_home),
-                            contentDescription = "Size",
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.Black
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("${propertyListing.property.size.toInt()} mq")
-                    }
+                    PropertyInfoItem(R.drawable.ic_bed, "${propertyListing.property.numberOfRooms} bedroom")
+                    PropertyInfoItem(R.drawable.ic_bathroom, "${propertyListing.property.numberOfBathrooms} bathroom")
+                    PropertyInfoItem(R.drawable.ic_home, "${propertyListing.property.size.toInt()} mq")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // pulsante e prezzo
-
+                //  Pulsante gradiente + Prezzo
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(
-                        onClick = { /* TODO: Azione prenotazione */ },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF1688CF)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(brush = AscientGradient)
+                            .clickable {
+                                // TODO: Azione prenotazione
+                            },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text("Book an appointment")
+                        Text(
+                            text = "Book an appointment",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = Rubik
+                            ),
+                            color = Color.White
+                        )
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -420,45 +442,247 @@ fun PropertyItem(propertyListing: PropertyListing) {
 }
 
 @Composable
+private fun PropertyInfoItem(iconRes: Int, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = Color.Black
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text,
+            style = MaterialTheme.typography.bodySmall.copy(fontFamily = Rubik),
+            color = Color.Black
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun FiltersSheet(
     onApply: () -> Unit,
-    onDismiss: () -> Unit
+    rm: ResultsViewModel,
+    type: String,
+    location: String
 ) {
+    var minPrice by remember { mutableStateOf<Float?>(null) }
+    var maxPrice by remember { mutableStateOf<Float?>(null) }
+
+    var rooms by remember { mutableStateOf(0) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedEnergyClass by remember { mutableStateOf<EnergyClass?>(null) }
+
+    var elevator by remember { mutableStateOf(false) }
+    var gatehouse by remember { mutableStateOf(false) }
+    var balcony by remember { mutableStateOf(false) }
+    var roof by remember { mutableStateOf(false) }
+
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.9f)
-            .background(Color.White)
             .padding(24.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Text(
             text = "Filters",
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontFamily = Rubik
+            ),
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- SLIDER Prezzo ---
+        Text("Price range", fontWeight = FontWeight.Bold)
+        RangeSlider(
+            value = (minPrice ?: 0f)..(maxPrice ?: 100000f),
+            onValueChange = { range ->
+                minPrice = if (range.start > 0f) range.start else null
+                maxPrice = if (range.endInclusive < 100000f) range.endInclusive else null
+            },
+            valueRange = 0f..100000f,
+            steps = 20
+        )
+
+        Text(
+            "€${minPrice?.toInt() ?: 0} - €${maxPrice?.toInt() ?: 100000}"
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- Numero di stanze ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Rooms", fontWeight = FontWeight.Bold)
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = { if (rooms > 0) rooms-- }
+                ) {
+                    Icon(Icons.Default.Remove, contentDescription = "Decrease")
+                }
+                Text("$rooms", modifier = Modifier.padding(horizontal = 8.dp))
+                IconButton(
+                    onClick = { rooms++ }
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Increase")
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- Classe energetica ---
+        Text("Energy Class", fontWeight = FontWeight.Bold)
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = selectedEnergyClass?.label ?: "Select class",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Energy class") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                EnergyClass.values().forEach { energy ->
+                    DropdownMenuItem(
+                        text = { Text(energy.label) },
+                        onClick = {
+                            selectedEnergyClass = energy
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Facilities",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
             color = Color.Black
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("• Prezzo minimo/massimo", color = Color.Black)
-        Text("• Numero stanze", color = Color.Black)
-        Text("• Tipo di proprietà", color = Color.Black)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
+        // 🔹 Prima riga
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Button(
-                onClick = onDismiss,
-                modifier = Modifier.weight(1f)
-            ) { Text("Close") }
-
-            Button(
-                onClick = onApply,
-                modifier = Modifier.weight(1f)
-            ) { Text("Apply") }
+            FilterChip(
+                label = "Elevator",
+                selected = elevator,
+                onClick = { elevator = !elevator }
+            )
+            FilterChip(
+                label = "Gatehouse",
+                selected = gatehouse,
+                onClick = { gatehouse = !gatehouse }
+            )
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 🔹 Seconda riga
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            FilterChip(
+                label = "Balcony",
+                selected = balcony,
+                onClick = { balcony = !balcony }
+            )
+            FilterChip(
+                label = "Roof",
+                selected = roof,
+                onClick = { roof = !roof }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(brush = AscientGradient)
+                .clickable {
+                    val request = PropertySearchRequest(
+                        type = type,
+                        city = location,
+                        minPrice = minPrice,   // slider → Int
+                        maxPrice = maxPrice,
+                        minRooms = if (rooms > 0) rooms else null,              // numero stanze
+                        elevator = elevator,
+                        gatehouse = gatehouse,
+                        balcony = balcony,
+                        roof = roof,
+                        energyClass = selectedEnergyClass?.label
+                    )
+
+
+                    rm.applyFilters(request)
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Apply",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Rubik
+                ),
+                color = Color.White
+            )
+        }
+    }
+}
+
+// cliccabile
+@Composable
+fun FilterChip(label: String, selected: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .clickable(onClick = onClick)
+            .background(
+                if (selected) AscientGradient else Brush.linearGradient(
+                    listOf(
+                        unselectedFacility,
+                        unselectedFacility
+                    )
+                )
+            )
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            label,
+            color = if (selected) Color.White else Color.Black,
+            fontWeight = FontWeight.Medium
+        )
     }
 }

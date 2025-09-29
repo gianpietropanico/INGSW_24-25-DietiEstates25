@@ -36,6 +36,10 @@ import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.MakeOfferScreen
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.OfferChatScreen
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.SendEmailFormScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminAgencyScreen
@@ -67,7 +71,8 @@ enum class Screen {
     AGENTAGENCY,
     USERACTIVITIES,
     ADDPROPERTYLISTING,
-
+    MAKEOFFER,
+    OFFERCHAT,
     LISTINGDETAIL,
     APPOINTMENTCHAT,
     BOOKAPPOINTMENT,
@@ -93,6 +98,9 @@ sealed class NavigationItem(val route: String) {
     object AgentAgency : NavigationItem(Screen.AGENTAGENCY.name)
     object UserActivities : NavigationItem(Screen.USERACTIVITIES.name)
     object AddPropertyListings : NavigationItem(Screen.ADDPROPERTYLISTING.name)
+    object MakeOffer : NavigationItem(Screen.MAKEOFFER.name)
+    object OfferChat : NavigationItem(Screen.OFFERCHAT.name)
+    object ListingDetail : NavigationItem("listingDetail/{listingId}")
     object ListingDetail : NavigationItem(Screen.LISTINGDETAIL.name)
     object AppointmentChat : NavigationItem(Screen.APPOINTMENTCHAT.name)
     object InboxScreen : NavigationItem(Screen.INBOX.name)
@@ -115,6 +123,7 @@ fun AppNavHost(
     val agentViewModel : AgentViewModel = hiltViewModel()
     val mailerSenderViewModel : MailerSenderViewModel = hiltViewModel()
     val listingViewModel : ListingViewModel = hiltViewModel()
+    val inboxViewModel : InboxViewModel = hiltViewModel()
     val inboxViewModel: InboxViewModel = hiltViewModel()
     val appointmentViewModel : AppointmentViewModel = hiltViewModel()
 
@@ -196,28 +205,26 @@ fun AppNavHost(
         }
 
         composable(NavigationItem.Inbox.route){
-
-            val userRole = authViewModel.getUserRole()
-
-            when (userRole){
-                "SUPER_ADMIN" -> {
-                    /*TODO*/
-                }
-                "SUPPORT_ADMIN" -> {
-                    /*TODO*/
-                }
-                "AGENT_ADMIN" -> {
-                    /*TODO*/
-                }
-                "AGENT_USER" ->{
-                    /*TODO*/
-                }
-                else -> {
-                    /*TODO*/
-                }
-            }
+            InboxScreen(
+                navController = navController,
+                inboxVm = inboxViewModel
+            )
 
         }
+        composable(NavigationItem.OfferChat.route){
+            OfferChatScreen(
+                navController = navController,
+                inboxVm = inboxViewModel
+            )
+        }
+
+        composable(NavigationItem.MakeOffer.route){
+            MakeOfferScreen(
+                navController = navController,
+                inboxVm = inboxViewModel
+            )
+        }
+
 
         composable(NavigationItem.AgentAgency.route){
             AgencySettingsScreen(

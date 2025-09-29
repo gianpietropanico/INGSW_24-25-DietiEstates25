@@ -44,10 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Chip
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiColors
@@ -91,10 +93,6 @@ fun ListingDetailContent(
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(latLng, 15f)
     }
-
-
-
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -293,7 +291,7 @@ fun ListingDetailContent(
                     Button(
                         onClick = {
                             // Naviga allo screen per fare offerta
-                            navController.navigate("makeOffer") // da inserire route corretta
+                            navController.navigate(NavigationItem.MakeOffer.route)
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                         shape = RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp),
@@ -305,4 +303,5 @@ fun ListingDetailContent(
             }
         }
     }
+
 }
