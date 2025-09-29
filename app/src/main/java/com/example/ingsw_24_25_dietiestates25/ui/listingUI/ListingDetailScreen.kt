@@ -34,29 +34,45 @@ fun ListingDetailScreen(
         }
     }
 
-    when (uiState) {
-        is ListingState.Loading -> {
-            LoadingOverlay(isVisible = true)
-        }
+//    when (uiState) {
+//        is ListingState.Loading -> {
+//            LoadingOverlay(isVisible = true)
+//        }
+//
+//        is ListingState.Success -> {
+//            listing?.let { propertyListing ->
+//                ListingDetailContent(propertyListing = propertyListing, navController = navController, listingVm = listingVm)
+//            }
+//        }
+//
+//        is ListingState.Error -> {
+//            Text(
+//                text = (uiState as ListingState.Error).message,
+//                color = MaterialTheme.colorScheme.error,
+//                modifier = Modifier.padding(16.dp)
+//            )
+//        }
+//
+//        is ListingState.Idle -> {
+//            // Stato iniziale
+//        }
+//    }
 
-        is ListingState.Success -> {
-            listing?.let { propertyListing ->
-                ListingDetailContent(propertyListing = propertyListing, navController = navController, listingVm = listingVm)
-            }
-        }
 
-        is ListingState.Error -> {
-            Text(
-                text = (uiState as ListingState.Error).message,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+    when {
+        uiState is ListingState.Loading -> LoadingOverlay(true)
 
-        is ListingState.Idle -> {
-            // Stato iniziale
-        }
+        listing != null -> ListingDetailContent(
+            propertyListing = listing!!,
+            navController = navController,
+            listingVm = listingVm
+        )
+
+        uiState is ListingState.Error -> Text(uiState.message)
+
+        else -> Text("Nessun annuncio selezionato")
     }
+
 }
 
 
