@@ -38,6 +38,8 @@ import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.MakeOfferScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.OfferChatScreen
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
+
 
 
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
@@ -100,6 +102,7 @@ sealed class NavigationItem(val route: String) {
     object AddPropertyListings : NavigationItem(Screen.ADDPROPERTYLISTING.name)
     object MakeOffer : NavigationItem(Screen.MAKEOFFER.name)
     object OfferChat : NavigationItem(Screen.OFFERCHAT.name)
+
     object ListingDetail : NavigationItem(Screen.LISTINGDETAIL.name)
     object AppointmentChat : NavigationItem(Screen.APPOINTMENTCHAT.name)
     object InboxScreen : NavigationItem(Screen.INBOX.name)
@@ -122,7 +125,7 @@ fun AppNavHost(
     val agentViewModel : AgentViewModel = hiltViewModel()
     val mailerSenderViewModel : MailerSenderViewModel = hiltViewModel()
     val listingViewModel : ListingViewModel = hiltViewModel()
-    val inboxViewModel : InboxViewModel = hiltViewModel()
+    val inboxViewModel: InboxViewModel = hiltViewModel()
     val appointmentViewModel : AppointmentViewModel = hiltViewModel()
 
 
