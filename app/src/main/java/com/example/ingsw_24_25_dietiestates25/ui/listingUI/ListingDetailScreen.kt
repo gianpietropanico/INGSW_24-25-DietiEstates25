@@ -28,51 +28,33 @@ fun ListingDetailScreen(
     val listing by listingVm.selectedListing.collectAsState()
 
 
-    LaunchedEffect(Unit) {
-        if (listing == null && id != null) {
-            listingVm.getListingById(id)
+    LaunchedEffect(listing) {
+        listing?.id?.let { listingVm.getListingById(it) }
+    }
+
+    when (uiState) {
+        is ListingState.Loading -> {
+            LoadingOverlay(isVisible = true)
+        }
+
+        is ListingState.Success -> {
+            listing?.let { propertyListing ->
+                ListingDetailContent(propertyListing = propertyListing, navController = navController, listingVm = listingVm)
+            }
+        }
+
+        is ListingState.Error -> {
+            Text(
+                text = (uiState as ListingState.Error).message,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        is ListingState.Idle -> {
+            // Stato iniziale
         }
     }
-
-//    when (uiState) {
-//        is ListingState.Loading -> {
-//            LoadingOverlay(isVisible = true)
-//        }
-//
-//        is ListingState.Success -> {
-//            listing?.let { propertyListing ->
-//                ListingDetailContent(propertyListing = propertyListing, navController = navController, listingVm = listingVm)
-//            }
-//        }
-//
-//        is ListingState.Error -> {
-//            Text(
-//                text = (uiState as ListingState.Error).message,
-//                color = MaterialTheme.colorScheme.error,
-//                modifier = Modifier.padding(16.dp)
-//            )
-//        }
-//
-//        is ListingState.Idle -> {
-//            // Stato iniziale
-//        }
-//    }
-
-
-    when {
-        uiState is ListingState.Loading -> LoadingOverlay(true)
-
-        listing != null -> ListingDetailContent(
-            propertyListing = listing!!,
-            navController = navController,
-            listingVm = listingVm
-        )
-
-        uiState is ListingState.Error -> Text(uiState.message)
-
-        else -> Text("Nessun annuncio selezionato")
-    }
-
 }
 
 
