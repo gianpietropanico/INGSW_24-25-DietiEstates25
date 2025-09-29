@@ -38,12 +38,15 @@ import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 import com.example.ingsw_24_25_dietiestates25.ui.theme.cardBackground
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
+import com.example.ingsw_24_25_dietiestates25.ui.utils.safeDecodeBase64
 
 @Composable
 fun ListingCard(
     propertyListing: PropertyListing,
     onClick: () -> Unit
 ) {
+    val firstImageBitmap = safeDecodeBase64(propertyListing.property.images.firstOrNull())
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -57,20 +60,7 @@ fun ListingCard(
 
             Row(modifier = Modifier.height(120.dp)) {
                 // Primo tentativo di immagine Base64 sicuro
-                val firstImageBitmap = try {
-                    propertyListing.property.images.firstOrNull()?.let { base64 ->
-                        // Decoding sicuro con eventuale controllo lunghezza
-                        if (base64.length > 1_000_000) { // esempio limite 1MB
-                            Log.w("ListingCard", "Immagine troppo grande, uso default")
-                            null
-                        } else {
-                            bse64ToImageBitmap(base64)
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e("ListingCard", "Errore decoding immagine: ${e.message}")
-                    null
-                }
+
 
                 if (firstImageBitmap != null) {
                     Image(

@@ -26,6 +26,10 @@ import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileScreen
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgencySettingsScreen
+import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentChatScreen
+import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.BookAppointmentScreen
+import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.CheckListingAppointmentScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.AddPropertyListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingDetailScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingScreen
@@ -34,6 +38,8 @@ import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.MakeOfferScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.OfferChatScreen
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.SendEmailFormScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminAgencyScreen
@@ -44,6 +50,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminSupportsS
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminViewModel
 
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 enum class Screen {
     HOME,
@@ -66,7 +73,10 @@ enum class Screen {
     ADDPROPERTYLISTING,
     MAKEOFFER,
     OFFERCHAT,
-    LISTINGDETAIL
+    LISTINGDETAIL,
+    APPOINTMENTCHAT,
+    BOOKAPPOINTMENT,
+    CHECKAPPOINTMENT
 }
 
 sealed class NavigationItem(val route: String) {
@@ -91,6 +101,11 @@ sealed class NavigationItem(val route: String) {
     object MakeOffer : NavigationItem(Screen.MAKEOFFER.name)
     object OfferChat : NavigationItem(Screen.OFFERCHAT.name)
     object ListingDetail : NavigationItem("listingDetail/{listingId}")
+    object ListingDetail : NavigationItem(Screen.LISTINGDETAIL.name)
+    object AppointmentChat : NavigationItem(Screen.APPOINTMENTCHAT.name)
+    object InboxScreen : NavigationItem(Screen.INBOX.name)
+    object BookAppointment : NavigationItem(Screen.BOOKAPPOINTMENT.name)
+    object CheckListingAppointment : NavigationItem(Screen.CHECKAPPOINTMENT.name)
 }
 
 
@@ -109,6 +124,9 @@ fun AppNavHost(
     val mailerSenderViewModel : MailerSenderViewModel = hiltViewModel()
     val listingViewModel : ListingViewModel = hiltViewModel()
     val inboxViewModel : InboxViewModel = hiltViewModel()
+    val inboxViewModel: InboxViewModel = hiltViewModel()
+    val appointmentViewModel : AppointmentViewModel = hiltViewModel()
+
 
     NavHost(
         modifier = modifier,
@@ -138,16 +156,13 @@ fun AppNavHost(
             )
         }
 
-        composable(
-            route = "listingDetail/{listingId}",
-            arguments = listOf(navArgument("listingId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val listingId = backStackEntry.arguments?.getString("listingId") ?: ""
-            ListingDetailScreen(
-                listingId = listingId,
+
+        composable(NavigationItem.ListingDetail.route){
+            ListingScreen(
                 listingVm = listingViewModel,
                 navController = navController
             )
+
         }
 
         composable(NavigationItem.Home.route){
@@ -275,12 +290,6 @@ fun AppNavHost(
             )
         }
 
-        composable(NavigationItem.PropertyListing.route){
-//            AddListingScreen(
-//                navController = navController,
-//                agentVm = agentViewModel
-//            )
-        }
 
         composable(NavigationItem.ProfileDetails.route) {
             ProfileDetailsScreen(
@@ -297,6 +306,33 @@ fun AppNavHost(
         }
 
 
+        composable(NavigationItem.InboxScreen.route) {
+            InboxScreen(
+                navController = navController,
+                inboxVm = inboxViewModel
+            )
+        }
+
+        composable(NavigationItem.AppointmentChat.route) {
+            AppointmentChatScreen(
+                inboxVm = inboxViewModel,
+                navController = navController
+            )
+        }
+
+        composable(NavigationItem.BookAppointment.route){
+            BookAppointmentScreen(
+                appointmentVm = appointmentViewModel,
+                navController = navController
+            )
+
+        }
+        composable(NavigationItem.CheckListingAppointment.route){
+            CheckListingAppointmentScreen(
+                appointmentVm = appointmentViewModel,
+                navController = navController
+            )
+        }
 
 
         composable(

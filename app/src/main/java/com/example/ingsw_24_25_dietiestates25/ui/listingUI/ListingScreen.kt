@@ -64,6 +64,9 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 
 @Composable
@@ -75,6 +78,8 @@ fun ListingScreen(
     val uiState = state.uiState
     val listings = state.myListings
     val context = LocalContext.current
+
+
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -172,7 +177,8 @@ fun ListingScreen(
                 ) {
                     items(listings) { propertyListing ->
                         ListingCard(propertyListing) {
-                            navController.navigate("listingDetail/${propertyListing.id}")
+                            listingVm.setSelectedListing(propertyListing)
+                            navController.navigate(NavigationItem.ListingDetail.route)
                         }
                     }
                 }
@@ -184,3 +190,4 @@ fun ListingScreen(
 
 
 }
+

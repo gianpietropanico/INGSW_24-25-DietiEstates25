@@ -48,6 +48,8 @@ class ListingViewModel @Inject constructor(
 
     val energyClass = MutableStateFlow(EnergyClass.A)
 
+    private val _selectedListing = MutableStateFlow<PropertyListing?>(null)
+    val selectedListing: StateFlow<PropertyListing?> = _selectedListing.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -143,6 +145,9 @@ class ListingViewModel @Inject constructor(
         }
     }
 
+    fun setSelectedListing(listing: PropertyListing) {
+        _selectedListing.value = listing
+    }
     fun resetForm() {
         _state.update { it.copy(formState = ListingFormState()) }
     }
@@ -212,5 +217,6 @@ private fun ListingFormState.toPropertyListing(agent: User?, property: Property)
         property = property,
         agent = agent
     )
+
 
 

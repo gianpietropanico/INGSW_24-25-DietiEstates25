@@ -70,6 +70,21 @@ fun uriToBase64(context: Context, uri: Uri): String? {
     }
 }
 
+fun safeDecodeBase64(base64: String?): ImageBitmap? {
+    if (base64.isNullOrEmpty()) return null
+    return try {
+        if (base64.length > 1_000_000) {
+            Log.w("ImageDecode", "Immagine troppo grande, uso default")
+            null
+        } else {
+            bse64ToImageBitmap(base64)
+        }
+    } catch (e: Exception) {
+        Log.e("ImageDecode", "Errore decoding immagine: ${e.message}")
+        null
+    }
+}
+
 fun uriToBase64WithSizeLimit(context: Context, uri: Uri, maxKb: Int = 500): String? {
     return try {
         val inputStream = context.contentResolver.openInputStream(uri)
