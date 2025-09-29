@@ -72,6 +72,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
+import com.google.maps.android.compose.MarkerInfoWindowContent
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -328,7 +330,6 @@ fun MapSheet(properties: List<PropertyListing>,
     val mapProperties = MapUtils.defaultMapProperties(context)
     val uiSettings = MapUtils.defaultUiSettings
 
-
     var selectedPoi by remember { mutableStateOf<POI?>(null) }
 
     Column(
@@ -372,18 +373,20 @@ fun MapSheet(properties: List<PropertyListing>,
                             position = LatLng(property.property.latitude, property.property.longitude)
                         ),
                         title = property.title,
-                        snippet = "${property.price} €",
-                        onClick = {
-                            rm.setSelectedListing(property)
-                           navController.navigate(NavigationItem.ListingDetail.route)
-                            true
-                        }
+                        snippet = "${property.price} €"
                     )
                 }
             }
         }
     }
 }
+
+
+
+
+
+
+
 
 
 @Composable
