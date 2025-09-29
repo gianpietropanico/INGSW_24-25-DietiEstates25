@@ -30,6 +30,10 @@ class ResultsViewModel @Inject constructor(
     private val _state = MutableStateFlow(ResultsState())
     val state: StateFlow<ResultsState> = _state.asStateFlow()
 
+    private val _selectedListing = MutableStateFlow<PropertyListing?>(null)
+    val selectedListing: StateFlow<PropertyListing?> = _selectedListing.asStateFlow()
+
+
     fun searchProperties(type: String, location: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, errorMessage = null)
@@ -61,6 +65,10 @@ class ResultsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun setSelectedListing(listing: PropertyListing) {
+        _selectedListing.value = listing
     }
 
 

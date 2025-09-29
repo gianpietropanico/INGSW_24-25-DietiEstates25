@@ -38,8 +38,8 @@ import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.MakeOfferScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.OfferChatScreen
-import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
-import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
+
+
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.SendEmailFormScreen
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminAgencyScreen
@@ -50,7 +50,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminSupportsS
 import com.example.ingsw_24_25_dietiestates25.ui.systemAdminUI.SysAdminViewModel
 
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.*
-import dagger.hilt.android.lifecycle.HiltViewModel
+
 
 enum class Screen {
     HOME,
@@ -100,7 +100,6 @@ sealed class NavigationItem(val route: String) {
     object AddPropertyListings : NavigationItem(Screen.ADDPROPERTYLISTING.name)
     object MakeOffer : NavigationItem(Screen.MAKEOFFER.name)
     object OfferChat : NavigationItem(Screen.OFFERCHAT.name)
-    object ListingDetail : NavigationItem("listingDetail/{listingId}")
     object ListingDetail : NavigationItem(Screen.LISTINGDETAIL.name)
     object AppointmentChat : NavigationItem(Screen.APPOINTMENTCHAT.name)
     object InboxScreen : NavigationItem(Screen.INBOX.name)
@@ -124,7 +123,6 @@ fun AppNavHost(
     val mailerSenderViewModel : MailerSenderViewModel = hiltViewModel()
     val listingViewModel : ListingViewModel = hiltViewModel()
     val inboxViewModel : InboxViewModel = hiltViewModel()
-    val inboxViewModel: InboxViewModel = hiltViewModel()
     val appointmentViewModel : AppointmentViewModel = hiltViewModel()
 
 
@@ -158,7 +156,7 @@ fun AppNavHost(
 
 
         composable(NavigationItem.ListingDetail.route){
-            ListingScreen(
+            ListingDetailScreen(
                 listingVm = listingViewModel,
                 navController = navController
             )

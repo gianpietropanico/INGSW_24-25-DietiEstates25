@@ -55,9 +55,24 @@ import com.example.ingsw_24_25_dietiestates25.ui.theme.Rubik
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.ui.theme.testColor
 import com.example.ingsw_24_25_dietiestates25.ui.theme.unselectedFacility
+import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils
+import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiColors
+import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiIcons
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
+import com.example.ingsw_24_25_dietiestates25.ui.utils.getPoiBitmapDescriptor
+import com.google.android.gms.maps.model.CameraPosition
+import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
-import java.util.Base64
+import androidx.compose.ui.platform.LocalContext
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
+import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,11 +84,12 @@ fun ResultsScreen(
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
-
+    var activeSheet by remember { mutableStateOf<String?>(null) }
 
     val state by rm.state.collectAsState()
 
-    //  Avvio della chiamata quando apro la schermata
+
+    // Avvio della chiamata quando apro la schermata
     LaunchedEffect(type, location) {
         rm.searchProperties(type, location)
     }
@@ -84,21 +100,30 @@ fun ResultsScreen(
         containerColor = Color.White,
         sheetContainerColor = Color.White,
         sheetContent = {
-            FiltersSheet(
-                rm = rm,
-                type = type,
-                location = location,
-                onApply = {
-                    scope.launch { scaffoldState.bottomSheetState.partialExpand() }
-                }
-            )
+            when (activeSheet) {
+                "filters" -> FiltersSheet(
+                    rm = rm,
+                    type = type,
+                    location = location,
+                    onApply = {
+                        scope.launch { scaffoldState.bottomSheetState.partialExpand() }
+                    }
+                )
+                "map" -> MapSheet(
+                    state.properties,
+                    rm = rm,
+                    navController = navController
+                )
+            }
         },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = "Search results",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold
+                        ),
                         color = testColor,
                         fontSize = 20.sp
                     )
@@ -125,6 +150,7 @@ fun ResultsScreen(
                     ) {
                         IconButton(
                             onClick = {
+                                activeSheet = "filters"
                                 scope.launch { scaffoldState.bottomSheetState.expand() }
                             },
                             modifier = Modifier.size(32.dp)
@@ -137,7 +163,10 @@ fun ResultsScreen(
                             )
                         }
                         IconButton(
-                            onClick = { /* TODO: Mappa */ },
+                            onClick = {
+                                activeSheet = "map"
+                                scope.launch { scaffoldState.bottomSheetState.expand() }
+                            },
                             modifier = Modifier.size(32.dp)
                         ) {
                             Icon(
@@ -156,6 +185,7 @@ fun ResultsScreen(
             .background(Color.White)
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -178,10 +208,8 @@ fun ResultsScreen(
                     )
                 }
                 else -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // titolo Found X estates
                         Text(
                             text = buildAnnotatedString {
                                 withStyle(
@@ -191,10 +219,7 @@ fun ResultsScreen(
                                         fontFamily = Rubik,
                                         fontSize = 24.sp
                                     )
-                                ) {
-                                    append("Found ")
-                                }
-
+                                ) { append("Found ") }
 
                                 withStyle(
                                     style = SpanStyle(
@@ -203,9 +228,7 @@ fun ResultsScreen(
                                         fontFamily = Rubik,
                                         fontSize = 24.sp
                                     )
-                                ) {
-                                    append("${state.properties.size}")
-                                }
+                                ) { append("${state.properties.size}") }
 
                                 withStyle(
                                     style = SpanStyle(
@@ -214,22 +237,17 @@ fun ResultsScreen(
                                         fontFamily = Rubik,
                                         fontSize = 24.sp
                                     )
-                                ) {
-                                    append(" estates")
-                                }
+                                ) { append(" estates") }
                             },
                             style = MaterialTheme.typography.bodyLarge
                         )
-
 
                         if (state.properties.isEmpty()) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.attention),
                                         contentDescription = "No results",
@@ -237,7 +255,6 @@ fun ResultsScreen(
                                         modifier = Modifier.size(160.dp)
                                     )
                                     Spacer(modifier = Modifier.height(16.dp))
-
                                     Text(
                                         text = buildAnnotatedString {
                                             withStyle(
@@ -247,9 +264,7 @@ fun ResultsScreen(
                                                     fontWeight = FontWeight.SemiBold,
                                                     fontSize = 24.sp
                                                 )
-                                            ) {
-                                                append("Search ")
-                                            }
+                                            ) { append("Search ") }
                                             withStyle(
                                                 style = SpanStyle(
                                                     color = primaryBlu,
@@ -257,19 +272,15 @@ fun ResultsScreen(
                                                     fontWeight = FontWeight.ExtraBold,
                                                     fontSize = 24.sp
                                                 )
-                                            ) {
-                                                append("not found")
-                                            }
+                                            ) { append("not found") }
                                         },
-                                        style = MaterialTheme.typography.titleMedium, // base style
+                                        style = MaterialTheme.typography.titleMedium,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 24.dp)
                                     )
-
                                     Spacer(modifier = Modifier.height(20.dp))
-
                                     Text(
                                         text = "Sorry, we can’t find the real estates you are looking for. Maybe, a little spelling mistake?",
                                         style = MaterialTheme.typography.titleMedium.copy(
@@ -285,29 +296,95 @@ fun ResultsScreen(
                                     )
                                 }
                             }
-                        }else {
-
+                        } else {
                             Spacer(modifier = Modifier.height(20.dp))
-
-                            // risultati della lista
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(state.properties) { property ->
-                                    PropertyItem(property){
-                                        navController.navigate("listingDetail/${property.id}")
+                                    PropertyItem(property) {
+                                        rm.setSelectedListing(property)
+                                        navController.navigate(NavigationItem.ListingDetail.route)
                                     }
                                 }
                             }
                         }
                     }
                 }
-
             }
         }
     }
 }
+
+@Composable
+fun MapSheet(properties: List<PropertyListing>,
+             rm: ResultsViewModel,
+             navController: NavController
+             ) {
+
+    val context = LocalContext.current
+    val mapHeight = 250.dp
+    val mapProperties = MapUtils.defaultMapProperties(context)
+    val uiSettings = MapUtils.defaultUiSettings
+
+
+    var selectedPoi by remember { mutableStateOf<POI?>(null) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Maps",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontFamily = Rubik
+            ),
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+        val cameraPositionState = rememberCameraPositionState {
+            // Centro iniziale su Napoli
+            position = CameraPosition.fromLatLngZoom(LatLng(40.8522, 14.2681), 12f)
+        }
+
+        // --- MAPPA ---
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(mapHeight)
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                uiSettings = uiSettings,
+                properties = mapProperties,
+                onMapClick = { selectedPoi = null }
+            ) {
+                properties.forEach { property ->
+                    Marker(
+                        state = MarkerState(
+                            position = LatLng(property.property.latitude, property.property.longitude)
+                        ),
+                        title = property.title,
+                        snippet = "${property.price} €",
+//                        onClick = {
+//                            rm.setSelectedListing(property)
+//                           navController.navigate(NavigationItem.ListingDetail.route)
+//                            true
+//                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun PropertyItem(
@@ -357,8 +434,6 @@ fun PropertyItem(
                 )
             }
 
-            // Info testuali
-            // 🔹 Box grigio sotto
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

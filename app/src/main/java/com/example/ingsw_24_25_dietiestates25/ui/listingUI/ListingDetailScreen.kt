@@ -24,12 +24,7 @@ fun ListingDetailScreen(
     val state by listingVm.state.collectAsState()
     val uiState = state.uiState
 
-    val listing by listingVm.selectedListing.collectAsState()
-
-    LaunchedEffect(listing?.id) {
-        listing?.let { listingVm.getListingById(it.id) }
-    }
-
+    val listing by listingVm.myListing.collectAsState()
 
     when (uiState) {
         is ListingState.Loading -> {
