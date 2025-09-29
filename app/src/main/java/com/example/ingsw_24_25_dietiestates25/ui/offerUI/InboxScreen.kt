@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,11 +27,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferMessage
 import com.example.ingsw_24_25_dietiestates25.ui.profileUI.ProfileViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Screen
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 
 
 @Composable
@@ -44,8 +50,12 @@ fun InboxScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val state by inboxVm.state.collectAsState()
 
+    // Stato per la tab selezionata
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     LaunchedEffect(Unit) {
         inboxVm.loadOffers()
+        inboxVm.loadAppointments()
     }
 
     Scaffold(
@@ -67,21 +77,38 @@ fun InboxScreen(
 
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             Column {
-                TabRow(selectedTabIndex = 0) {
-                    Tab(selected = true, onClick = { }, text = { Text("Messages ${state.offers.size}") })
-                    Tab(selected = false, onClick = { }, text = { Text("Appointment") })
+                TabRow(selectedTabIndex = selectedTabIndex) {
+                    Tab(selected = selectedTabIndex == 0, onClick = { selectedTabIndex = 0 }, text = { Text("Messages ${state.offers.size}") })
+                    Tab(selected = selectedTabIndex == 1, onClick = { selectedTabIndex = 1 }, text = { Text("Appointment ${state.appointments.size}") })
                 }
 
                 LazyColumn {
-                    items(state.offers) { offer ->
-                        OfferItem(offer, user!!.username, inboxVm)
-                        HorizontalDivider()
+                    if (selectedTabIndex == 0) {
+                        items(state.offers) { offer ->
+                            OfferItem(offer, user!!.username, inboxVm)
+                            HorizontalDivider()
+                        }
+                    } else {
+                        items(state.appointments) { appointment ->
+                            AppointmentItem(
+                                appointment = appointment,
+                                currentUserId = user!!.id,
+                                inboxVm = inboxVm,
+                                onClick = {
+                                    inboxVm.setSelectedAppointment(appointment)
+                                    navController.navigate("appointmentChat")
+                                }
+                            )
+                            HorizontalDivider()
+                        }
+
+                        }
                     }
                 }
             }
         }
     }
-}
+
 
 @Composable
 fun OfferItem(
@@ -143,6 +170,63 @@ fun OfferItem(
     }
 }
 
+@Composable
+fun AppointmentItem(
+    appointment: Appointment,
+    currentUserId: String,
+    inboxVm : InboxViewModel,
+    onClick: (Appointment) -> Unit // callback
+) {
+    val lastMessage = appointment.appointmentMessages.lastOrNull()
+    val otherUser = if (appointment.agent.id == currentUserId) appointment.agent else appointment.user
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick(appointment) } // chiama la callback
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF006666)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = otherUser.username.firstOrNull()?.uppercase() ?: "?",
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = otherUser.username,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            Text(
+                text = "Immobile: ${appointment.listing.id}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = lastMessage?.timestamp?.toDaysAgo() ?: "",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+    }
+}
 
 fun Long.toDaysAgo(): String {
     val days = (System.currentTimeMillis() - this) / (1000 * 60 * 60 * 24)

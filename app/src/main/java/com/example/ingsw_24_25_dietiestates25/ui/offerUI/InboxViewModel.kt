@@ -3,6 +3,9 @@ package com.example.ingsw_24_25_dietiestates25.ui.offerUI
 import android.provider.ContactsContract.CommonDataKinds.Email
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentMessage
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
@@ -10,6 +13,7 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.data.model.request.OfferRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepo
+import com.example.ingsw_24_25_dietiestates25.data.repository.appointmentRepo.AppointmentRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.offerRepo.OfferRepository
@@ -27,6 +31,7 @@ import javax.inject.Inject
 class InboxViewModel  @Inject constructor (
     private val userSessionManager: UserSessionManager,
     private val offerRepo : OfferRepository,
+    private val appointmentRepo: AppointmentRepository,
     private val authRepo : AuthRepository
 ): ViewModel() {
 
@@ -89,6 +94,26 @@ class InboxViewModel  @Inject constructor (
         }
     }
 
+    fun loadHistoryAppointments(){
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, resultMessage = null) }
+
+            var result: ApiResult<List<AppointmentSummary>> = appointmentRepo.getAllAppointments()
+
+            if (result is ApiResult.Success) {
+                _state.update {
+                    it.copy(
+                        historyAppointments = result.data ?: emptyList()
+                    )
+                }
+
+                handleResult(ApiResult.Success(Unit, result.message))
+            } else {
+                handleResult(result = result)
+            }
+        }
+    }
+
     fun loadOffers() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
@@ -99,6 +124,26 @@ class InboxViewModel  @Inject constructor (
                 _state.update {
                     it.copy(
                         offers = result.data ?: emptyList()
+                    )
+                }
+
+                handleResult(ApiResult.Success(Unit, result.message))
+            } else {
+                handleResult(result = result)
+            }
+        }
+    }
+
+    fun loadAppointments() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, resultMessage = null) }
+
+            var result: ApiResult<List<Appointment>> = appointmentRepo.getAppointmentsByUser(user.value!!.id)
+
+            if (result is ApiResult.Success) {
+                _state.update {
+                    it.copy(
+                        appointments = result.data ?: emptyList()
                     )
                 }
 
@@ -144,4 +189,73 @@ class InboxViewModel  @Inject constructor (
 
     }
 
+    fun setSelectedAppointment (appointment: Appointment){
+        _state.update { current ->
+            current.copy(selectedAppointment = appointment)
+        }
+    }
+
+    fun acceptAppointment(appointmentId: String) {
+        viewModelScope.launch {
+            try {
+                // Chiamata al backend tramite repository che restituisce ApiResult<Unit>
+                val result: ApiResult<Unit> = appointmentRepo.acceptAppointment(appointmentId)
+
+                // Gestione centralizzata dell'esito
+                handleResult(result)
+
+                if (result is ApiResult.Success) {
+                    // Aggiorna lo stato locale solo se il backend ha risposto con successo
+                    _state.update { current ->
+                        current.copy(
+                            selectedAppointment = current.selectedAppointment?.copy(
+                                appointmentMessages = current.selectedAppointment.appointmentMessages.map {
+                                    if (it.id == appointmentId) it.copy(accepted = true) else it
+                                }
+                            )
+                        )
+                    }
+                    println("Appuntamento accettato con id = $appointmentId")
+                }
+            } catch (e: Exception) {
+                println("Errore acceptAppointment: ${e.message}")
+            }
+        }
+    }
+
+    fun rejectAppointment(appointmentId: String) {
+        viewModelScope.launch {
+            try {
+                val result: ApiResult<Unit> = appointmentRepo.rejectAppointment(appointmentId)
+
+                handleResult(result)
+
+                if (result is ApiResult.Success) {
+                    _state.update { current ->
+                        current.copy(
+                            selectedAppointment = current.selectedAppointment?.copy(
+                                appointmentMessages = current.selectedAppointment.appointmentMessages.map {
+                                    if (it.id == appointmentId) it.copy(accepted = false) else it
+                                }
+                            )
+                        )
+                    }
+                    println("Appuntamento rifiutato con id = $appointmentId")
+                }
+            } catch (e: Exception) {
+                println("Errore rejectAppointment: ${e.message}")
+            }
+        }
+    }
+
+    fun bookNewAppointment(propertyId: String) {
+        viewModelScope.launch {
+            try {
+                // TODO: aprire schermata calendario o fare chiamata backend
+                println("Prenotato nuovo appuntamento per propertyId = $propertyId")
+            } catch (e: Exception) {
+                println("Errore bookNewAppointment: ${e.message}")
+            }
+        }
+    }
 }

@@ -28,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,8 +43,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
+import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Chip
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiColors
@@ -62,12 +66,18 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun ListingDetailContent(propertyListing: PropertyListing) {
+fun ListingDetailContent(
+    propertyListing: PropertyListing,
+    navController: NavHostController,
+    listingVm: ListingViewModel) {
 
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     var selectedPoi by remember { mutableStateOf<POI?>(null) }
     val mapHeight = 250.dp
+
+    val currentUser by listingVm.currentUser.collectAsState()
+    val currentUserRole = currentUser?.role
 
     val mapProperties = MapUtils.defaultMapProperties(context)
     val uiSettings = MapUtils.defaultUiSettings
@@ -209,6 +219,7 @@ fun ListingDetailContent(propertyListing: PropertyListing) {
         }
 
 
+        // --- BOTTOM BAR PERSONALIZZATA ---
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -218,41 +229,80 @@ fun ListingDetailContent(propertyListing: PropertyListing) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp) // altezza fissa tipo bottom bar
+                    .height(56.dp)
                     .clip(RoundedCornerShape(50))
                     .border(1.dp, Color.Black, RoundedCornerShape(50))
                     .background(Color.LightGray),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Pulsante VENDI
-                Button(
-                    onClick = { /* TODO: azione vendita */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    shape = RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("VENDI", color = Color.Black)
-                }
+                if (currentUserRole == Role.AGENT_USER) {
+                    // Pulsanti per agenti
+                    Button(
+                        onClick = {
+                            // Naviga allo screen offerte
+                            navController.navigate(NavigationItem.Inbox.route)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        shape = RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Controlla Offerte", color = Color.Black)
+                    }
 
-                // Divider centrale
-                Divider(
-                    color = Color.Black,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
-                )
+                    Divider(
+                        color = Color.Black,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(1.dp)
+                    )
 
-                // Pulsante ACQUISTA
-                Button(
-                    onClick = { /* TODO: azione acquisto */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    shape = RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("ACQUISTA", color = Color.Black)
+                    Button(
+                        onClick = {
+                            // Naviga allo screen appuntamenti
+                            navController.navigate(NavigationItem.CheckListingAppointment.route)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        shape = RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Controlla Appuntamenti", color = Color.Black)
+                    }
+
+                } else {
+                    // Pulsanti per utenti normali
+                    Button(
+                        onClick = {
+                            // Imposta listing e naviga a prenotazione appuntamento
+                            listingVm.setSelectedListing(propertyListing)
+                            navController.navigate(NavigationItem.BookAppointment.route)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        shape = RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Prenota Appuntamento", color = Color.Black)
+                    }
+
+                    Divider(
+                        color = Color.Black,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(1.dp)
+                    )
+
+                    Button(
+                        onClick = {
+                            // Naviga allo screen per fare offerta
+                            navController.navigate("makeOffer") // da inserire route corretta
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        shape = RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Fai Offerta", color = Color.Black)
+                    }
                 }
             }
         }
     }
-
 }

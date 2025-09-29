@@ -3,6 +3,8 @@ package com.example.ingsw_24_25_dietiestates25.di
 import com.example.ingsw_24_25_dietiestates25.data.repository.adminRepo.*
 import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepo
 import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepoImp
+import com.example.ingsw_24_25_dietiestates25.data.repository.appointmentRepo.AppointmentRepository
+import com.example.ingsw_24_25_dietiestates25.data.repository.appointmentRepo.AppointmentRepositoryImpl
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.authRepo.AuthRepositoryImpl
@@ -13,6 +15,8 @@ import com.example.ingsw_24_25_dietiestates25.data.repository.offerRepo.OfferRep
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepositoryImpl
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepo
 import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.ProfileRepoImp
+import com.example.ingsw_24_25_dietiestates25.data.repository.weatherRepo.WeatherRepository
+import com.example.ingsw_24_25_dietiestates25.data.repository.weatherRepo.WeatherRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -57,4 +61,16 @@ abstract class RepositoryModule {
     abstract fun bindAgentRepository(
         impl: AgentRepoImp
     ): AgentRepo
+
+    @Binds
+    @Singleton
+    abstract fun bindAppointmentRepository(
+        impl: AppointmentRepositoryImpl
+    ): AppointmentRepository
+
+    @Binds
+    abstract fun bindWeatherRepository (
+        impl: WeatherRepositoryImpl
+    ): WeatherRepository
+
 }
