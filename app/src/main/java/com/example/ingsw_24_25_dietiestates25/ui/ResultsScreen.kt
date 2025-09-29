@@ -373,11 +373,11 @@ fun MapSheet(properties: List<PropertyListing>,
                         ),
                         title = property.title,
                         snippet = "${property.price} €",
-//                        onClick = {
-//                            rm.setSelectedListing(property)
-//                           navController.navigate(NavigationItem.ListingDetail.route)
-//                            true
-//                        }
+                        onClick = {
+                            rm.setSelectedListing(property)
+                           navController.navigate(NavigationItem.ListingDetail.route)
+                            true
+                        }
                     )
                 }
             }
