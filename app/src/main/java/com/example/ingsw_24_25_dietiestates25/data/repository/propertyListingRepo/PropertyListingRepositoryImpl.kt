@@ -212,15 +212,20 @@ class PropertyListingRepositoryImpl @Inject constructor(
     override suspend fun searchProperties(type: String, location: String): ApiResult<List<PropertyListing>> {
         return try {
             val response = httpClient.get("$baseURL/propertylisting/search") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
                 parameter("type", type)
                 parameter("city", location)
-                accept(ContentType.Application.Json)
             }
 
             when (response.status) {
                 HttpStatusCode.OK -> {
-                    val listings: List<PropertyListing> = response.body()
-                    ApiResult.Success(listings, "Proprietà trovate con successo")
+                    val listings: ListResponse<List<PropertyListing>> = response.body()
+                    if (listings.success && listings.data != null) {
+                        ApiResult.Success(listings.data)
+                    } else {
+                        ApiResult.UnknownError(listings.message ?: "Errore sconosciuto dal server")
+                    }
                 }
                 HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata")
                 else -> {

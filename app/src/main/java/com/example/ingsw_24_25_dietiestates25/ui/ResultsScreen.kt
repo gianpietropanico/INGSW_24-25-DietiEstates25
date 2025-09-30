@@ -72,6 +72,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.utils.safeDecodeBase64
 import com.google.maps.android.compose.MarkerInfoWindowContent
 import kotlinx.coroutines.delay
 
@@ -395,6 +396,7 @@ fun PropertyItem(
     onClick: () -> Unit
 
 ) {
+    val firstImageBitmap = safeDecodeBase64(propertyListing.property.images.firstOrNull())
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -408,14 +410,14 @@ fun PropertyItem(
     ) {
         Column  {
             //  Immagine principale
-            val firstImageBitmap = try {
-                propertyListing.property.images.firstOrNull() ?. let { base64 ->
-                    bse64ToImageBitmap(base64)
-                }
-            } catch (e: Exception) {
-                Log.e("PropertyItem", "Errore decoding immagine: ${e.message}")
-                null
-            }
+//            val firstImageBitmap = try {
+//                propertyListing.property.images.firstOrNull() ?. let { base64 ->
+//                    bse64ToImageBitmap(base64)
+//                }
+//            } catch (e: Exception) {
+//                Log.e("PropertyItem", "Errore decoding immagine: ${e.message}")
+//                null
+//            }
 
             if (firstImageBitmap != null) {
                 Image(
