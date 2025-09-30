@@ -49,6 +49,7 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 
 import com.example.ingsw_24_25_dietiestates25.ui.utils.Chip
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils
@@ -70,7 +71,9 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun ListingDetailContent(
     navController: NavHostController,
-    listingVm: ListingViewModel) {
+    listingVm: ListingViewModel,
+    inboxVm : InboxViewModel
+) {
 
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -291,7 +294,7 @@ fun ListingDetailContent(
 
                     Button(
                         onClick = {
-                            // Naviga allo screen per fare offerta
+                            inboxVm.setSelectedProperty(propertyListing)
                             navController.navigate(NavigationItem.MakeOffer.route)
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),

@@ -159,9 +159,11 @@ fun AppNavHost(
 
 
         composable(NavigationItem.ListingDetail.route){
+
             ListingDetailScreen(
                 listingVm = listingViewModel,
-                navController = navController
+                navController = navController,
+                inboxVm = inboxViewModel
             )
 
         }

@@ -396,7 +396,6 @@ fun PropertyItem(
     onClick: () -> Unit
 
 ) {
-    val firstImageBitmap = safeDecodeBase64(propertyListing.property.images.firstOrNull())
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -418,6 +417,8 @@ fun PropertyItem(
 //                Log.e("PropertyItem", "Errore decoding immagine: ${e.message}")
 //                null
 //            }
+
+            val firstImageBitmap = safeDecodeBase64(propertyListing.property.images.firstOrNull())
 
             if (firstImageBitmap != null) {
                 Image(
