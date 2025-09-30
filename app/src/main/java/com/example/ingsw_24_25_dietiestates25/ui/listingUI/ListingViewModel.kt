@@ -48,8 +48,6 @@ class ListingViewModel @Inject constructor(
 
     val energyClass = MutableStateFlow(EnergyClass.A)
 
-    private val _selectedListing = MutableStateFlow<PropertyListing?>(null)
-    val selectedListing: StateFlow<PropertyListing?> = _selectedListing.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -137,17 +135,21 @@ class ListingViewModel @Inject constructor(
             }
         }
 
-    fun getListingById(id: String) = viewModelScope.launch {
-        _state.update { it.copy(uiState = ListingState.Loading) }
-        val result = listingsRepo.getListingById(id)
-        handleApiResult(result) { data ->
-            _state.update { it.copy(myListing = data, uiState = ListingState.Success) }
-        }
-    }
+//    fun getListingById(id: String) = viewModelScope.launch {
+//        _state.update { it.copy(uiState = ListingState.Loading) }
+//        val result = listingsRepo.getListingById(id)
+//        handleApiResult(result) { data ->
+//            _state.update { it.copy(myListing = data, uiState = ListingState.Success) }
+//        }
+//    }
 
     fun setSelectedListing(listing: PropertyListing) {
-        _selectedListing.value = listing
+        _state.update {
+            it.copy(selectedListing = listing, uiState = ListingState.Success)
+        }
+
     }
+
     fun resetForm() {
         _state.update { it.copy(formState = ListingFormState()) }
     }

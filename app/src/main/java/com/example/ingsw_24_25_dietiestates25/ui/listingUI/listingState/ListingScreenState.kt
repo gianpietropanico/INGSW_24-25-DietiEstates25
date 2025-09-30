@@ -7,5 +7,6 @@ data class ListingScreenState(
     val uiState: ListingState = ListingState.Idle,
     val formState: ListingFormState = ListingFormState(),
     val myListings: List<PropertyListing> = emptyList(),
-    val myListing: PropertyListing? = null
+    val myListing: PropertyListing? = null,
+    val selectedListing: PropertyListing? = null
 )

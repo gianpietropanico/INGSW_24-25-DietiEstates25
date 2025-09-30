@@ -69,7 +69,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun ListingDetailContent(
-    propertyListing: PropertyListing,
     navController: NavHostController,
     listingVm: ListingViewModel) {
 
@@ -81,12 +80,14 @@ fun ListingDetailContent(
     val currentUser by listingVm.currentUser.collectAsState()
     val currentUserRole = currentUser?.role
 
+    val state by listingVm.state.collectAsState()
+    val propertyListing = state.selectedListing
     val mapProperties = MapUtils.defaultMapProperties(context)
     val uiSettings = MapUtils.defaultUiSettings
     // LatLng della proprietà
     val latLng = LatLng(
-        propertyListing.property.latitude,
-        propertyListing.property.longitude
+        propertyListing!!.property.latitude,
+        propertyListing!!.property.longitude
     )
 
     // Stato della camera

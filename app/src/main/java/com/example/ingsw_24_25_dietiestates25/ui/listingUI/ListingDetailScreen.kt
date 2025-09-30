@@ -18,19 +18,18 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 @Composable
 fun ListingDetailScreen(
     listingVm: ListingViewModel,
-    navController: NavHostController,
-    id: String? = null
+    navController: NavHostController
 ) {
 
     val state by listingVm.state.collectAsState()
     val uiState = state.uiState
 
-    val listing by listingVm.selectedListing.collectAsState()
 
 
-    LaunchedEffect(listing) {
-        listing?.id?.let { listingVm.getListingById(it) }
-    }
+
+//    LaunchedEffect(listing) {
+//        listing?.id?.let { listingVm.getListingById(it) }
+//    }
 
     when (uiState) {
         is ListingState.Loading -> {
@@ -38,9 +37,8 @@ fun ListingDetailScreen(
         }
 
         is ListingState.Success -> {
-            listing?.let { propertyListing ->
-                ListingDetailContent(propertyListing = propertyListing, navController = navController, listingVm = listingVm)
-            }
+                ListingDetailContent( navController = navController, listingVm = listingVm)
+
         }
 
         is ListingState.Error -> {
