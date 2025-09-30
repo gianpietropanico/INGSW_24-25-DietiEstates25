@@ -12,13 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 
 
 @Composable
 fun ListingDetailScreen(
     listingVm: ListingViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    inboxVm: InboxViewModel
 ) {
 
     val state by listingVm.state.collectAsState()
@@ -37,7 +39,7 @@ fun ListingDetailScreen(
         }
 
         is ListingState.Success -> {
-                ListingDetailContent( navController = navController, listingVm = listingVm)
+                ListingDetailContent( navController = navController, listingVm = listingVm, inboxVm = inboxVm )
 
         }
 
