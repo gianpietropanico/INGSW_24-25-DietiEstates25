@@ -107,20 +107,15 @@ class PropertyListingRepositoryImpl @Inject constructor(
 
     override suspend fun getListingById(id: String): ApiResult<PropertyListing> {
         return try {
-            val response = httpClient.get("$baseURL/propertylisting/getpropertieslistingbyid") {
+            val response = httpClient.get("$baseURL/propertylisting/$id") {
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
-                setBody(id)
             }
 
-            return when (response.status) {
+            when (response.status) {
                 HttpStatusCode.OK -> {
-                    val body: ListResponse<PropertyListing> = response.body()
-                    if (body.success && body.data != null) {
-                        ApiResult.Success(body.data, "Proprietà recuperata con successo")
-                    } else {
-                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto dal server")
-                    }
+                    val listing: PropertyListing = response.body()
+                    ApiResult.Success(listing, "Proprietà recuperata con successo")
                 }
                 HttpStatusCode.NotFound -> {
                     ApiResult.UnknownError("Proprietà con id $id non trovata")
@@ -130,17 +125,11 @@ class PropertyListingRepositoryImpl @Inject constructor(
                     ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
                 }
             }
-        } catch (e: ResponseException) {
-            when (e.response.status) {
-                HttpStatusCode.NotFound -> ApiResult.UnknownError("Proprietà con id $id non trovata")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
-            }
         } catch (e: Exception) {
             e.printStackTrace()
             ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
-
 
     override suspend fun getAllListings(): ApiResult<List<PropertyListing>> {
         return try {

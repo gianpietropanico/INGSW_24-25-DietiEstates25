@@ -15,13 +15,18 @@ data class InboxState (
     val success: Boolean = false,
     val resultMessage: String? = null,
     val localError: Boolean = false,
+
     val offers : List<Offer> = emptyList(),
     val appointments : List<Appointment> = emptyList(),
+
     val offerMessages : List<OfferMessage> = emptyList(),
     val appointmentMessages : List<AppointmentMessage> = emptyList(),
+
     val historyOffers : List<OfferSummary> = emptyList(),
     val historyAppointments : List<AppointmentSummary> = emptyList(),
+
     val selectedOffer : Offer? = null,
     val selectedAppointment: Appointment? = null,
     val selectedProperty : PropertyListing? = null
+
 )

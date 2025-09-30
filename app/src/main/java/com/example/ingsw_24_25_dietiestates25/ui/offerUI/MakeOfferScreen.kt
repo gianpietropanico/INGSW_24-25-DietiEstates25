@@ -103,7 +103,7 @@ fun MakeOfferScreen(
                     bitmap = bse64ToImageBitmap(picture),
                     contentDescription = "Profile Picture",
                     modifier = Modifier
-                        .fillMaxSize()
+                        .size(40.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
@@ -113,7 +113,7 @@ fun MakeOfferScreen(
                     imageVector = Icons.Default.Image,
                     contentDescription = "Profile Picture",
                     modifier = Modifier
-                        .fillMaxSize()
+                        .size(40.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
