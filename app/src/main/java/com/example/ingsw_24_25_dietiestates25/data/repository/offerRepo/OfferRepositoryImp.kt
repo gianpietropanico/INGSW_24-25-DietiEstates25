@@ -26,7 +26,7 @@ class OfferRepositoryImp @Inject constructor(
 
     private val baseURL = "http://10.0.2.2:8080"
 
-    override suspend fun makeOffer(request: OfferRequest): ApiResult<Offer> {
+    override suspend fun makeOffer(request: OfferRequest): ApiResult<Offer?> {
 
         return try {
             val response = httpClient.post("$baseURL/offers/makeoffer") {
@@ -36,11 +36,18 @@ class OfferRepositoryImp @Inject constructor(
             }
 
             when (response.status) {
-                HttpStatusCode.OK -> {
-                    val body: Offer = response.body()
-                    ApiResult.Success(body, "Offerta creata con successo")
+                HttpStatusCode.Created -> {
+                    val offer: Offer = response.body()
+                    ApiResult.Success(offer, "Offerta creata con successo")
                 }
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                HttpStatusCode.OK -> {
+                    val msg: String = response.bodyAsText()
+                    ApiResult.Success(null, msg) // o gestisci diversamente
+                }
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                }
             }
         } catch (e: Exception) {
             ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")

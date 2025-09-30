@@ -13,7 +13,7 @@ data class Offer(
 @Serializable
 data class OfferMessage(
     val id: String,
-    val senderId: String,
+    val senderName: String,
     val timestamp: Long,
     val amount: Double?,
     val accepted: Boolean? = null // null = idle, true = accettata, false = rifiutata

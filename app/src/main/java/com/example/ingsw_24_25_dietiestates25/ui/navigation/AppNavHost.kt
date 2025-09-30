@@ -355,7 +355,8 @@ fun AppNavHost(
                 navController = navController,
                 type = type,
                 location = location,
-                rm = resultsViewModel
+                rm = resultsViewModel,
+                listingVm = listingViewModel
             )
         }
     }

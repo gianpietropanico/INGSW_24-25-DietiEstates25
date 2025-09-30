@@ -135,13 +135,6 @@ class ListingViewModel @Inject constructor(
             }
         }
 
-//    fun getListingById(id: String) = viewModelScope.launch {
-//        _state.update { it.copy(uiState = ListingState.Loading) }
-//        val result = listingsRepo.getListingById(id)
-//        handleApiResult(result) { data ->
-//            _state.update { it.copy(myListing = data, uiState = ListingState.Success) }
-//        }
-//    }
 
     fun setSelectedListing(listing: PropertyListing) {
         _state.update {

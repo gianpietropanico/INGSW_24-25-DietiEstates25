@@ -7,17 +7,21 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.request.PropertySearchRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ResultsState(
     val isLoading: Boolean = false,
     val properties: List<PropertyListing> = emptyList(),
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val selectedListing : PropertyListing? = null,
+    val uiState: ListingState = ListingState.Idle,
 )
 
 
@@ -29,9 +33,6 @@ class ResultsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(ResultsState())
     val state: StateFlow<ResultsState> = _state.asStateFlow()
-
-    private val _selectedListing = MutableStateFlow<PropertyListing?>(null)
-    val selectedListing: StateFlow<PropertyListing?> = _selectedListing.asStateFlow()
 
 
     fun searchProperties(type: String, location: String) {
@@ -68,9 +69,11 @@ class ResultsViewModel @Inject constructor(
     }
 
     fun setSelectedListing(listing: PropertyListing) {
-        _selectedListing.value = listing
-    }
+        _state.update {
+            it.copy(selectedListing = listing)
+        }
 
+    }
 
     fun applyFilters(request: PropertySearchRequest) {
         viewModelScope.launch {

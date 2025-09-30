@@ -1,6 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.ui.offerUI
 
 import android.provider.ContactsContract.CommonDataKinds.Email
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
@@ -20,6 +21,7 @@ import com.example.ingsw_24_25_dietiestates25.data.repository.offerRepo.OfferRep
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepository
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgentState
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -57,7 +59,7 @@ class InboxViewModel  @Inject constructor (
 
             val agentName = offerRepo.getAgentNameByEmail(agentEmail)
 
-            val result: ApiResult<Offer> = offerRepo.makeOffer(
+            val result: ApiResult<Offer?> = offerRepo.makeOffer(
                 OfferRequest(
                     propertyId = propertyId,
                     buyerName = user.value!!.username,
@@ -67,7 +69,6 @@ class InboxViewModel  @Inject constructor (
             )
 
             if (result is ApiResult.Success) {
-
                 handleResult(ApiResult.Success(Unit, result.message))
             } else {
                 handleResult(result)
@@ -184,26 +185,38 @@ class InboxViewModel  @Inject constructor (
 
     }
 
-    fun setSelectedOffer (offer : Offer){
+    fun setSelectedOffer( offer: Offer){
+        _state.update { it.copy(selectedOffer = offer) }
+    }
 
-        viewModelScope.launch {
+    fun offerChatInit (offer : Offer?){
 
-            _state.update { it.copy(isLoading = true, resultMessage = null) }
-            val result = propertyRepo.getListingById(offer.propertyId)
+        if(offer == null ) {
+            Log.d("OFFERCHATINIT", "errore nell'inizializzazione di offerchat : offer = null")
+        }else {
 
-            if (result is ApiResult.Success) {
+            Log.d("OFFERCHATINIT", "INIZIALIZZO")
+            viewModelScope.launch {
 
-                _state.update { current ->
-                    current.copy(
-                        selectedOffer = offer,
-                        selectedProperty = result.data ,
-                        offerMessages = offer.messages
-                    )
+                _state.update { it.copy(isLoading = true, resultMessage = null) }
+
+                val result = propertyRepo.getListingById(offer.propertyId)
+
+                Log.d("SET SELECTED OFFER ", "${result.data}")
+
+                if (result is ApiResult.Success) {
+                    _state.update {
+                        it.copy(
+                            selectedOffer = offer,
+                            selectedProperty = result.data,
+                            offerMessages = offer.messages
+                        )
+                    }
+
+                    handleResult(ApiResult.Success(Unit, result.message))
+                } else {
+                    handleResult(result)
                 }
-
-                handleResult(ApiResult.Success(Unit, result.message))
-            } else {
-                handleResult(result)
             }
         }
 

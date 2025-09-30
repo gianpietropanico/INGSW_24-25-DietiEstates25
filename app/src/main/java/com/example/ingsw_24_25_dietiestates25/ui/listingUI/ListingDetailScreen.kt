@@ -1,6 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +27,9 @@ fun ListingDetailScreen(
     val state by listingVm.state.collectAsState()
     val uiState = state.uiState
 
+    LaunchedEffect(Unit) {
+        Log.d("LISTING DETAIL SCREEN "," Stato della UI : $uiState")
+    }
 
 
 
@@ -40,7 +44,6 @@ fun ListingDetailScreen(
 
         is ListingState.Success -> {
                 ListingDetailContent( navController = navController, listingVm = listingVm, inboxVm = inboxVm )
-
         }
 
         is ListingState.Error -> {
@@ -52,7 +55,7 @@ fun ListingDetailScreen(
         }
 
         is ListingState.Idle -> {
-            // Stato iniziale
+            ListingDetailContent( navController = navController, listingVm = listingVm, inboxVm = inboxVm )
         }
     }
 }
