@@ -43,6 +43,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -61,6 +62,11 @@ android {
 
 dependencies {
 
+
+    coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.1.0")
+
+    //Per calendario
+    implementation("com.kizitonwose.calendar:compose:2.4.0")
     // Credential Manager (core + provider)
     implementation("androidx.credentials:credentials:1.5.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.5.0")

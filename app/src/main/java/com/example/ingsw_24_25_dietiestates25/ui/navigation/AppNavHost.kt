@@ -323,19 +323,19 @@ fun AppNavHost(
             )
         }
 
-        composable(NavigationItem.BookAppointment.route){
-            BookAppointmentScreen(
-                appointmentVm = appointmentViewModel,
-                navController = navController
-            )
-
-        }
-        composable(NavigationItem.CheckListingAppointment.route){
-            CheckListingAppointmentScreen(
-                appointmentVm = appointmentViewModel,
-                navController = navController
-            )
-        }
+//        composable(NavigationItem.BookAppointment.route){
+//            BookAppointmentScreen(
+//                appointmentVm = appointmentViewModel,
+//                navController = navController
+//            )
+//
+//        }
+//        composable(NavigationItem.CheckListingAppointment.route){
+//            CheckListingAppointmentScreen(
+//                appointmentVm = appointmentViewModel,
+//                navController = navController
+//            )
+//        }
 
 
         composable(
