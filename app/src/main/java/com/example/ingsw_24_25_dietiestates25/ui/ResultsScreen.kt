@@ -73,6 +73,8 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.theme.grayWithOpacity
+import com.example.ingsw_24_25_dietiestates25.ui.theme.inActiveTextColor
 import com.example.ingsw_24_25_dietiestates25.ui.utils.safeDecodeBase64
 import com.google.maps.android.compose.MarkerInfoWindowContent
 import kotlinx.coroutines.delay
@@ -106,8 +108,9 @@ fun ResultsScreen(
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
-        containerColor = Color.White,
-        sheetContainerColor = Color.White,
+       // containerColor = Color.White,
+        sheetContainerColor = Color(0xFFF2F2F2),
+        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         sheetContent = {
             when (activeSheet) {
                 "filters" -> FiltersSheet(

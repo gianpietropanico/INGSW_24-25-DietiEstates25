@@ -22,7 +22,7 @@ val primaryBlueWithOpacity: Color = primaryBlu.copy(alpha = 0.1f)
 val DarkRed = Color(0xFFC62828)
 val bluPerchEcipiace = Color(0xFF2F6690)
 val unselectedFacility = Color(0xFFF5F4F8)
-
+val grayWithOpacity = Color(0x73D9D9D9)
 val pageBackgroundColor = Color(0xFF0E0E0E)
 val itemBackgroundColor = Color(0xFF1B1B1B)
 val toolbarColor = Color(0xFF282828)
