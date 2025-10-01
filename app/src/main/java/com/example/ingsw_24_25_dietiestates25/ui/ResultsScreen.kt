@@ -96,7 +96,11 @@ fun ResultsScreen(
 
     // Avvio della chiamata quando apro la schermata
     LaunchedEffect(type, location) {
-        rm.searchProperties(type, location)
+        if (location == "ALL") {
+            rm.loadAllProperties()
+        } else {
+            rm.searchProperties(type, location)
+        }
     }
 
     BottomSheetScaffold(
@@ -707,10 +711,10 @@ fun FiltersSheet(
                 .clickable {
                     val request = PropertySearchRequest(
                         type = type,
-                        city = location,
+                        city = location.takeIf { it.isNotBlank() },
                         minPrice = minPrice,   // slider → Int
                         maxPrice = maxPrice,
-                        minRooms = if (rooms > 0) rooms else null,              // numero stanze
+                        minRooms = if (rooms > 0) rooms else null,
                         elevator = elevator,
                         gatehouse = gatehouse,
                         balcony = balcony,

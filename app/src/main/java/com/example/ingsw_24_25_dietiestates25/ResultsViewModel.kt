@@ -68,6 +68,28 @@ class ResultsViewModel @Inject constructor(
         }
     }
 
+    fun loadAllProperties() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+
+            when (val result = propertyRepo.getAllListings()) {
+                is ApiResult.Success -> {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        properties = result.data ?: emptyList()
+                    )
+                }
+                else -> {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        errorMessage = "Errore durante il caricamento di tutte le proprietà"
+                    )
+                }
+            }
+        }
+    }
+
+
     fun setSelectedListing(listing: PropertyListing) {
         _state.update {
             it.copy(selectedListing = listing)
