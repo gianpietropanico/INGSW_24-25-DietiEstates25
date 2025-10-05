@@ -24,9 +24,15 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferStatus
 import java.util.Locale
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
@@ -42,21 +48,9 @@ fun OfferChatScreen(
     val state by inboxVm.state.collectAsState()
 
 
-    LaunchedEffect(Unit) {
-        Log.d(
-            "TEST OFFERCHAT",
-            "OFFERMESSAGES : ${state.offerMessages}, SELECTEDOFFER : ${state.selectedOffer}, SELECTEDPROPERTY : ${state.selectedProperty}"
-        )
-        inboxVm.offerChatInit(state.selectedOffer)
-        Log.d(
-            "TEST OFFERCHAT after vm call",
-            "OFFERMESSAGES : ${state.offerMessages}, SELECTEDOFFER : ${state.selectedOffer}, SELECTEDPROPERTY : ${state.selectedProperty}"
-        )
-    }
-
     when {
         (state.selectedProperty == null || state.selectedOffer == null) -> {
-
+            Log.d("OFFERCHATSCREEN","${state.selectedProperty} AYAYAYAYAY ${state.selectedOffer}")
             LoadingOverlay(true)
         }
         else -> {
@@ -92,23 +86,32 @@ fun OfferChatScreen(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(Color.Gray, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
+
+                        if(state.selectedProperty!!.agent!!.username != inboxVm.getUsername() ){
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(Color.Gray, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = state.selectedProperty!!.agent!!.username.first().toString(),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = state.selectedProperty!!.agent!!.username.first().toString(),
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
+                                text = state.selectedProperty!!.agent!!.username,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                            )
+                        }else{
+                            Text(
+                                text = "Your Listing",
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                             )
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = state.selectedProperty!!.agent!!.username,
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                        )
+
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -156,6 +159,10 @@ fun OfferChatScreen(
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                             )
                             Text(
+                                text = state.selectedProperty!!.property.street,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Text(
                                 text = "€${String.format(Locale.US, "%.2f", state.selectedProperty!!.price)}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.Gray
@@ -165,7 +172,6 @@ fun OfferChatScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 🔹 Bottoni
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -178,6 +184,8 @@ fun OfferChatScreen(
                         ) {
                             Text("Fai un’offerta")
                         }
+
+
                         Button(
                             onClick = {},//TODO CLICK SU MAKE APPOINTMENT
                             modifier = Modifier.weight(1f),
@@ -199,6 +207,8 @@ fun OfferChatScreen(
                             amount = offer.amount!!,
                             username = offer.senderName,
                             currentUser = inboxVm.user.collectAsState().value!!.username,
+                            status = offer.status!!,
+                            inboxVm
                         )
                     }
                 }
@@ -211,10 +221,19 @@ fun OfferChatScreen(
     fun OfferCardMessage(
         amount: Double,
         username: String,
-        currentUser: String
+        currentUser: String,
+        status : OfferStatus,
+        inboxVm: InboxViewModel
     ) {
         val isMine = username == currentUser
         val bubbleColor = if (isMine) Color(0xFFD1F2EB) else Color.White
+        val textColor = when (status) {
+            OfferStatus.ACCEPTED ->  Color(0xFF2E7D32) // verde accettata
+            OfferStatus.REJECTED ->  Color.Red.copy(alpha = 0.6f) // rosso per rifiutata
+            else -> Color(0xFF006666) // default
+        }
+
+        val textDecoration = if (status == OfferStatus.REJECTED) TextDecoration.LineThrough else TextDecoration.None
 
         Row(
             modifier = Modifier
@@ -224,8 +243,7 @@ fun OfferChatScreen(
         ) {
             Card(
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .widthIn(max = 250.dp), // larghezza max stile chat
+                modifier = Modifier.widthIn(max = 250.dp),
                 colors = CardDefaults.cardColors(containerColor = bubbleColor),
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {
@@ -234,41 +252,36 @@ fun OfferChatScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = if (isMine) "La tua offerta" else "Offerta ricevuta",
+                        text = if (isMine) "Your Offer" else "His Offer",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
 
                     Text(
                         text = "€${String.format("%.2f", amount)}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color(0xFF006666)
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = textColor,
+                            textDecoration = textDecoration
+                        )
                     )
 
-                    // Solo se l'offerta NON è mia mostra bottoni
-                    if (!isMine) {
+
+                    // Bottoni solo se l'offerta NON è mia e non è già accettata o rifiutata
+                    if (!isMine && status == OfferStatus.PENDING) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Button(
-                                onClick = { },
+                                onClick = { inboxVm.acceptOffer(true)},
                                 modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFF2E7D32
-                                    )
-                                )
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
                             ) {
                                 Text("Accetta")
                             }
                             OutlinedButton(
-                                onClick = {},//DELCINE
+                                onClick = { inboxVm.acceptOffer(false) },
                                 modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color(
-                                        0xFFC62828
-                                    )
-                                )
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFC62828))
                             ) {
                                 Text("Rifiuta")
                             }

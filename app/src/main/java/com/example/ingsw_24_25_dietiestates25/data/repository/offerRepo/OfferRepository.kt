@@ -11,8 +11,8 @@ interface OfferRepository {
     suspend fun addOfferMessage(request: MessageRequest): ApiResult<Unit>
     suspend fun acceptOffer(offerId: String): ApiResult<Unit>
     suspend fun declineOffer(offerId: String): ApiResult<Unit>
-    suspend fun getAllOffers(): ApiResult<List<OfferSummary>>
-    suspend fun getOffersByUser(userId: String): ApiResult<List<Offer>>
-
+    suspend fun getOffersSummary(propertyId: String): ApiResult<List<OfferSummary>>
+    suspend fun getOffersByUser(userName: String): ApiResult<List<Offer>>
     suspend fun getAgentNameByEmail(email: String): ApiResult<String>
+    suspend fun loadOfferChat(offerId : String): ApiResult<Offer>
 }

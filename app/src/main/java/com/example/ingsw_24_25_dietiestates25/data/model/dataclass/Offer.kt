@@ -1,4 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.data.model.dataclass
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,11 +17,19 @@ data class OfferMessage(
     val senderName: String,
     val timestamp: Long,
     val amount: Double?,
-    val accepted: Boolean? = null // null = idle, true = accettata, false = rifiutata
+    val status: OfferStatus?
 )
-
+@Serializable
+enum class OfferStatus {
+    @SerialName("PENDING")
+    PENDING,
+    @SerialName("ACCEPTED")
+    ACCEPTED,
+    @SerialName("REJECTED")
+    REJECTED
+}
 @Serializable
 data class OfferSummary(
     val amount: Double?,
-    val accepted: Boolean?
+    val status: OfferStatus
 )

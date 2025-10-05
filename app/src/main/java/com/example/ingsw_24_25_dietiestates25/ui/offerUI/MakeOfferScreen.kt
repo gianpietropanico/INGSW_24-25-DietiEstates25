@@ -1,4 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.ui.offerUI
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,12 +47,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferStatus
+import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 
 
 @Composable
@@ -60,8 +66,20 @@ fun MakeOfferScreen(
     navController : NavController
 ) {
     var amount by remember { mutableStateOf("") }
-    var showDialog by remember { mutableStateOf(false) }
     val state by inboxVm.state.collectAsState()
+    val previousRoute = navController.previousBackStackEntry?.destination?.route
+
+    LaunchedEffect(state.created) {
+        if (state.created  ) {
+            navController.navigate(NavigationItem.InboxScreen.route)
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            inboxVm.clearState()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -80,7 +98,11 @@ fun MakeOfferScreen(
                 modifier = Modifier
                     .size(28.dp)
                     .clickable {
-                        navController.popBackStack()
+                        if (previousRoute == NavigationItem.OfferChat.route) {
+                            navController.navigate(NavigationItem.InboxScreen.route)
+                        }else{
+                            navController.popBackStack()
+                        }
                     }
             )
         }
@@ -148,7 +170,7 @@ fun MakeOfferScreen(
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
-        if(!showDialog) {
+        if(!state.historyOffersDialog) {
 
             Row(
                 modifier = Modifier
@@ -171,7 +193,7 @@ fun MakeOfferScreen(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 OutlinedButton(
-                    onClick = { showDialog = true },
+                    onClick = { inboxVm.setDialogHistoryOffer(true)},
                     shape = RoundedCornerShape(8.dp),
                     border = BorderStroke(1.dp, Color(0xFF673AB7)),
                     colors = ButtonDefaults.outlinedButtonColors(
@@ -217,8 +239,9 @@ fun MakeOfferScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
+
                     OutlinedButton(
-                        onClick = { showDialog = true },
+                        onClick = { inboxVm.setDialogHistoryOffer(false) },
                         shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(1.dp, Color(0xFF673AB7)),
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -231,6 +254,7 @@ fun MakeOfferScreen(
                             contentDescription = "Freccia su"
                         )
                     }
+
                 }
 
                 Spacer(Modifier.height(8.dp))
@@ -243,10 +267,16 @@ fun MakeOfferScreen(
                         HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
                     }
                 }
+
             }
         }
     }
+    LoadingOverlay(isVisible = state.isLoading)
+
+
 }
+
+
 
 @Composable
 fun OfferSummaryItem(offer: OfferSummary) {
@@ -262,19 +292,19 @@ fun OfferSummaryItem(offer: OfferSummary) {
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
         )
 
-        val statusText: String = when (offer.accepted) {
-            true -> "Accettata"
-            false -> "Rifiutata"
-            null -> "In attesa"
+        val statusText: String = when (offer.status) {
+            OfferStatus.ACCEPTED ->  "Accettata"
+            OfferStatus.REJECTED ->  "Rifiutata"
+            else -> "In attesa"
         }
 
         Text(
             text = statusText,
             style = MaterialTheme.typography.bodyMedium,
-            color = when (offer.accepted) {
-                true -> Color(0xFF2E7D32)
-                false -> Color(0xFFC62828)
-                null -> Color(0xFFF9A825)
+            color = when (offer.status) {
+                OfferStatus.ACCEPTED ->  Color(0xFF2E7D32)
+                OfferStatus.REJECTED ->  Color(0xFFC62828)
+                else -> Color(0xFFF9A825)
             }
         )
     }

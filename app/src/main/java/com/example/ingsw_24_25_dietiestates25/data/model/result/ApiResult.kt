@@ -9,5 +9,7 @@ sealed class ApiResult<T>(val data: T? = null, val message: String? = null) {
     class UnknownError<T>(message: String? = "An unknown error occurred") : ApiResult<T>(message = message)
 
     class Success<T>(data: T, message: String? = "ok") : ApiResult<T>(data = data, message = message)
+
+    class Created<T>(data: T, message: String? ="created") : ApiResult<T>(data=data , message = message)
 }
 
