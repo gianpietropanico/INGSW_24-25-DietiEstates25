@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,13 +52,11 @@ fun InboxScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val state by inboxVm.state.collectAsState()
-
     // Stato per la tab selezionata
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         inboxVm.loadOffers()
-        //inboxVm.loadAppointments()
     }
 
     Scaffold(
@@ -80,22 +79,37 @@ fun InboxScreen(
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             Column {
                 TabRow(selectedTabIndex = selectedTabIndex) {
-                    Tab(selected = selectedTabIndex == 0, onClick = { selectedTabIndex = 0 }, text = { Text("Messages ${state.offers.size}") })
-                    Tab(selected = selectedTabIndex == 1, onClick = { selectedTabIndex = 1 }, text = { Text("Appointment ${state.appointments.size}") })
+                    Tab(
+                        selected = selectedTabIndex == 0,
+                        onClick = {
+                            selectedTabIndex = 0
+                            inboxVm.loadOffers()
+                        },
+                        text = { Text("Messages ${state.offers.size}") }
+                    )
+                    Tab(
+                        selected = selectedTabIndex == 1,
+                        onClick = {
+                            selectedTabIndex = 1
+                            inboxVm.loadAppointments()
+                        },
+                        text = { Text("Appointment ${state.appointments.size}") }
+                    )
                 }
 
                 LazyColumn {
                     if (selectedTabIndex == 0) {
+
                         items(state.offers) { offer ->
                             OfferItem(offer, inboxVm, navController)
                             HorizontalDivider()
                         }
                     } else {
+
                         items(state.appointments) { appointment ->
                             AppointmentItem(
                                 appointment = appointment,
                                 currentUserId = user!!.id,
-                                inboxVm = inboxVm,
                                 onClick = {
                                     inboxVm.setSelectedAppointment(appointment)
                                     navController.navigate("appointmentChat")
@@ -122,12 +136,13 @@ fun OfferItem(
     val lastMessage = offer.messages.lastOrNull()
     val otherUser = if ( user!!.username == offer.agentName ) offer.buyerName else offer.agentName
 
+
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                Log.d("OFFER_ITEM", "Click su offerta ${offer.propertyId}")
-                inboxVm.setSelectedOffer(offer)
+                inboxVm.offerChatInit(offer)
                 navController.navigate(NavigationItem.OfferChat.route)
             }
             .padding(12.dp),
@@ -156,7 +171,7 @@ fun OfferItem(
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
             )
             Text(
-                text = (if (offer.messages.last().senderName == user!!.username ) "You offered : " else "He/She offered") + offer.messages.last().amount,
+                text = (if (offer.messages.last().senderName == user!!.username ) "You offered : " else "${offer.messages.last().senderName} offered $") + offer.messages.last().amount,
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray,
                 maxLines = 1,
@@ -178,7 +193,6 @@ fun OfferItem(
 fun AppointmentItem(
     appointment: Appointment,
     currentUserId: String,
-    inboxVm : InboxViewModel,
     onClick: (Appointment) -> Unit // callback
 ) {
     val lastMessage = appointment.appointmentMessages.lastOrNull()

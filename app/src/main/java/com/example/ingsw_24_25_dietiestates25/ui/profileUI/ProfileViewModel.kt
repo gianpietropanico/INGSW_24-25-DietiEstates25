@@ -141,6 +141,7 @@ class ProfileViewModel @Inject constructor (
                 _state.update { it.copy(isLoading = false, resultMessage = result.message, success = true) }
                 user = userSessionManager.currentUser
             }
+            else -> {}
         }
     }
 

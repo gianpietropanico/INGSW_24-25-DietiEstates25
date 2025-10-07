@@ -73,6 +73,8 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.theme.grayWithOpacity
+import com.example.ingsw_24_25_dietiestates25.ui.theme.inActiveTextColor
 import com.example.ingsw_24_25_dietiestates25.ui.utils.safeDecodeBase64
 import com.google.maps.android.compose.MarkerInfoWindowContent
 import kotlinx.coroutines.delay
@@ -96,14 +98,19 @@ fun ResultsScreen(
 
     // Avvio della chiamata quando apro la schermata
     LaunchedEffect(type, location) {
-        rm.searchProperties(type, location)
+        if (location == "ALL") {
+            rm.loadAllProperties()
+        } else {
+            rm.searchProperties(type, location)
+        }
     }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
-        containerColor = Color.White,
-        sheetContainerColor = Color.White,
+       // containerColor = Color.White,
+        sheetContainerColor = Color(0xFFF2F2F2),
+        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         sheetContent = {
             when (activeSheet) {
                 "filters" -> FiltersSheet(
@@ -707,10 +714,10 @@ fun FiltersSheet(
                 .clickable {
                     val request = PropertySearchRequest(
                         type = type,
-                        city = location,
+                        city = location.takeIf { it.isNotBlank() },
                         minPrice = minPrice,   // slider → Int
                         maxPrice = maxPrice,
-                        minRooms = if (rooms > 0) rooms else null,              // numero stanze
+                        minRooms = if (rooms > 0) rooms else null,
                         elevator = elevator,
                         gatehouse = gatehouse,
                         balcony = balcony,

@@ -138,7 +138,7 @@ class ListingViewModel @Inject constructor(
 
     fun setSelectedListing(listing: PropertyListing) {
         _state.update {
-            it.copy(selectedListing = listing, uiState = ListingState.Success)
+            it.copy(selectedListing = listing)
         }
 
     }

@@ -294,7 +294,7 @@ fun ListingDetailContent(
 
                     Button(
                         onClick = {
-                            inboxVm.setSelectedProperty(propertyListing)
+                            inboxVm.setSelectedProperty(propertyListing, true)
                             navController.navigate(NavigationItem.MakeOffer.route)
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),

@@ -197,6 +197,7 @@ class AuthViewModel @Inject constructor (
             is ApiResult.Success -> {
                 _authState.update { it.copy(isLoading = false, resultMessage = result.message, isAuthenticated = false, success = true) }
             }
+            else -> {}
         }
     }
 

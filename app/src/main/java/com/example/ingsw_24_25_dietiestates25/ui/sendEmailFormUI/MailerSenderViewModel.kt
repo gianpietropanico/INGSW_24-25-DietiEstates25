@@ -101,6 +101,7 @@ class MailerSenderViewModel @Inject constructor(
                         )
                     }
                 }
+                else -> {}
             }
         }
     }

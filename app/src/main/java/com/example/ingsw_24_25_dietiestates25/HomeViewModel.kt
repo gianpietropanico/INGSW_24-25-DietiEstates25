@@ -32,12 +32,13 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     fun onSearchClicked(): Pair<String, String>? {
         val current = _state.value
         return if (current.location.isBlank()) {
-            // aggiorna lo stato con errore
-            _state.value = current.copy(errorMessage = "Inserisci una località")
-            null
+            // Nessuna location → segnalo con "ALL"
+            Pair(current.propertyType, "ALL")
         } else {
-            // nessun errore, ritorna parametri
+            // normale ricerca
             Pair(current.propertyType, current.location)
         }
     }
+
+
 }

@@ -1,6 +1,8 @@
 package com.example.ingsw_24_25_dietiestates25.ui.utils
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -13,7 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -23,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 
 @Composable
 fun GradientButton(
@@ -55,6 +60,36 @@ fun GradientButton(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 22.sp,
                 letterSpacing = 0.sp
+            ),
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+    }
+}
+
+
+@Composable
+fun GradientButtonWhite(
+    text: String,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White), // ✅ sfondo bianco
+        contentPadding = PaddingValues(),
+        modifier = Modifier
+            .width(320.dp)
+            .height(40.dp)
+            .clip(RoundedCornerShape(50.dp))
+            .border(2.dp, AscientGradient, RoundedCornerShape(50.dp)) // ✅ bordo con gradiente
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontFamily = FontFamily(Font(R.font.rubik_semibold)),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 22.sp,
+                letterSpacing = 0.sp,
+                color = Color(0xFF1688CF)
             ),
             modifier = Modifier.align(Alignment.CenterVertically)
         )

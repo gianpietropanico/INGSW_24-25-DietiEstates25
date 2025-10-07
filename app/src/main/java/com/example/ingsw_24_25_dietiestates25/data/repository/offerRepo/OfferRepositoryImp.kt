@@ -73,6 +73,25 @@ class OfferRepositoryImp @Inject constructor(
         }
     }
 
+    override suspend fun loadOfferChat(offerId : String): ApiResult<Offer>{
+        return try {
+            val response = httpClient.get("$baseURL/offers/single") {
+                url { parameters.append("offerId", offerId) }
+                accept(ContentType.Application.Json)
+            }
+
+            return when (response.status) {
+                HttpStatusCode.OK -> {
+                    val body: Offer = response.body()
+                    ApiResult.Success(body)
+                }
+                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+            }
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+        }
+    }
+
     override suspend fun acceptOffer(offerId: String): ApiResult<Unit> {
         return try {
             val response = httpClient.post("$baseURL/offers/accept") {
@@ -107,9 +126,10 @@ class OfferRepositoryImp @Inject constructor(
         }
     }
 
-    override suspend fun getAllOffers(): ApiResult<List<OfferSummary>> {
+    override suspend fun getOffersSummary(propertyId: String): ApiResult<List<OfferSummary>>{
         return try {
-            val response = httpClient.get("$baseURL/offers/all") {
+            val response = httpClient.get("$baseURL/offers/summary") {
+                url { parameters.append("propertyId", propertyId) }
                 accept(ContentType.Application.Json)
             }
 
@@ -125,10 +145,10 @@ class OfferRepositoryImp @Inject constructor(
         }
     }
 
-    override suspend fun getOffersByUser(userId: String): ApiResult<List<Offer>> {
+    override suspend fun getOffersByUser(userName: String): ApiResult<List<Offer>> {
         return try {
             val response = httpClient.get("$baseURL/offers") {
-                url { parameters.append("userId", userId) }
+                url { parameters.append("userName", userName) }
                 accept(ContentType.Application.Json)
             }
 

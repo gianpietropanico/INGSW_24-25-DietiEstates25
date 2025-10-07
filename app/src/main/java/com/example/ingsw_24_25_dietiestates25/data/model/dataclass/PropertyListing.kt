@@ -11,7 +11,8 @@ data class PropertyListing(
     val type: Type?,
     val price: Float,
     val property: Property,
-    val agent: User?
+    val agent: User?,
+    val available: Boolean = true
 )
 
 @Serializable
@@ -21,6 +22,7 @@ enum class Type {
 
     @SerialName("Sell")
     SELL
+
 }
 
 fun PropertyListing.toLightCopy(): PropertyListing {

@@ -86,6 +86,7 @@ class AgentViewModel  @Inject constructor (
             is ApiResult.Success -> {
                 _state.update { it.copy(isLoading = false, resultMessage = result.message, success = true) }
             }
+            else -> {}
         }
     }
 

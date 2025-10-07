@@ -47,10 +47,10 @@ class InboxViewModel  @Inject constructor (
         _state.update { it.copy(resultMessage = null, success = false, localError = false) }
     }
 
-    fun makeOffer( propertyId: String , agentEmail : String, amount : String  ) {
+    fun createOffer(propertyId: String , agentEmail : String, amount : String){
 
-        if(amount.toDoubleOrNull() == null ){
-            handleResult(ApiResult.UnknownError<String>("Devi inserire un numero"))
+        if ( user.value!!.role.name.contains("AGENT")) {
+            handleResult(ApiResult.Unauthorized<String>("An agent cant propose an offer on listing"))
             return
         }
 
@@ -64,34 +64,48 @@ class InboxViewModel  @Inject constructor (
                     propertyId = propertyId,
                     buyerName = user.value!!.username,
                     agentName = agentName.data!!,
-                    amount = amount.toDouble()
+                    amount = amount.toDouble(),
+                    false
                 )
             )
 
             if (result is ApiResult.Success) {
-                handleResult(ApiResult.Success(Unit, result.message))
+                handleResult(ApiResult.Created(Unit, result.message))
             } else {
                 handleResult(result)
             }
         }
     }
+    fun makeOffer( propertyId: String , agentEmail : String, amount : String) {
 
-    fun loadHistoryOffers(){
+        if(amount.toDoubleOrNull() == null ){
+            handleResult(ApiResult.UnknownError<String>("Devi inserire un numero"))
+            return
+        }
+
+        if( _state.value.createOffer ){
+            createOffer(propertyId, agentEmail, amount)
+            _state.update { it.copy(createOffer = false) }
+            return
+        }
+
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            var result: ApiResult<List<OfferSummary>> = offerRepo.getAllOffers()
+            val result: ApiResult<Offer?> = offerRepo.makeOffer(
+                OfferRequest(
+                    propertyId = propertyId,
+                    buyerName = state.value.selectedOffer!!.buyerName,
+                    agentName = user.value!!.username,
+                    amount = amount.toDouble(),
+                    isAgent = user.value!!.role.name.contains("AGENT")
+                )
+            )
 
             if (result is ApiResult.Success) {
-                _state.update {
-                    it.copy(
-                        historyOffers = result.data ?: emptyList()
-                    )
-                }
-
-                handleResult(ApiResult.Success(Unit, result.message))
+                handleResult(ApiResult.Created(Unit, result.message))
             } else {
-                handleResult(result = result)
+                handleResult(result)
             }
         }
     }
@@ -116,12 +130,32 @@ class InboxViewModel  @Inject constructor (
         }
     }
 
+    fun acceptOffer(accepted : Boolean){
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, resultMessage = null) }
+
+            val result : ApiResult<Unit> = if( accepted ){
+                offerRepo.acceptOffer(state.value.selectedOffer!!.id)
+            }else{
+                offerRepo.declineOffer(state.value.selectedOffer!!.id)
+            }
+
+            if (result is ApiResult.Success) {
+
+                state.value.offerMessages = offerRepo.loadOfferChat(state.value.selectedOffer!!.id).data!!.messages
+
+                handleResult(ApiResult.Success(Unit, result.message))
+            } else {
+                handleResult(result = result)
+            }
+        }
+    }
 
     fun loadOffers() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            var result: ApiResult<List<Offer>> = offerRepo.getOffersByUser(user.value!!.id)
+            var result: ApiResult<List<Offer>> = offerRepo.getOffersByUser(user.value!!.username)
 
             if (result is ApiResult.Success) {
                 _state.update {
@@ -175,18 +209,18 @@ class InboxViewModel  @Inject constructor (
             is ApiResult.Success -> {
                 _state.update { it.copy(isLoading = false, resultMessage = result.message, success = true) }
             }
+            is ApiResult.Created -> {
+                _state.update { it.copy(isLoading = false, resultMessage = result.message, created = true) }
+            }
         }
     }
 
-    fun setSelectedProperty (propertyListing : PropertyListing){
+    fun setSelectedProperty (propertyListing : PropertyListing, createOffer :Boolean){
+
         _state.update { current ->
-            current.copy(selectedProperty = propertyListing)
+            current.copy(selectedProperty = propertyListing, createOffer = createOffer)
         }
 
-    }
-
-    fun setSelectedOffer( offer: Offer){
-        _state.update { it.copy(selectedOffer = offer) }
     }
 
     fun offerChatInit (offer : Offer?){
@@ -222,9 +256,8 @@ class InboxViewModel  @Inject constructor (
 
     }
 
-    fun getChatUser(): String {
-        return if( user.value!!.email == state.value.selectedOffer!!.agentName) state.value.selectedOffer!!.buyerName
-        else state.value.selectedOffer!!.agentName
+    fun getUsername( ): String{
+        return user.value!!.username
     }
 
 
@@ -296,5 +329,39 @@ class InboxViewModel  @Inject constructor (
                 println("Errore bookNewAppointment: ${e.message}")
             }
         }
+    }
+
+    fun setDialogHistoryOffer (showDialog : Boolean){
+
+        if(!showDialog){
+            _state.update { current ->
+                current.copy(
+                    historyOffersDialog = false
+                )
+            }
+        }else{
+
+            viewModelScope.launch {
+                _state.update { it.copy(isLoading = true, resultMessage = null) }
+
+                val result: ApiResult<List<OfferSummary>> = offerRepo.getOffersSummary(_state.value.selectedProperty!!.id)
+
+                if (result is ApiResult.Success) {
+                    _state.update {
+                        it.copy(
+                            historyOffersDialog = true,
+                            historyOffers = result.data ?: emptyList()
+                        )
+                    }
+                    handleResult(ApiResult.Success(Unit, result.message))
+                } else {
+                    handleResult(result = result)
+                }
+            }
+        }
+    }
+
+    fun clearState (){
+        _state.value = InboxState()
     }
 }

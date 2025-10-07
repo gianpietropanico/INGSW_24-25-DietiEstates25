@@ -47,6 +47,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlueWithOpacity
 import com.example.ingsw_24_25_dietiestates25.ui.utils.GradientButton
+import com.example.ingsw_24_25_dietiestates25.ui.utils.GradientButtonWhite
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 
 
@@ -161,7 +162,7 @@ fun WelcomeScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            GradientButton(
+            GradientButtonWhite(
                 text = "Sign Up",
                 onClick = {
                     navController.navigate(NavigationItem.SignUp.route)
