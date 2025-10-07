@@ -63,8 +63,10 @@ android {
 dependencies {
 
 
-    coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.1.0")
 
+    implementation(libs.generativeai)
+    coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.1.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     //Per calendario
     implementation("com.kizitonwose.calendar:compose:2.4.0")
     // Credential Manager (core + provider)

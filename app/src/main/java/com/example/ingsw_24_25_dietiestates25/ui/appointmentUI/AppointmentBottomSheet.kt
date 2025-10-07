@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.appointmentUI
 
+import WeatherChart
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -11,14 +12,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.time.LocalDate
-
-
-
-
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
-
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.WeatherInfo
+import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherRow
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,16 +24,22 @@ fun AppointmentBottomSheet(
     day: LocalDate,
     appointmentsForDay: List<AppointmentUI>,
     propertyListing: PropertyListing?,
-    weather: String? = null,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    weatherForecast: List<WeatherInfo>? = null,
+    appointmentVM: AppointmentViewModel,
+    onDismiss: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        dragHandle = { Box(modifier = Modifier
-            .height(4.dp)
-            .width(40.dp)
-            .background(Color.Gray)) }
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .height(4.dp)
+                    .width(40.dp)
+                    .background(Color.Gray)
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+            )
+        }
     ) {
         Column(
             modifier = Modifier
@@ -59,9 +63,14 @@ fun AppointmentBottomSheet(
             }
 
             // Meteo
-            weather?.let {
-                Text("☀️ Meteo: $it")
-                Spacer(Modifier.height(8.dp))
+            weatherForecast?.let { forecasts ->
+                if (forecasts.isNotEmpty()) {
+                    Text("🌡️ Andamento temperature:", fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.height(8.dp))
+                    WeatherRow(forecasts)
+                    Spacer(Modifier.height(8.dp))
+                    WeatherChart(forecasts)
+                }
             }
 
             // Lista appuntamenti del giorno
@@ -77,66 +86,18 @@ fun AppointmentBottomSheet(
                 }
             }
 
-            Spacer(Modifier.weight(1f)) // spinge il bottone in basso
+            Spacer(Modifier.weight(1f))
 
+            // Pulsante Conferma
             Button(
-                onClick = onConfirm,
+                onClick = {
+                    propertyListing?.let { appointmentVM.bookAppointment(it) }
+                    onDismiss()
+                },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text("Conferma")
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Preview_AppointmentBottomSheet() {
-    val today = LocalDate.now()
-    val fakeAppointments = listOf(
-        AppointmentUI(today, "10:00", "casa","Mario Rossi", "listing1"),
-        AppointmentUI(today, "15:30","casa", "Luca Bianchi", "listing1")
-    )
-
-    val fakeProperty = com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property(
-        city = "Milano",
-        cap = "20100",
-        country = "Italia",
-        province = "MI",
-        street = "Via Roma",
-        civicNumber = "12",
-        latitude = 45.4642,
-        longitude = 9.1900,
-        numberOfRooms = 3,
-        numberOfBathrooms = 2,
-        size = 80f,
-        energyClass = com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass.B,
-        parking = true,
-        garden = false,
-        elevator = true,
-        gatehouse = false,
-        balcony = true,
-        roof = false,
-        airConditioning = true,
-        heatingSystem = true,
-        description = "Bellissimo appartamento nel centro"
-    )
-
-    val fakeListing = PropertyListing(
-        id = "listing1",
-        title = "Appartamento Via Roma 12",
-        type = Type.SELL,
-        price = 250000f,
-        property = fakeProperty,
-        agent = null
-    )
-
-    AppointmentBottomSheet(
-        day = today,
-        appointmentsForDay = fakeAppointments,
-        propertyListing = fakeListing,
-        weather = "Soleggiato, 25°C",
-        onDismiss = {},
-        onConfirm = {}
-    )
 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.DailyWeather
 import java.util.Locale
 
 
@@ -29,6 +30,7 @@ fun CalendarWithEvents(
     month: YearMonth,
     occupiedDays: Set<LocalDate>,
     appointments: Map<LocalDate, List<AppointmentUI>> = emptyMap(),
+    weatherByDay: Map<LocalDate, DailyWeather> = emptyMap(), // 👈 aggiunto
     onDaySelected: (LocalDate) -> Unit
 ) {
     var selectedDay by remember { mutableStateOf<LocalDate?>(null) }
@@ -38,7 +40,7 @@ fun CalendarWithEvents(
     val start = firstOfMonth.minusDays(offset.toLong())
 
     Column {
-        // Giorni settimana
+        // Giorni della settimana
         Row(modifier = Modifier.fillMaxWidth()) {
             listOf("Mon","Tue","Wed","Thu","Fri","Sat","Sun").forEach {
                 Text(
@@ -61,9 +63,17 @@ fun CalendarWithEvents(
                     val isPast = day.isBefore(today)
 
                     val bgColor = when {
-                        selectedDay == day -> Color(0x3301976D2) // trasparenza per selezionato
+                        selectedDay == day -> Color(0x3301976D2)
                         isOccupied -> Color(0xFFFFCDD2)
                         else -> Color.Transparent
+                    }
+
+                    val weatherEmoji = when (weatherByDay[day]?.condition) {
+                        "sole" -> "☀️"
+                        "pioggia" -> "🌧️"
+                        "nuvoloso" -> "☁️"
+                        "neve" -> "❄️"
+                        else -> ""
                     }
 
                     Box(
@@ -85,15 +95,12 @@ fun CalendarWithEvents(
                                 color = if (isInMonth) Color.Black else Color.LightGray,
                                 fontWeight = if (day == today) FontWeight.Bold else FontWeight.Normal
                             )
-
-//                            if ((appointments[day]?.size ?: 0) > 0) {
-//                                Box(
-//                                    modifier = Modifier
-//                                        .size(5.dp)
-//                                        .clip(CircleShape)
-//                                        .background(Color.Blue)
-//                                )
-//                            }
+                            if (weatherEmoji.isNotEmpty()) {
+                                Text(
+                                    text = weatherEmoji,
+                                    fontSize = 12.sp
+                                )
+                            }
                         }
                     }
                 }

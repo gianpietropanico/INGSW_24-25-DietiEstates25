@@ -2,160 +2,127 @@ package com.example.ingsw_24_25_dietiestates25.ui.appointmentUI
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
-import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
-
+import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
 @Composable
 fun BookAppointmentScreen(
-    appointments: List<AppointmentUI>,
-    propertyListing: PropertyListing
-
+    navController: NavController,
+    appointmentVM: AppointmentViewModel,
+    listingVm: ListingViewModel,
+    weatherVM: WeatherViewModel
 ) {
+    val state by appointmentVM.state.collectAsState()
+    val weatherState by weatherVM.state.collectAsState()
+    val currentUser by appointmentVM.currentUser.collectAsState()
 
+    val listingState by listingVm.state.collectAsState()
+    val propertyListing = listingState.selectedListing ?: return
 
     val today = LocalDate.now()
     var selectedMonth by remember { mutableStateOf(YearMonth.from(today)) }
-    var selectedDay by remember { mutableStateOf<LocalDate?>(null) }
 
-    val appointmentsThisMonth = appointments.filter { YearMonth.from(it.date) == selectedMonth }
+    // Filtra appuntamenti per il mese
+    val appointmentsThisMonth = state.unavailableDates
+        .filter { YearMonth.from(it) == selectedMonth }
+        .map { date -> AppointmentUI(date, "", propertyListing.title, "", propertyListing.id) }
+
     val appointmentsByDate = appointmentsThisMonth.groupBy { it.date }
 
     Column(modifier = Modifier.padding(8.dp)) {
-        // Intestazione mese con navigazione
+
+        // Header mese
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "<",
+            Text("<",
                 fontSize = 24.sp,
-                modifier = Modifier
-                    .clickable { selectedMonth = selectedMonth.minusMonths(1) }
-                    .padding(8.dp)
+                modifier = Modifier.clickable { selectedMonth = selectedMonth.minusMonths(1) }
             )
             Text(
-                text = "${
-                    selectedMonth.month.getDisplayName(
-                        TextStyle.FULL,
-                        Locale.getDefault()
-                    )
-                } ${selectedMonth.year}",
+                "${selectedMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${selectedMonth.year}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
-            Text(
-                text = ">",
+            Text(">",
                 fontSize = 24.sp,
-                modifier = Modifier
-                    .clickable { selectedMonth = selectedMonth.plusMonths(1) }
-                    .padding(8.dp)
+                modifier = Modifier.clickable { selectedMonth = selectedMonth.plusMonths(1) }
             )
         }
 
         Spacer(Modifier.height(12.dp))
 
-        // Calendario con dot per giorni occupati
+        // Calendario
         CalendarWithEvents(
             month = selectedMonth,
             occupiedDays = appointmentsByDate.keys,
             appointments = appointmentsByDate,
-            onDaySelected = { day -> selectedDay = day }
+            onDaySelected = { day ->
+                appointmentVM.selectDate(day)
+                weatherVM.loadWeather(propertyListing, day)
+            }
         )
-
-        Spacer(Modifier.height(12.dp))
     }
 
-    selectedDay?.let { day ->
+    // BottomSheet solo se giorno selezionato
+    state.selectedDate?.let { day ->
+        val appointmentsForDay = appointmentsByDate[day] ?: emptyList()
         AppointmentBottomSheet(
             day = day,
-            appointmentsForDay = appointmentsByDate[day] ?: emptyList(),
-            onDismiss = { selectedDay = null },
-            onConfirm = {},
-            propertyListing = propertyListing
-
+            appointmentsForDay = appointmentsForDay,
+            propertyListing = propertyListing,
+            weatherForecast = weatherState.weatherForecast,
+            appointmentVM = appointmentVM,
+            onDismiss = { appointmentVM.selectDate(null) }
         )
     }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun Preview_BookAppointmentScreen() {
-    val today = LocalDate.now()
+    // Loading e messaggi
+    if (state.isLoading || weatherState.isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            LoadingOverlay(isVisible = true)
+        }
+    }
 
-    val fakeAppointments = listOf(
-        AppointmentUI(
-            date = today.plusDays(2),
-            time = "10:00",
-            propertyTitle = "Appartamento Via Roma 12",
-            bookedBy = "Mario Rossi",
-            listingId = "34577"
-        ),
-        AppointmentUI(
-            date = today.plusDays(5),
-            time = "11:30",
-            propertyTitle = "Villa Corso Milano",
-            bookedBy = "Luca Bianchi",
-            listingId = "34577"
-
-
+    state.resultMessage?.let { msg ->
+        Text(
+            msg,
+            color = if (state.success) Color.Green else Color.Red,
+            modifier = Modifier.padding(8.dp)
         )
-    )
-    val fakeProperty = com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property(
-        city = "Milano",
-        cap = "20100",
-        country = "Italia",
-        province = "MI",
-        street = "Via Roma",
-        civicNumber = "12",
-        latitude = 45.4642,
-        longitude = 9.1900,
-        numberOfRooms = 3,
-        numberOfBathrooms = 2,
-        size = 80f,
-        energyClass = com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass.B,
-        parking = true,
-        garden = false,
-        elevator = true,
-        gatehouse = false,
-        balcony = true,
-        roof = false,
-        airConditioning = true,
-        heatingSystem = true,
-        description = "Bellissimo appartamento nel centro"
-    )
+    }
 
-    val fakeListing = PropertyListing(
-        id = "listing1",
-        title = "Appartamento Via Roma 12",
-        type = com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type.SELL,
-        price = 250000f,
-        property = fakeProperty,
-        agent = null
-    )
-
-    BookAppointmentScreen(appointments = fakeAppointments, propertyListing = fakeListing)
+    weatherState.error?.let { error ->
+        Text("Errore meteo: $error", color = Color.Red, modifier = Modifier.padding(8.dp))
+    }
 }

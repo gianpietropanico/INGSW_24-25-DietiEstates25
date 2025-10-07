@@ -2,11 +2,10 @@ package com.example.ingsw_24_25_dietiestates25.ui.appointmentUI
 
 import java.time.LocalDate
 
-data class BookAppointmentState(
-    val selectedDate: LocalDate? = null,
+data class AppointmentScreenState(
     val unavailableDates: List<LocalDate> = emptyList(),
-    val weatherInfo: String? = null,
+    val selectedDate: LocalDate? = null,
     val isLoading: Boolean = false,
-    val resultMessage: String? = null,
-    val success: Boolean = false
+    val success: Boolean = false,
+    val resultMessage: String? = null
 )

@@ -39,7 +39,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.MakeOfferScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.OfferChatScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
-
+import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
 
 
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
@@ -127,7 +127,7 @@ fun AppNavHost(
     val listingViewModel : ListingViewModel = hiltViewModel()
     val inboxViewModel: InboxViewModel = hiltViewModel()
     val appointmentViewModel : AppointmentViewModel = hiltViewModel()
-
+    val weatherViewModel : WeatherViewModel = hiltViewModel()
 
     NavHost(
         modifier = modifier,
@@ -323,13 +323,14 @@ fun AppNavHost(
             )
         }
 
-//        composable(NavigationItem.BookAppointment.route){
-//            BookAppointmentScreen(
-//                appointmentVm = appointmentViewModel,
-//                navController = navController
-//            )
-//
-//        }
+        composable(NavigationItem.BookAppointment.route) {
+            BookAppointmentScreen(
+                navController = navController,
+                appointmentVM = appointmentViewModel,
+                listingVm = listingViewModel,
+                weatherVM = weatherViewModel
+            )
+        }
 //        composable(NavigationItem.CheckListingAppointment.route){
 //            CheckListingAppointmentScreen(
 //                appointmentVm = appointmentViewModel,
