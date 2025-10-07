@@ -50,14 +50,13 @@ class AppointmentViewModel @Inject constructor(
 
         _state.update { it.copy(isLoading = true, resultMessage = null, success = false) }
 
-        // Creiamo la versione leggera
-        val lightProperty = listing.toLightCopy()
+
 
         val appointmentRequest = AppointmentRequest(
-            listing = lightProperty,
-            user = user,
-            agent = agent,
-            date = date
+            listingId = listing.id,
+            userId = user.id,
+            agentId = agent.id,
+            date = date.toString()
         )
 
         val result = appointmentRepo.bookAppointment(appointmentRequest)

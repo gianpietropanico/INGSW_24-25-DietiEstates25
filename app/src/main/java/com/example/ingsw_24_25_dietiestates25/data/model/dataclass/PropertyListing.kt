@@ -27,35 +27,35 @@ enum class Type {
 
 fun PropertyListing.toLightCopy(): PropertyListing {
     return this.copy(
-        title = this.title,
         id = this.id,
+        title = this.title,
         agent = this.agent,
-        type = null,      // oppure lascia originale se vuoi
-        price = 0f,       // opzionale
+        type = this.type,
+        price = this.price,
         property = Property(
             city = this.property.city,
             street = this.property.street,
             civicNumber = this.property.civicNumber,
-            cap = "",
-            country = "",
-            province = "",
-            latitude = 0.0,
-            longitude = 0.0,
-            pois = emptyList(),
-            images = emptyList(),
-            numberOfRooms = 0,
-            numberOfBathrooms = 0,
-            size = 0f,
-            energyClass = EnergyClass.A,
-            parking = false,
-            garden = false,
-            elevator = false,
-            gatehouse = false,
-            balcony = false,
-            roof = false,
-            airConditioning = false,
-            heatingSystem = false,
-            description = ""
+            cap = this.property.cap ?: "",
+            country = this.property.country ?: "",
+            province = this.property.province ?: "",
+            latitude = this.property.latitude,
+            longitude = this.property.longitude,
+            pois = this.property.pois ?: emptyList(),
+            images = emptyList(), // 🔹 foto rimosse
+            numberOfRooms = this.property.numberOfRooms,
+            numberOfBathrooms = this.property.numberOfBathrooms,
+            size = this.property.size,
+            energyClass = this.property.energyClass,
+            parking = this.property.parking,
+            garden = this.property.garden,
+            elevator = this.property.elevator,
+            gatehouse = this.property.gatehouse,
+            balcony = this.property.balcony,
+            roof = this.property.roof,
+            airConditioning = this.property.airConditioning,
+            heatingSystem = this.property.heatingSystem,
+            description = this.property.description ?: ""
         )
     )
 }

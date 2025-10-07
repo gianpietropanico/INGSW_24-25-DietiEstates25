@@ -8,9 +8,9 @@ import java.time.LocalDate
 @Serializable
 data class Appointment(
     val id: String,
-    val listing: PropertyListing,
-    val user: User,
-    val agent: User,
+    val listingId: String,
+    val userId: String,
+    val agentId: String,
     @Serializable(with = LocalDateSerializer::class)
     val date: LocalDate,
     val status: AppointmentStatus = AppointmentStatus.PENDING,

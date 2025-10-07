@@ -37,3 +37,14 @@ enum class Role {
     @SerialName("PENDING_AGENT_ADMIN")
     PENDING_AGENT_ADMIN
 }
+
+fun User.toLightCopy(): User {
+    return this.copy(
+        id = this.id,
+        username = this.username,
+        email = this.email,
+        surname = this.surname,
+        role = this.role,
+        profilePicture = null
+    )
+}

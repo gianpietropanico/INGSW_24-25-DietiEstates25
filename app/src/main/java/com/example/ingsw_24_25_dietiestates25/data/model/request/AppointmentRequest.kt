@@ -8,11 +8,10 @@ import java.time.LocalDate
 
 @Serializable
 data class AppointmentRequest(
-    val listing : PropertyListing,
-    val user: User,
-    val agent: User,
-    @Serializable(with = LocalDateSerializer::class)
-    val date: LocalDate
+    val listingId: String,
+    val userId: String,
+    val agentId: String,
+    val date: String
 )
 
 @Serializable
