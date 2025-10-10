@@ -1,6 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.ui.appointmentUI
 
-import WeatherChart
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -9,13 +8,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.WeatherInfo
-import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherRow
+import com.example.ingsw_24_25_dietiestates25.ui.theme.BlueGray
+import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherCard
+import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherForecast
+
+import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,10 +25,14 @@ fun AppointmentBottomSheet(
     day: LocalDate,
     appointmentsForDay: List<AppointmentUI>,
     propertyListing: PropertyListing?,
-    weatherForecast: List<WeatherInfo>? = null,
+    weatherVM: WeatherViewModel,
     appointmentVM: AppointmentViewModel,
     onDismiss: () -> Unit
 ) {
+
+    weatherVM.loadWeatherInfo(propertyListing!!, day)
+
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         dragHandle = {
@@ -63,16 +68,36 @@ fun AppointmentBottomSheet(
             }
 
             // Meteo
-            weatherForecast?.let { forecasts ->
-                if (forecasts.isNotEmpty()) {
-                    Text("🌡️ Andamento temperature:", fontWeight = FontWeight.SemiBold)
-                    Spacer(Modifier.height(8.dp))
-                    WeatherRow(forecasts)
-                    Spacer(Modifier.height(8.dp))
-                    WeatherChart(forecasts)
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(BlueGray)
+                ) {
+                    WeatherCard(
+                        state = weatherVM.state,
+                        backgroundColor = BlueGray
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    WeatherForecast(state = weatherVM.state)
+                }
+                if (weatherVM.state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                weatherVM.state.error?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             }
-
             // Lista appuntamenti del giorno
             if (appointmentsForDay.isEmpty()) {
                 Text("Giorno libero, nessun appuntamento")

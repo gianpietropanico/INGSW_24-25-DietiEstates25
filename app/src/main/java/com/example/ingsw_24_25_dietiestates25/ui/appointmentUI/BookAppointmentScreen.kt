@@ -41,7 +41,6 @@ fun BookAppointmentScreen(
     weatherVM: WeatherViewModel
 ) {
     val state by appointmentVM.state.collectAsState()
-    val weatherState by weatherVM.state.collectAsState()
     val currentUser by appointmentVM.currentUser.collectAsState()
 
     val listingState by listingVm.state.collectAsState()
@@ -89,7 +88,7 @@ fun BookAppointmentScreen(
             appointments = appointmentsByDate,
             onDaySelected = { day ->
                 appointmentVM.selectDate(day)
-                weatherVM.loadWeather(propertyListing, day)
+
             }
         )
     }
@@ -101,14 +100,14 @@ fun BookAppointmentScreen(
             day = day,
             appointmentsForDay = appointmentsForDay,
             propertyListing = propertyListing,
-            weatherForecast = weatherState.weatherForecast,
+            weatherVM,
             appointmentVM = appointmentVM,
             onDismiss = { appointmentVM.selectDate(null) }
         )
     }
 
     // Loading e messaggi
-    if (state.isLoading || weatherState.isLoading) {
+    if (state.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             LoadingOverlay(isVisible = true)
         }
@@ -122,7 +121,5 @@ fun BookAppointmentScreen(
         )
     }
 
-    weatherState.error?.let { error ->
-        Text("Errore meteo: $error", color = Color.Red, modifier = Modifier.padding(8.dp))
-    }
+
 }
