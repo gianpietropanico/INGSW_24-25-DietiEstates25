@@ -246,14 +246,14 @@ fun MakeOfferScreen(
                     )
                     .clickable {
                         selectedIndex = 0
-                        amount = calculateDiscount(state.selectedProperty!!.price.toDouble(), 4).toInt()
+                        amount = inboxVm.calculateDiscount(state.selectedProperty!!.price.toDouble(), 4).toInt()
                             .toString()
                     }
                     .padding(8.dp)
                     .height(65.dp)
             ) {
                 Text(
-                    text = calculateDiscount(state.selectedProperty!!.price.toDouble(), 4)
+                    text = inboxVm.calculateDiscount(state.selectedProperty!!.price.toDouble(), 4)
                         .toInt()
                         .toString() + " €",
                     style = MaterialTheme.typography.bodyLarge.copy(
@@ -287,13 +287,13 @@ fun MakeOfferScreen(
                     )
                     .clickable {
                         selectedIndex = 1
-                        amount = calculateDiscount(state.selectedProperty!!.price.toDouble(), 7).toString()
+                        amount = inboxVm.calculateDiscount(state.selectedProperty!!.price.toDouble(), 7).toString()
                     }
                     .padding(8.dp)
                     .height(65.dp)
             ) {
                 Text(
-                    text = calculateDiscount(state.selectedProperty!!.price.toDouble(), 7)
+                    text = inboxVm.calculateDiscount(state.selectedProperty!!.price.toDouble(), 7)
                         .toInt()
                         .toString() + " €",
                     style = MaterialTheme.typography.bodyLarge.copy(
@@ -394,7 +394,6 @@ fun MakeOfferScreen(
 
                         Box(modifier = Modifier.fillMaxWidth()) {
 
-                            if (amount.isEmpty())
                             Text(
                                 text = "Insert your price",
                                 style = MaterialTheme.typography.labelLarge.copy(
@@ -447,7 +446,13 @@ fun MakeOfferScreen(
                     else Brush.linearGradient(listOf(Color.LightGray, Color.LightGray))
                 )
                 .clickable(enabled = isEnabled) {
-                    navController.navigate(NavigationItem.MakeOffer.route)
+                    if ( inboxVm.checkPrice(amount.toDouble()) ){
+                        if( state.createOffer ){
+                            inboxVm.createOffer(amount.toDouble())
+                        }else{
+                            inboxVm.makeOffer(amount.toDouble())
+                        }
+                    }
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -628,16 +633,6 @@ fun OfferSummaryItem(offer: OfferSummary, index: Int) {
     }
 }
 
-//TETTO MASSIMO 10% che sarebbe 0.1
-fun calculateDiscount(price: Double, discountType: Int): Double {
-    val discountPercent = when (discountType) {
-        10 -> 0.1
-        4 -> 0.04
-        7 -> 0.07
-        else -> 0.0
-    }
-    return price - (price * discountPercent)
-}
 
 
 //@Preview(showBackground = true, showSystemUi = true)

@@ -8,9 +8,11 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentMessage
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferMessage
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.request.MessageRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.request.OfferRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.data.repository.agentRepo.AgentRepo
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.String
 
 @HiltViewModel
 class InboxViewModel  @Inject constructor (
@@ -59,22 +62,40 @@ class InboxViewModel  @Inject constructor (
             else -> "UNKNOW STATE"
         }
     }
-
-    fun createOffer(listing: PropertyListing , agent : User, amount : Double){
-
-        if ( user.value!!.role.name.contains("AGENT")) {
-            handleResult(ApiResult.Unauthorized<String>("An agent cant propose an offer on listing"))
-            return
+    //TETTO MASSIMO 10% che sarebbe 0.1
+    fun calculateDiscount(price: Double, discountType: Int): Double {
+        val discountPercent = when (discountType) {
+            10 -> 0.1
+            4 -> 0.04
+            7 -> 0.07
+            else -> 0.0
         }
+        return price - (price * discountPercent)
+    }
+
+    fun checkPrice( price : Double): Boolean{
+        val discount = calculateDiscount(price , 10)
+
+        if( price < discount){
+            _state.update { it.copy(isLoading = false, resultMessage = "The limit of the discount is 10% taht is $discount  €",success = false, localError = true) }
+            false
+        }else{
+            true
+        }
+
+        return false
+    }
+
+    fun createOffer (amount : Double){
 
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            val result: ApiResult<Offer?> = offerRepo.makeOffer(
+            val result: ApiResult<Offer?> = offerRepo.createOffer(
                 OfferRequest(
-                    property = listing,
+                    property = state.value.selectedProperty!!,
                     buyerUser = userSessionManager.getCurrentUser()!!,
-                    agent = agent,
+                    agent = state.value.selectedProperty!!.agent!!,
                     amount = amount
                 )
             )
@@ -86,28 +107,16 @@ class InboxViewModel  @Inject constructor (
             }
         }
     }
-    fun makeOffer( listing: PropertyListing , agent : User, amount : String) {
 
-        if(amount.toDoubleOrNull() == null ){
-            handleResult(ApiResult.UnknownError<String>("Devi inserire un numero"))
-            return
-        }
-
-        if( _state.value.createOffer ){
-            createOffer(listing, agent, amount.toDouble())
-            _state.update { it.copy(createOffer = false) }
-            return
-        }
-
+    fun makeOffer (amount: Double){
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            val result: ApiResult<Offer?> = offerRepo.makeOffer(
-                OfferRequest(
-                    property = listing,
-                    buyerUser = userSessionManager.getCurrentUser()!!,
-                    agent = agent,
-                    amount = amount.toDouble()
+            val result: ApiResult<Unit> = offerRepo.makeOffer(
+                MessageRequest(
+                    offerId = state.value.selectedOffer!!.id,
+                    sender = userSessionManager.getCurrentUser()!!,
+                    amount = amount
                 )
             )
 

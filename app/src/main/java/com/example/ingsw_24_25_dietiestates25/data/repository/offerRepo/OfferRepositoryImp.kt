@@ -26,7 +26,7 @@ class OfferRepositoryImp @Inject constructor(
 
     private val baseURL = "http://10.0.2.2:8080"
 
-    override suspend fun makeOffer(request: OfferRequest): ApiResult<Offer?> {
+    override suspend fun createOffer(request: OfferRequest): ApiResult<Offer?> {
 
         return try {
             val response = httpClient.post("$baseURL/offers/makeoffer") {
@@ -54,7 +54,7 @@ class OfferRepositoryImp @Inject constructor(
         }
     }
 
-    override suspend fun addOfferMessage(request: MessageRequest): ApiResult<Unit> {
+    override suspend fun makeOffer(request: MessageRequest): ApiResult<Unit> {
         return try {
             val response = httpClient.post("$baseURL/offers/message") {
                 contentType(ContentType.Application.Json)

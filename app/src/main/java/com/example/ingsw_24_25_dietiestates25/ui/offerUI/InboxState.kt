@@ -33,4 +33,6 @@ data class InboxState (
     val selectedAppointment: Appointment? = null,
     val selectedProperty : PropertyListing? = null
 
+
+
 )
