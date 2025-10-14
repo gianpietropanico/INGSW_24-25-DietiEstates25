@@ -33,6 +33,15 @@ data class Property(
 )
 
 @Serializable
+
+data class PropertySummary(
+    val city: String,
+    val street: String,
+    val civicNumber: String
+)
+
+
+@Serializable
 enum class EnergyClass(val label: String) {
     @SerialName("A")
     A("A"),

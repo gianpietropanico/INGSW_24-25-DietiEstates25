@@ -44,8 +44,8 @@ fun AppointmentChatScreen(
     val currentUser = inboxVm.user.value?.username ?: ""
     val selectedAppointment = state.selectedAppointment ?: return
     val appointments = selectedAppointment.appointmentMessages
-    val firstImageBitmap =
-        safeDecodeBase64(selectedAppointment.listing.property.images.firstOrNull())
+//    val firstImageBitmap =
+//        safeDecodeBase64(selectedAppointment.listing.property.images.firstOrNull())
 
 
     // LazyListState per scroll automatico
@@ -78,30 +78,30 @@ fun AppointmentChatScreen(
                         .background(Color.Gray),
                     contentAlignment = Alignment.Center
                 ) {
-                    val agentPhoto = selectedAppointment.listing.agent?.profilePicture
-                    if (agentPhoto != null) {
-                        val bitmap = safeDecodeBase64(agentPhoto)
-                        if (bitmap != null) {
-                            Image(
-                                bitmap = bitmap,
-                                contentDescription = "Foto agente",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        } else {
-                            Text(
-                                text = selectedAppointment.listing.agent?.name?.firstOrNull()?.uppercase() ?: "?",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    } else {
-                        Text(
-                            text = selectedAppointment.listing.agent?.name?.firstOrNull()?.uppercase() ?: "?",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+//                    val agentPhoto = selectedAppointment.listing.agent?.profilePicture
+//                    if (agentPhoto != null) {
+//                        val bitmap = safeDecodeBase64(agentPhoto)
+//                        if (bitmap != null) {
+//                            Image(
+//                                bitmap = bitmap,
+//                                contentDescription = "Foto agente",
+//                                contentScale = ContentScale.Crop,
+//                                modifier = Modifier.fillMaxSize()
+//                            )
+//                        } else {
+//                            Text(
+//                                text = selectedAppointment.listing.agent?.name?.firstOrNull()?.uppercase() ?: "?",
+//                                color = Color.White,
+//                                fontWeight = FontWeight.Bold
+//                            )
+//                        }
+//                    } else {
+//                        Text(
+//                            text = selectedAppointment.listing.agent?.name?.firstOrNull()?.uppercase() ?: "?",
+//                            color = Color.White,
+//                            fontWeight = FontWeight.Bold
+//                        )
+//                    }
                 }
             }
 
@@ -116,38 +116,38 @@ fun AppointmentChatScreen(
                     .clip(RoundedCornerShape(8.dp)) // stessa forma
                     .background(Color.LightGray)    // sfondo fallback se serve
 
-                if (firstImageBitmap != null) {
-                    Image(
-                        bitmap = firstImageBitmap,
-                        contentDescription = selectedAppointment.listing.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = imageModifier
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(R.drawable.default_house),
-                        contentDescription = selectedAppointment.listing.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = imageModifier
-                    )
-                }
+//                if (firstImageBitmap != null) {
+//                    Image(
+//                        bitmap = firstImageBitmap,
+//                        contentDescription = selectedAppointment.listing.title,
+//                        contentScale = ContentScale.Crop,
+//                        modifier = imageModifier
+//                    )
+//                } else {
+//                    Image(
+//                        painter = painterResource(R.drawable.default_house),
+//                        contentDescription = selectedAppointment.listing.title,
+//                        contentScale = ContentScale.Crop,
+//                        modifier = imageModifier
+//                    )
+//                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = selectedAppointment.listing.title,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = listOfNotNull(
-                            selectedAppointment.listing.property.city,
-                            selectedAppointment.listing.property.street,
-                            selectedAppointment.listing.property.civicNumber
-                        ).joinToString(", "),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
-                    )
+//                    Text(
+//                        text = selectedAppointment.listing.title,
+//                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+//                    )
+//                    Text(
+//                        text = listOfNotNull(
+//                            selectedAppointment.listing.property.city,
+//                            selectedAppointment.listing.property.street,
+//                            selectedAppointment.listing.property.civicNumber
+//                        ).joinToString(", "),
+//                        style = MaterialTheme.typography.bodySmall,
+//                        color = Color.Gray
+//                    )
                 }
             }
 
@@ -163,17 +163,17 @@ fun AppointmentChatScreen(
                 .background(Color(0xFFF5F5F5)),
             reverseLayout = true
         ) {
-            items(appointments.reversed()) { appointment ->
-                AppointmentCardMessage(
-                    date = appointment.date,
-                    username = appointment.senderId,
-                    currentUser = currentUser,
-                    accepted = appointment.accepted,
-                    onAccept = { inboxVm.acceptAppointment(selectedAppointment.id) },
-                    onDecline = { inboxVm.rejectAppointment(selectedAppointment.id) },
-                    onBookAgain = { inboxVm.bookNewAppointment(selectedAppointment.listing.id) }
-                )
-            }
+//            items(appointments.reversed()) { appointment ->
+//                AppointmentCardMessage(
+//                    date = appointment.date,
+//                    username = appointment.senderId,
+//                    currentUser = currentUser,
+//                    accepted = appointment.accepted,
+//                    onAccept = { inboxVm.acceptAppointment(selectedAppointment.id) },
+//                    onDecline = { inboxVm.rejectAppointment(selectedAppointment.id) },
+//                    onBookAgain = { inboxVm.bookNewAppointment(selectedAppointment.listing.id) }
+//                )
+//            }
         }
     }
 }

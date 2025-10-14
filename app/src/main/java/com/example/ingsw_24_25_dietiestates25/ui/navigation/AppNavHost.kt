@@ -29,6 +29,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.agentUI.AgencySettingsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentChatScreen
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.BookAppointmentScreen
+import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.CheckAllAppointmentsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.CheckListingAppointmentScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.AddPropertyListingScreen
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingDetailScreen
@@ -39,7 +40,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.MakeOfferScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.OfferChatScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
-
+import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
 
 
 import com.example.ingsw_24_25_dietiestates25.ui.sendEmailFormUI.MailerSenderViewModel
@@ -78,7 +79,9 @@ enum class Screen {
     LISTINGDETAIL,
     APPOINTMENTCHAT,
     BOOKAPPOINTMENT,
-    CHECKAPPOINTMENT
+    CHECKAPPOINTMENT,
+
+    CHECKALLAPPOINTMENT
 }
 
 sealed class NavigationItem(val route: String) {
@@ -108,6 +111,8 @@ sealed class NavigationItem(val route: String) {
     object InboxScreen : NavigationItem(Screen.INBOX.name)
     object BookAppointment : NavigationItem(Screen.BOOKAPPOINTMENT.name)
     object CheckListingAppointment : NavigationItem(Screen.CHECKAPPOINTMENT.name)
+
+    object CheckAllAppointments : NavigationItem(Screen.CHECKALLAPPOINTMENT.name)
 }
 
 
@@ -127,7 +132,7 @@ fun AppNavHost(
     val listingViewModel : ListingViewModel = hiltViewModel()
     val inboxViewModel: InboxViewModel = hiltViewModel()
     val appointmentViewModel : AppointmentViewModel = hiltViewModel()
-
+    val weatherViewModel : WeatherViewModel = hiltViewModel()
 
     NavHost(
         modifier = modifier,
@@ -324,19 +329,31 @@ fun AppNavHost(
             )
         }
 
-//        composable(NavigationItem.BookAppointment.route){
-//            BookAppointmentScreen(
-//                appointmentVm = appointmentViewModel,
-//                navController = navController
-//            )
-//
-//        }
-//        composable(NavigationItem.CheckListingAppointment.route){
-//            CheckListingAppointmentScreen(
-//                appointmentVm = appointmentViewModel,
-//                navController = navController
-//            )
-//        }
+        composable(NavigationItem.BookAppointment.route) {
+            BookAppointmentScreen(
+                navController = navController,
+                appointmentVM = appointmentViewModel,
+                listingVm = listingViewModel,
+                weatherVM = weatherViewModel
+            )
+        }
+
+        composable(NavigationItem.CheckListingAppointment.route){
+            CheckListingAppointmentScreen(
+                navController = navController,
+                appointmentVM = appointmentViewModel,
+                listingVm = listingViewModel,
+                weatherVM = weatherViewModel
+            )
+        }
+
+        composable(NavigationItem.CheckAllAppointments.route){
+            CheckAllAppointmentsScreen(
+                navController = navController,
+                appointmentVM = appointmentViewModel,
+                weatherVM = weatherViewModel
+            )
+        }
 
 
         composable(

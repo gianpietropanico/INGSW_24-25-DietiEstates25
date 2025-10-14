@@ -21,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
+
 import java.util.Locale
 
 
@@ -28,7 +30,8 @@ import java.util.Locale
 fun CalendarWithEvents(
     month: YearMonth,
     occupiedDays: Set<LocalDate>,
-    appointments: Map<LocalDate, List<AppointmentUI>> = emptyMap(),
+    appointments: Map<LocalDate, List<Appointment>> = emptyMap(),
+    isForBooking: Boolean = true,
     onDaySelected: (LocalDate) -> Unit
 ) {
     var selectedDay by remember { mutableStateOf<LocalDate?>(null) }
@@ -38,9 +41,9 @@ fun CalendarWithEvents(
     val start = firstOfMonth.minusDays(offset.toLong())
 
     Column {
-        // Giorni settimana
+        // Giorni della settimana
         Row(modifier = Modifier.fillMaxWidth()) {
-            listOf("Mon","Tue","Wed","Thu","Fri","Sat","Sun").forEach {
+            listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun").forEach {
                 Text(
                     text = it,
                     modifier = Modifier.weight(1f),
@@ -61,9 +64,18 @@ fun CalendarWithEvents(
                     val isPast = day.isBefore(today)
 
                     val bgColor = when {
-                        selectedDay == day -> Color(0x3301976D2) // trasparenza per selezionato
                         isOccupied -> Color(0xFFFFCDD2)
+                        selectedDay == day -> Color(0x3301976D2)
                         else -> Color.Transparent
+                    }
+
+                    // Logica clickabile
+                    val isClickable = if (isForBooking) {
+                        !isOccupied && !isPast && isInMonth
+
+                    } else {
+                            isOccupied && isInMonth
+
                     }
 
                     Box(
@@ -73,7 +85,7 @@ fun CalendarWithEvents(
                             .padding(2.dp)
                             .clip(RoundedCornerShape(6.dp))
                             .background(bgColor)
-                            .clickable(enabled = isInMonth && !isPast) {
+                            .clickable(enabled = isClickable) {
                                 selectedDay = day
                                 onDaySelected(day)
                             },
@@ -82,18 +94,17 @@ fun CalendarWithEvents(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = day.dayOfMonth.toString(),
-                                color = if (isInMonth) Color.Black else Color.LightGray,
-                                fontWeight = if (day == today) FontWeight.Bold else FontWeight.Normal
+                                color = when {
+                                    isOccupied -> Color.Red
+                                    !isInMonth -> Color.LightGray
+                                    else -> Color.Black
+                                },
+                                fontWeight = when {
+                                    day == today -> FontWeight.Bold
+                                    isOccupied -> FontWeight.Bold
+                                    else -> FontWeight.Normal
+                                }
                             )
-
-//                            if ((appointments[day]?.size ?: 0) > 0) {
-//                                Box(
-//                                    modifier = Modifier
-//                                        .size(5.dp)
-//                                        .clip(CircleShape)
-//                                        .background(Color.Blue)
-//                                )
-//                            }
                         }
                     }
                 }

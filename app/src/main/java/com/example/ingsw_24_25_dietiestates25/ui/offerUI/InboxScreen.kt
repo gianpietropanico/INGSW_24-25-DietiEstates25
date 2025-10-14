@@ -233,55 +233,55 @@ fun AppointmentItem(
     currentUserId: String,
     onClick: (Appointment) -> Unit // callback
 ) {
-    val lastMessage = appointment.appointmentMessages.lastOrNull()
-    val otherUser = if (appointment.agent.id == currentUserId) appointment.agent else appointment.user
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick(appointment) } // chiama la callback
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF006666)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = otherUser.username.firstOrNull()?.uppercase() ?: "?",
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = otherUser.username,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            Text(
-                text = "Immobile: ${appointment.listing.id}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = lastMessage?.timestamp?.toDaysAgo() ?: "",
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
-        )
-    }
+//    val lastMessage = appointment.appointmentMessages.lastOrNull()
+//    val otherUser = if (appointment.agent.id == currentUserId) appointment.agent else appointment.user
+//
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .clickable { onClick(appointment) } // chiama la callback
+//            .padding(12.dp),
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//
+//        Box(
+//            modifier = Modifier
+//                .size(40.dp)
+//                .clip(CircleShape)
+//                .background(Color(0xFF006666)),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Text(
+//                text = otherUser.username.firstOrNull()?.uppercase() ?: "?",
+//                color = Color.White,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.width(12.dp))
+//
+//        Column(modifier = Modifier.weight(1f)) {
+//            Text(
+//                text = otherUser.username,
+//                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+//            )
+//            Text(
+//                text = "Immobile: ${appointment.listing.id}",
+//                style = MaterialTheme.typography.bodySmall,
+//                color = Color.Gray,
+//                maxLines = 1,
+//                overflow = TextOverflow.Ellipsis
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.width(8.dp))
+//
+//        Text(
+//            text = lastMessage?.timestamp?.toDaysAgo() ?: "",
+//            style = MaterialTheme.typography.bodySmall,
+//            color = Color.Gray
+//        )
+//    }
 }
 
 fun Long.toDaysAgo(): String {

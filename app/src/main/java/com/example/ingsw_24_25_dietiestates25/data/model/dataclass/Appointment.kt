@@ -8,7 +8,7 @@ import java.time.LocalDate
 @Serializable
 data class Appointment(
     val id: String,
-    val listing: PropertyListing,
+    val listing :ListingSummary,
     val user: User,
     val agent: User,
     @Serializable(with = LocalDateSerializer::class)
@@ -43,3 +43,4 @@ data class AppointmentSummary(
     val date: LocalDate,
     val status: Boolean?
 )
+
