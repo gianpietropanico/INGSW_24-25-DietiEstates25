@@ -214,10 +214,11 @@ fun AppNavHost(
             )
 
         }
+
         composable(NavigationItem.OfferChat.route){
             OfferChatScreen(
                 navController = navController,
-                inboxVm = inboxViewModel
+                inboxVm = inboxViewModel,
             )
         }
 

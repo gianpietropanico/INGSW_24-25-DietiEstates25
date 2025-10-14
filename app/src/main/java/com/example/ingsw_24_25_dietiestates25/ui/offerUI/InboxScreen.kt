@@ -1,6 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.ui.offerUI
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +42,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 
 
 @Composable
@@ -47,17 +54,15 @@ fun InboxScreen(
     navController : NavController,
     inboxVm : InboxViewModel
 ) {
-
     val user by inboxVm.user.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val state by inboxVm.state.collectAsState()
+
     // Stato per la tab selezionata
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        inboxVm.loadOffers()
-    }
+    LaunchedEffect(Unit) { inboxVm.loadOffers() }
 
     Scaffold(
         bottomBar = {
@@ -94,6 +99,7 @@ fun InboxScreen(
                             inboxVm.loadAppointments()
                         },
                         text = { Text("Appointment ${state.appointments.size}") }
+
                     )
                 }
 
@@ -101,11 +107,15 @@ fun InboxScreen(
                     if (selectedTabIndex == 0) {
 
                         items(state.offers) { offer ->
-                            OfferItem(offer, inboxVm, navController)
+                            OfferItem(
+                                offer,
+                                inboxVm,
+                                navController
+                            )
                             HorizontalDivider()
                         }
-                    } else {
 
+                    } else {
                         items(state.appointments) { appointment ->
                             AppointmentItem(
                                 appointment = appointment,
@@ -117,14 +127,12 @@ fun InboxScreen(
                             )
                             HorizontalDivider()
                         }
-
                     }
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun OfferItem(
@@ -133,10 +141,6 @@ fun OfferItem(
     navController: NavController
 ) {
     val user by inboxVm.user.collectAsState()
-    val lastMessage = offer.messages.lastOrNull()
-    val otherUser = if ( user!!.username == offer.agentName ) offer.buyerName else offer.agentName
-
-
 
     Row(
         modifier = Modifier
@@ -151,27 +155,60 @@ fun OfferItem(
 
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
+                .size(73.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .background(Color(0xFF006666)),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = otherUser.firstOrNull()?.uppercase() ?: "?",
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
+            if (!offer.listing.property.images.isEmpty()) {
+                Image(
+                    bitmap = bse64ToImageBitmap(offer.listing.property.images.first()),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RectangleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }else{
+                Image(
+                    painter = painterResource(id = R.drawable.default_house),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RectangleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+
         }
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f).height(65.dp)) {
+
             Text(
-                text = otherUser,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                text = offer.listing.title,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
+
             Text(
-                text = (if (offer.messages.last().senderName == user!!.username ) "You offered : " else "${offer.messages.last().senderName} offered $") + offer.messages.last().amount,
+                text = offer.listing.property.street ,
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            val currentUser = user!!.username == offer.messages.last().sender.username
+            Text(
+                text =  if(!currentUser) {
+                    offer.agent.username + " offered " + offer.messages.last().amount
+                } else{
+                    "You offered " + offer.messages.last().amount
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray,
                 maxLines = 1,
@@ -182,12 +219,13 @@ fun OfferItem(
         Spacer(modifier = Modifier.width(8.dp))
 
         Text(
-            text = lastMessage?.timestamp?.toDaysAgo() ?: "",
+            text = offer.messages.last().timestamp.toDaysAgo(), // dummy
             style = MaterialTheme.typography.bodySmall,
             color = Color.Gray
         )
     }
 }
+
 
 @Composable
 fun AppointmentItem(

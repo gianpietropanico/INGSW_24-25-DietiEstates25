@@ -68,6 +68,10 @@ open class UserSessionManager @Inject constructor() {
         }
     }
 
+    fun getCurrentUser(): User? {
+        return currentUser.value
+    }
+
     fun saveAgencyProfilePic(profilePicture: String) {
         val current = _currentAgency.value
         if (current != null) {

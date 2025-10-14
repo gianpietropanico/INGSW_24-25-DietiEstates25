@@ -47,7 +47,20 @@ class InboxViewModel  @Inject constructor (
         _state.update { it.copy(resultMessage = null, success = false, localError = false) }
     }
 
-    fun createOffer(propertyId: String , agentEmail : String, amount : String){
+    fun getCurrentUser ( ): User?{
+        return userSessionManager.getCurrentUser()
+    }
+
+    fun returnStatus(status: String): String {
+        return when (status) {
+            "PENDING" -> "In progress"
+            "ACCEPTED" -> "Accepted"
+            "REJECTED" -> "Declined"
+            else -> "UNKNOW STATE"
+        }
+    }
+
+    fun createOffer(listing: PropertyListing , agent : User, amount : Double){
 
         if ( user.value!!.role.name.contains("AGENT")) {
             handleResult(ApiResult.Unauthorized<String>("An agent cant propose an offer on listing"))
@@ -57,15 +70,12 @@ class InboxViewModel  @Inject constructor (
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            val agentName = offerRepo.getAgentNameByEmail(agentEmail)
-
             val result: ApiResult<Offer?> = offerRepo.makeOffer(
                 OfferRequest(
-                    propertyId = propertyId,
-                    buyerName = user.value!!.username,
-                    agentName = agentName.data!!,
-                    amount = amount.toDouble(),
-                    false
+                    property = listing,
+                    buyerUser = userSessionManager.getCurrentUser()!!,
+                    agent = agent,
+                    amount = amount
                 )
             )
 
@@ -76,7 +86,7 @@ class InboxViewModel  @Inject constructor (
             }
         }
     }
-    fun makeOffer( propertyId: String , agentEmail : String, amount : String) {
+    fun makeOffer( listing: PropertyListing , agent : User, amount : String) {
 
         if(amount.toDoubleOrNull() == null ){
             handleResult(ApiResult.UnknownError<String>("Devi inserire un numero"))
@@ -84,7 +94,7 @@ class InboxViewModel  @Inject constructor (
         }
 
         if( _state.value.createOffer ){
-            createOffer(propertyId, agentEmail, amount)
+            createOffer(listing, agent, amount.toDouble())
             _state.update { it.copy(createOffer = false) }
             return
         }
@@ -94,11 +104,10 @@ class InboxViewModel  @Inject constructor (
 
             val result: ApiResult<Offer?> = offerRepo.makeOffer(
                 OfferRequest(
-                    propertyId = propertyId,
-                    buyerName = state.value.selectedOffer!!.buyerName,
-                    agentName = user.value!!.username,
-                    amount = amount.toDouble(),
-                    isAgent = user.value!!.role.name.contains("AGENT")
+                    property = listing,
+                    buyerUser = userSessionManager.getCurrentUser()!!,
+                    agent = agent,
+                    amount = amount.toDouble()
                 )
             )
 
@@ -114,7 +123,7 @@ class InboxViewModel  @Inject constructor (
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            var result: ApiResult<List<AppointmentSummary>> = appointmentRepo.getAllAppointments()
+            val result: ApiResult<List<AppointmentSummary>> = appointmentRepo.getAllAppointments()
 
             if (result is ApiResult.Success) {
                 _state.update {
@@ -155,7 +164,7 @@ class InboxViewModel  @Inject constructor (
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            var result: ApiResult<List<Offer>> = offerRepo.getOffersByUser(user.value!!.username)
+            val result: ApiResult<List<Offer>> = offerRepo.getOffersByUser(user.value!!.username)
 
             if (result is ApiResult.Success) {
                 _state.update {
@@ -175,7 +184,7 @@ class InboxViewModel  @Inject constructor (
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            var result: ApiResult<List<Appointment>> = appointmentRepo.getAppointmentsByUser(user.value!!.id)
+            val result: ApiResult<List<Appointment>> = appointmentRepo.getAppointmentsByUser(user.value!!.id)
 
             if (result is ApiResult.Success) {
                 _state.update {
@@ -229,28 +238,19 @@ class InboxViewModel  @Inject constructor (
             Log.d("OFFERCHATINIT", "errore nell'inizializzazione di offerchat : offer = null")
         }else {
 
-            Log.d("OFFERCHATINIT", "INIZIALIZZO")
             viewModelScope.launch {
 
-                _state.update { it.copy(isLoading = true, resultMessage = null) }
+                val offerUser = if ( offer.buyerUser.username ==  user.value!!.username) offer.agent else offer.buyerUser
 
-                val result = propertyRepo.getListingById(offer.propertyId)
-
-                Log.d("SET SELECTED OFFER ", "${result.data}")
-
-                if (result is ApiResult.Success) {
-                    _state.update {
-                        it.copy(
-                            selectedOffer = offer,
-                            selectedProperty = result.data,
-                            offerMessages = offer.messages
-                        )
-                    }
-
-                    handleResult(ApiResult.Success(Unit, result.message))
-                } else {
-                    handleResult(result)
+                _state.update {
+                    it.copy(
+                        selectedOffer = offer,
+                        selectedProperty = offer.listing,
+                        offerMessages = offer.messages,
+                        selectedOfferUser = offerUser
+                    )
                 }
+
             }
         }
 

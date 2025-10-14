@@ -1,6 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo
 
 import android.util.Log
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
@@ -31,7 +32,6 @@ class PropertyListingRepositoryImpl @Inject constructor(
 ) : PropertyListingRepository {
 
     private val baseURL = "http://10.0.2.2:8080"
-    private val userSessionManager = sessionManager
 
     override suspend fun addPropertyListing(propertyListing: PropertyListing): ApiResult<String> {
         return try {

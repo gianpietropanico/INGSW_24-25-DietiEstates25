@@ -29,6 +29,7 @@ data class InboxState (
     val historyAppointments : List<AppointmentSummary> = emptyList(),
 
     var selectedOffer : Offer? = null,
+    var selectedOfferUser : User? = null,
     val selectedAppointment: Appointment? = null,
     val selectedProperty : PropertyListing? = null
 
