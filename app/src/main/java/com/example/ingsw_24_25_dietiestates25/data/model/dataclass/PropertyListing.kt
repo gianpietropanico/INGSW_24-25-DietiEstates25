@@ -24,7 +24,12 @@ enum class Type {
     SELL
 
 }
-
+@Serializable
+data class ListingSummary(
+    val id: String,
+    val title: String,
+    val property: PropertySummary,
+)
 fun PropertyListing.toLightCopy(): PropertyListing {
     return this.copy(
         id = this.id,

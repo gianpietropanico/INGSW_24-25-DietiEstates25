@@ -2,10 +2,10 @@ package com.example.ingsw_24_25_dietiestates25.ui.appointmentUI
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.ListingSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertySummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.WeatherInfo
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.toLightCopy
 import com.example.ingsw_24_25_dietiestates25.data.model.request.AppointmentRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.data.repository.appointmentRepo.AppointmentRepository
@@ -32,17 +32,54 @@ class AppointmentViewModel @Inject constructor(
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
     init {
+        //Quando l’utente è loggato, carica i suoi appuntamenti
         viewModelScope.launch {
             userSessionManager.currentUser.collect { user ->
                 _currentUser.value = user
+                if (user != null) loadAppointmentsForUser(user)
             }
         }
     }
 
+    //Seleziona data per prenotazione o visualizzazione
     fun selectDate(date: LocalDate?) {
         _state.update { it.copy(selectedDate = date) }
     }
 
+    //Carica tutti gli appuntamenti dell’utente corrente
+    fun loadAppointmentsForUser(user: User) = viewModelScope.launch {
+        _state.update { it.copy(isLoading = true) }
+
+        val result = appointmentRepo.getAppointmentsByUser(user.id)
+        when (result) {
+            is ApiResult.Success -> {
+                val appointments = result.data ?: emptyList()
+                val unavailableDates = appointments.map { it.date }.toSet() // ✅ Fix qui
+
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        appointments = appointments,
+                        unavailableDates = unavailableDates
+                    )
+                }
+            }
+
+            is ApiResult.UnknownError -> {
+                _state.update {
+                    it.copy(isLoading = false, resultMessage = result.message)
+                }
+            }
+
+            else -> {
+                _state.update {
+                    it.copy(isLoading = false, resultMessage = "Errore nel caricamento")
+                }
+            }
+        }
+    }
+
+    //Prenotazione appuntamento
     fun bookAppointment(listing: PropertyListing) = viewModelScope.launch {
         val user = _currentUser.value ?: return@launch
         val date = _state.value.selectedDate ?: return@launch
@@ -50,12 +87,20 @@ class AppointmentViewModel @Inject constructor(
 
         _state.update { it.copy(isLoading = true, resultMessage = null, success = false) }
 
-
+        val listingSummary = ListingSummary(
+            id = listing.id,
+            title = listing.title,
+            property = PropertySummary(
+                city = listing.property.city,
+                street = listing.property.street,
+                civicNumber = listing.property.civicNumber
+            )
+        )
 
         val appointmentRequest = AppointmentRequest(
-            listingId = listing.id,
-            userId = user.id,
-            agentId = agent.id,
+            listing = listingSummary,
+            user = user,
+            agent = agent,
             date = date.toString()
         )
 
@@ -64,6 +109,7 @@ class AppointmentViewModel @Inject constructor(
             _state.update {
                 it.copy(isLoading = false, success = true, resultMessage = "Appuntamento prenotato!")
             }
+            loadAppointmentsForUser(user) // aggiorna lista
         } else {
             _state.update {
                 it.copy(
@@ -74,8 +120,6 @@ class AppointmentViewModel @Inject constructor(
             }
         }
     }
-
-
 
     fun resetResultMessage() {
         _state.update { it.copy(resultMessage = null, success = false) }

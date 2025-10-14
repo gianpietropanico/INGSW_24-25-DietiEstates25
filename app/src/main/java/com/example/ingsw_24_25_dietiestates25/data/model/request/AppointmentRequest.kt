@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.data.model.request
 
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.ListingSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LocalDateSerializer
@@ -8,9 +9,9 @@ import java.time.LocalDate
 
 @Serializable
 data class AppointmentRequest(
-    val listingId: String,
-    val userId: String,
-    val agentId: String,
+    val listing: ListingSummary,
+    val user: User,
+    val agent: User,
     val date: String
 )
 

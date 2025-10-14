@@ -22,7 +22,7 @@ fun WeatherForecast(
                 .padding(horizontal = 16.dp)
         ) {
             Text(
-                text = "Today",
+                text = "Weather during the day",
                 fontSize = 20.sp,
                 color = Color.White
             )

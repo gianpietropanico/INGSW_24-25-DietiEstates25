@@ -17,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,27 +32,40 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import java.time.LocalDate
 import java.time.YearMonth
-import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentUI
 import java.time.format.TextStyle
 import java.util.Locale
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
 
 
 @Composable
 fun CheckListingAppointmentScreen(
-    appointments: List<AppointmentUI>
+    navController: NavController,
+    appointmentVM: AppointmentViewModel,
+    listingVm: ListingViewModel,
+    weatherVM: WeatherViewModel
 ) {
+    val state by appointmentVM.state.collectAsState()
+    val currentUser by appointmentVM.currentUser.collectAsState()
+
+
+    val listingState by listingVm.state.collectAsState()
+    val propertyListing = listingState.selectedListing ?: return
+
     val today = LocalDate.now()
     var selectedMonth by remember { mutableStateOf(YearMonth.from(today)) }
 
-    // Filtra appuntamenti solo per il mese selezionato
-    val appointmentsThisMonth = appointments.filter {
-        YearMonth.from(it.date) == selectedMonth
-    }
 
-    // Raggruppa per giorno
-    val appointmentsByDate = appointmentsThisMonth.groupBy { it.date }
+// Filtra appuntamenti solo per il mese selezionato E per il listing selezionato
+    val appointmentsThisMonth = state.appointments
+        .filter { YearMonth.from(LocalDate.parse(it.date.toString())) == selectedMonth }
+        .filter { it.listing.id == propertyListing.id }
+
+// Raggruppa per giorno
+    val appointmentsByDate = appointmentsThisMonth.groupBy { LocalDate.parse(it.date.toString()) }
 
     Column(modifier = Modifier.padding(8.dp)) {
         // Intestazione mese con navigazione
@@ -88,43 +102,53 @@ fun CheckListingAppointmentScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        // Calendario
+
+        // Calendario con giorni occupati
         CalendarWithEvents(
             month = selectedMonth,
-            occupiedDays = appointmentsByDate.keys,
+            occupiedDays = state.unavailableDates,
             appointments = appointmentsByDate,
-            onDaySelected = {}
+            isForBooking = false,
+            onDaySelected = { date ->
+                appointmentVM.selectDate(date)
+            }
         )
 
         Spacer(Modifier.height(12.dp))
 
-        // Lista appuntamenti
+
+        // Lista appuntamenti per il mese
         LazyColumn {
             appointmentsByDate.toSortedMap().forEach { (date, list) ->
                 item {
                     Text(
-                        text = "📅 ${date.dayOfMonth}/${date.monthValue}",
+                        text = "📅 ${date.dayOfMonth}/${date.monthValue}/${date.year}",
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
                 }
-                items(list) { app ->
-                    AppointmentCard(appointment = app)
+                items(list) { appointment ->
+                    AppointmentCard(appointment = appointment)
                 }
             }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        state.selectedDate?.let { day ->
+            val appointmentsForDay = appointmentsByDate[day] ?: emptyList()
+            AppointmentBottomSheet(
+                day = day,
+                appointmentsForDay = appointmentsForDay,
+                propertyListing = propertyListing,
+                weatherVM,
+                appointmentVM = appointmentVM,
+                isForBooking = false,
+                onDismiss = { appointmentVM.selectDate(null) }
+            )
         }
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun Preview_CheckListingAppointmentScreen() {
-    val today = LocalDate.now()
-    val fakeAppointments = listOf(
-        AppointmentUI(today, "10:00", "casa", "Mario Rossi", "listing1"),
-        AppointmentUI(today, "15:30", "casa", "Luca Bianchi", "listing1")
-    )
 
-    CheckListingAppointmentScreen(appointments = fakeAppointments)
-}

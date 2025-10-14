@@ -18,10 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
 
 @Composable
 fun AppointmentCard(
-    appointment: AppointmentUI,
+    appointment: Appointment,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -45,9 +46,10 @@ fun AppointmentCard(
             )
             Spacer(Modifier.width(12.dp))
             Column {
-                Text("Ora: ${appointment.time}", fontWeight = FontWeight.SemiBold)
-                Text("Proprietà: ${appointment.propertyTitle}")
-                Text("Prenotato da: ${appointment.bookedBy}")
+                Text("Date: ${appointment.date}", fontWeight = FontWeight.SemiBold)
+                Text("Proprerty: ${appointment.listing.title}")
+                Text("Address ${appointment.listing.property.city}, ${appointment.listing.property.street}, ${appointment.listing.property.civicNumber}")
+                Text("Booking by: ${appointment.user.name}")
             }
         }
     }

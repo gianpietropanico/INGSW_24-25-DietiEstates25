@@ -9,18 +9,23 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
+import javax.inject.Inject
 
-class WeatherApiClient {
+class WeatherApiClient @Inject constructor(){
 
     val daysAhead: Long = 7
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json()
+            json(
+                kotlinx.serialization.json.Json {
+                    ignoreUnknownKeys = true
+                }
+            )
         }
     }
 
     suspend fun getWeatherData(lat: Double, long: Double, date: LocalDate): WeatherDto {
-        val endDate = date.plusDays(daysAhead)
+
         return client.get("https://api.open-meteo.com/v1/forecast") {
             parameter("latitude", lat)
             parameter("longitude", long)
@@ -29,7 +34,7 @@ class WeatherApiClient {
                 "temperature_2m,weathercode,relativehumidity_2m,windspeed_10m,pressure_msl"
             )
             parameter("start_date", date.toString())
-            parameter("end_date", date.toString())
+            parameter("end_date", date.plusDays(daysAhead).toString())
         }.body()
     }
 }

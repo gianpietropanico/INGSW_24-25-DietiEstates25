@@ -65,6 +65,7 @@ dependencies {
 
 
     implementation(libs.generativeai)
+    implementation(libs.androidx.runtime)
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.1.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     //Per calendario
