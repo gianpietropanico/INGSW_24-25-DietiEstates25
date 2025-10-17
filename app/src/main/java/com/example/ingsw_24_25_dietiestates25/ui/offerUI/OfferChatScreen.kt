@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferMessage
@@ -147,24 +148,41 @@ fun OfferChatScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             if (!state.selectedOffer!!.listing.property.images.isEmpty()) {
-                                Image(
-                                    bitmap = bse64ToImageBitmap(state.selectedOffer!!.listing.property.images.first()),
-                                    contentDescription = "Profile Picture",
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(RectangleShape),
-                                    contentScale = ContentScale.Crop
+                                AsyncImage(
+                                    model = state.selectedOffer!!.listing.property.images.first(),
+                                    contentDescription = "Property Image",
+                                    modifier = Modifier.fillMaxSize().clip(RectangleShape),
+                                    contentScale = ContentScale.Crop,
+                                    placeholder = painterResource(id = R.drawable.default_house),
+                                    error = painterResource(id = R.drawable.default_house)
                                 )
-                            }else{
+                            } else {
                                 Image(
                                     painter = painterResource(id = R.drawable.default_house),
-                                    contentDescription = "Profile Picture",
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(RectangleShape),
+                                    contentDescription = "Default House",
+                                    modifier = Modifier.fillMaxSize().clip(RectangleShape),
                                     contentScale = ContentScale.Crop
                                 )
                             }
+//                            if (!state.selectedOffer!!.listing.property.images.isEmpty()) {
+//                                Image(
+//                                    bitmap = bse64ToImageBitmap(state.selectedOffer!!.listing.property.images.first()),
+//                                    contentDescription = "Profile Picture",
+//                                    modifier = Modifier
+//                                        .fillMaxSize()
+//                                        .clip(RectangleShape),
+//                                    contentScale = ContentScale.Crop
+//                                )
+//                            }else{
+//                                Image(
+//                                    painter = painterResource(id = R.drawable.default_house),
+//                                    contentDescription = "Profile Picture",
+//                                    modifier = Modifier
+//                                        .fillMaxSize()
+//                                        .clip(RectangleShape),
+//                                    contentScale = ContentScale.Crop
+//                                )
+//                            }
 
 
                         }

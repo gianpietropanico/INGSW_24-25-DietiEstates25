@@ -1,6 +1,8 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo
 
 
+import android.content.Context
+import android.net.Uri
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.request.PropertySearchRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
@@ -15,6 +17,7 @@ interface PropertyListingRepository {
 
     suspend fun getListingById( id:String ): ApiResult<PropertyListing>
     suspend fun searchWithFilters(request: PropertySearchRequest): Any
+
 
 }
 

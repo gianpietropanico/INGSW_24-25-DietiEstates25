@@ -29,12 +29,11 @@ enum class AppointmentStatus {
 @Serializable
 data class AppointmentMessage(
     val id: String,
-    val senderId: String,
+    val sender: User,
     val timestamp: Long,
     @Serializable(with = LocalDateSerializer::class)
     val date: LocalDate,
-    val accepted: Boolean? = null,
-    val text: String? = null
+    val status: AppointmentStatus?
 )
 
 @Serializable

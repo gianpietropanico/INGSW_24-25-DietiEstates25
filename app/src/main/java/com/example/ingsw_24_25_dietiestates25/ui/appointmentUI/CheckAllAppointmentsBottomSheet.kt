@@ -72,7 +72,7 @@ fun CheckAllAppointmentsBottomSheet(
 
 
 
-            Text("📌 Appuntamenti del giorno:", fontWeight = FontWeight.Bold)
+            Text("Appuntamenti del giorno:", fontWeight = FontWeight.Bold)
             if (appointmentsForDay.isEmpty()) {
                 Text("Nessun appuntamento")
             } else {

@@ -157,25 +157,42 @@ fun MakeOfferScreen(
                         .background(Color(0xFF006666)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (state.selectedProperty!!.property.images.isEmpty()) {
-                        Image(
-                            bitmap = bse64ToImageBitmap(state.selectedProperty!!.property.images.first()),
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RectangleShape),
-                            contentScale = ContentScale.Crop
+                    if (!state.selectedOffer!!.listing.property.images.isEmpty()) {
+                        AsyncImage(
+                            model = state.selectedOffer!!.listing.property.images.first(),
+                            contentDescription = "Property Image",
+                            modifier = Modifier.fillMaxSize().clip(RectangleShape),
+                            contentScale = ContentScale.Crop,
+                            placeholder = painterResource(id = R.drawable.default_house),
+                            error = painterResource(id = R.drawable.default_house)
                         )
-                    }else{
+                    } else {
                         Image(
                             painter = painterResource(id = R.drawable.default_house),
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RectangleShape),
+                            contentDescription = "Default House",
+                            modifier = Modifier.fillMaxSize().clip(RectangleShape),
                             contentScale = ContentScale.Crop
                         )
                     }
+//                    if (state.selectedProperty!!.property.images.isEmpty()) {
+//                        Image(
+//                            bitmap = bse64ToImageBitmap(state.selectedProperty!!.property.images.first()),
+//                            contentDescription = "Profile Picture",
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                                .clip(RectangleShape),
+//                            contentScale = ContentScale.Crop
+//                        )
+//                    }else{
+//                        Image(
+//                            painter = painterResource(id = R.drawable.default_house),
+//                            contentDescription = "Profile Picture",
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                                .clip(RectangleShape),
+//                            contentScale = ContentScale.Crop
+//                        )
+//                    }
 
 
                 }

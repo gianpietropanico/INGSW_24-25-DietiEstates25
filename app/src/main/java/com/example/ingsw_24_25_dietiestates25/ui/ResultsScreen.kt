@@ -70,6 +70,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
@@ -418,27 +419,48 @@ fun PropertyItem(
     ) {
         Column  {
 
-            val firstImageBitmap = safeDecodeBase64(propertyListing.property.images.firstOrNull())
+            //val firstImageBitmap = safeDecodeBase64(propertyListing.property.images.firstOrNull())
 
-            if (firstImageBitmap != null) {
-                Image(
-                    bitmap = firstImageBitmap,
-                    contentDescription = propertyListing.title,
-                    contentScale = ContentScale.Crop,
+            if (propertyListing.property.images.isNotEmpty()) {
+                AsyncImage(
+                    model = propertyListing.property.images.first(),
+                    contentDescription = "Property Image",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.default_house),
+                    error = painterResource(id = R.drawable.default_house)
                 )
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.default_house),
-                    contentDescription = "No image",
-                    contentScale = ContentScale.Crop,
+                    contentDescription = "Default House",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop
                 )
             }
+//            if (firstImageBitmap != null) {
+//                Image(
+//                    bitmap = firstImageBitmap,
+//                    contentDescription = propertyListing.title,
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(200.dp)
+//                )
+//            } else {
+//                Image(
+//                    painter = painterResource(id = R.drawable.default_house),
+//                    contentDescription = "No image",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(200.dp)
+//                )
+//            }
 
             Column(
                 modifier = Modifier

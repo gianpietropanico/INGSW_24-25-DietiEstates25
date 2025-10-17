@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,6 +39,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentStatus
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
@@ -58,16 +62,18 @@ fun CheckListingAppointmentScreen(
     val today = LocalDate.now()
     var selectedMonth by remember { mutableStateOf(YearMonth.from(today)) }
 
-
+    appointmentVM.loadAppointmentsForListing(propertyListing.id, isForBooking = false)
 // Filtra appuntamenti solo per il mese selezionato E per il listing selezionato
     val appointmentsThisMonth = state.appointments
         .filter { YearMonth.from(LocalDate.parse(it.date.toString())) == selectedMonth }
         .filter { it.listing.id == propertyListing.id }
+        .filter { it.status != AppointmentStatus.REJECTED }
 
 // Raggruppa per giorno
     val appointmentsByDate = appointmentsThisMonth.groupBy { LocalDate.parse(it.date.toString()) }
 
-    Column(modifier = Modifier.padding(8.dp)) {
+    Column(modifier = Modifier.padding(8.dp)
+        .padding(WindowInsets.statusBars.asPaddingValues())) {
         // Intestazione mese con navigazione
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -122,7 +128,7 @@ fun CheckListingAppointmentScreen(
             appointmentsByDate.toSortedMap().forEach { (date, list) ->
                 item {
                     Text(
-                        text = "📅 ${date.dayOfMonth}/${date.monthValue}/${date.year}",
+                        text = "${date.dayOfMonth}/${date.monthValue}/${date.year}",
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 4.dp)
                     )

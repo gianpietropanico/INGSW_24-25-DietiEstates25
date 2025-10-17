@@ -37,7 +37,8 @@ data class Property(
 data class PropertySummary(
     val city: String,
     val street: String,
-    val civicNumber: String
+    val civicNumber: String,
+    val images: List<String> = emptyList(),
 )
 
 
