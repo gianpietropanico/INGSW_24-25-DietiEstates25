@@ -69,19 +69,23 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 
 @Composable
 fun MakeOfferScreen(
     inboxVm : InboxViewModel,
     navController : NavController,
+    listingVm : ListingViewModel
+
 ) {
     var amount by remember { mutableStateOf( "")}
     var customPrice by remember { mutableStateOf(true) }
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedIndex by remember { mutableStateOf(2) }
     val state by inboxVm.state.collectAsState()
     val previousRoute = navController.previousBackStackEntry?.destination?.route
-    var showHistoryOffers by remember { mutableStateOf(true) }
+    var showHistoryOffers by remember { mutableStateOf(false) }
+    var isPermittedAmount by remember { mutableStateOf(if (amount.isNotEmpty()) inboxVm.checkPrice(amount.toDouble()) else true) }
 
     LaunchedEffect(state.created) {
         if (state.created  ) {
@@ -140,12 +144,12 @@ fun MakeOfferScreen(
         ) {
 
 
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable( onClick = {
-                        navController.navigate(NavigationItem.InboxScreen.route)
+                        listingVm.setSelectedListing(state.selectedProperty!!)
+                        navController.navigate(NavigationItem.ListingDetail.route)
                     }),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -411,6 +415,7 @@ fun MakeOfferScreen(
 
                         Box(modifier = Modifier.fillMaxWidth()) {
 
+                            if(amount.isEmpty())
                             Text(
                                 text = "Insert your price",
                                 style = MaterialTheme.typography.labelLarge.copy(
@@ -422,7 +427,12 @@ fun MakeOfferScreen(
 
                             BasicTextField(
                                 value = amount,
-                                onValueChange = { amount = it },
+                                onValueChange = { newValue ->
+                                    amount = newValue
+                                    isPermittedAmount = newValue.toDoubleOrNull()?.let {
+                                        inboxVm.checkPrice(it)
+                                    } ?: false
+                                },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
                                 textStyle = TextStyle(
@@ -441,7 +451,18 @@ fun MakeOfferScreen(
                         color = bluPerchEcipiace,
                         modifier = Modifier.fillMaxWidth(1f)
                     )
+
+                    if(!isPermittedAmount && amount.isNotEmpty())
+                    Text(
+                        text =  "You have to insert a mininum amount of ${inboxVm.calculateDiscount(state.selectedProperty!!.price.toDouble(), 10)}",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 14.sp,
+                            color = DarkRed
+                        )
+                    )
                 }
+
+
 
                 Spacer(modifier = Modifier.width(8.dp))
 
@@ -459,7 +480,7 @@ fun MakeOfferScreen(
                 .align(Alignment.CenterHorizontally)
                 .clip(RoundedCornerShape(8.dp))
                 .background(
-                    if (isEnabled) AscientGradient
+                    if (isEnabled || isPermittedAmount ) AscientGradient
                     else Brush.linearGradient(listOf(Color.LightGray, Color.LightGray))
                 )
                 .clickable(enabled = isEnabled) {
@@ -473,11 +494,12 @@ fun MakeOfferScreen(
                 },
             contentAlignment = Alignment.Center
         ) {
+
             Text(
                 text = if (displayAmount.isNotEmpty()) "Offer $displayAmount" else "Offer",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isEnabled) Color.White else Color.DarkGray
+                color = if (isEnabled ) Color.White else Color.DarkGray
             )
         }
 
