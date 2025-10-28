@@ -267,7 +267,9 @@ fun OfferChatScreen(
                             message = message,
                             currentUser = currentUser,
                             offerUser = offerUser,
-                            offer = state.selectedOffer!!
+                            offer = state.selectedOffer!!,
+                            navController = navController,
+                            inboxVm = inboxVm
                         )
                     }
 
@@ -348,7 +350,7 @@ fun OfferChatScreen(
                                             .height(40.dp)
                                             .clip(RoundedCornerShape(4.dp))
                                             .background(AscientGradient)
-                                            .clickable { /* inboxVm.acceptOffer(true) TODO */ },
+                                            .clickable { inboxVm.acceptOffer(true) },
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
@@ -380,8 +382,9 @@ fun OfferChatScreen(
         message : OfferMessage,
         currentUser : User,
         offerUser : User,
-        offer: Offer
-        //inboxVm: InboxViewModel
+        offer: Offer,
+        inboxVm: InboxViewModel,
+        navController : NavController
     ) {
         val isMine = message.sender.username == currentUser.username
         val bubbleColor = if (isMine) Color(0xFFF2F2F2) else Color.White
@@ -494,7 +497,7 @@ fun OfferChatScreen(
                                     .height(30.dp)
                                     .clip(buttonShape)
                                     .background(AscientGradient)
-                                    .clickable { /* inboxVm.acceptOffer(true) TODO */ },
+                                    .clickable { inboxVm.acceptOffer(true) },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -519,7 +522,7 @@ fun OfferChatScreen(
                                         .height(30.dp)
                                         .clip(buttonShape)
                                         .border(1.dp, AscientGradient, buttonShape)
-                                        .clickable { /* inboxVm.declineOffer(true) TODO */ },
+                                        .clickable { inboxVm.acceptOffer(false) },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -537,7 +540,7 @@ fun OfferChatScreen(
                                         .height(30.dp)
                                         .clip(buttonShape)
                                         .border(1.dp, AscientGradient, buttonShape)
-                                        .clickable { /* inboxVm.makeOffer(false) TODO */ },
+                                        .clickable { navController.navigate(NavigationItem.MakeOffer.route)  },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(

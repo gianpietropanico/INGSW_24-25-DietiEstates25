@@ -230,7 +230,8 @@ fun AppNavHost(
         composable(NavigationItem.MakeOffer.route){
             MakeOfferScreen(
                 navController = navController,
-                inboxVm = inboxViewModel
+                inboxVm = inboxViewModel,
+                listingVm = listingViewModel
             )
         }
 

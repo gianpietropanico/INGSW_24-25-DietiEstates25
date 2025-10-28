@@ -74,10 +74,9 @@ class InboxViewModel  @Inject constructor (
     }
 
     fun checkPrice( price : Double): Boolean{
-        val discount = calculateDiscount(price , 10)
+        val discount = calculateDiscount(state.value.selectedProperty!!.price.toDouble() , 10)
 
         if( price < discount){
-            _state.update { it.copy(isLoading = false, resultMessage = "The limit of the discount is 10% taht is $discount  €",success = false, localError = true) }
             false
         }else{
             true
