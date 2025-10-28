@@ -38,10 +38,7 @@ import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
-import com.example.ingsw_24_25_dietiestates25.ui.theme.cardBackground
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
-import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
-import com.example.ingsw_24_25_dietiestates25.ui.utils.safeDecodeBase64
 
 @Composable
 fun ListingCard(
@@ -58,7 +55,6 @@ fun ListingCard(
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
-            // --- Immagine + testo affiancati ---
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -94,7 +90,6 @@ fun ListingCard(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                // --- Testi descrittivi ---
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -123,14 +118,12 @@ fun ListingCard(
                 }
             }
 
-            // --- Divider sottile ---
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 thickness = DividerDefaults.Thickness,
                 color = DividerDefaults.color
             )
 
-            // --- Pulsanti azione ---
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
