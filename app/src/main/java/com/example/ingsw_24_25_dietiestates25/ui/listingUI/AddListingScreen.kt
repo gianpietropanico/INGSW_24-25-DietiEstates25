@@ -128,6 +128,7 @@ fun AddPropertyListingScreen(
     val cap = formState.cap
     val country = formState.country
 
+    val maxImages : Int = 2
     // Stato della camera della mappa
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -414,7 +415,7 @@ fun AddPropertyListingScreen(
             }
 
 
-            if (imageUris.size < 2) {
+            if (imageUris.size < maxImages) {
                 IconButton(
                     onClick = pickImage,
                     modifier = Modifier

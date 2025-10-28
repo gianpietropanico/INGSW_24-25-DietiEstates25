@@ -6,12 +6,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +55,10 @@ fun BookAppointmentScreen(
     val today = LocalDate.now()
     var selectedMonth by remember { mutableStateOf(YearMonth.from(today)) }
 
+    LaunchedEffect(propertyListing.id) {
+        appointmentVM.loadAppointmentsForListing(propertyListing.id, isForBooking = true)
+    }
+
 // Filtra appuntamenti solo per il mese selezionato E per il listing selezionato
     val appointmentsThisMonth = state.appointments
         .filter { YearMonth.from(LocalDate.parse(it.date.toString())) == selectedMonth }
@@ -60,7 +68,8 @@ fun BookAppointmentScreen(
     val appointmentsByDate = appointmentsThisMonth.groupBy { LocalDate.parse(it.date.toString()) }
 
 
-    Column(modifier = Modifier.padding(8.dp)) {
+    Column(modifier = Modifier.padding(8.dp)
+        .padding(WindowInsets.statusBars.asPaddingValues())) {
 
         // Header mese
         Row(

@@ -49,19 +49,21 @@ class AppointmentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAppointmentsByListing(listingId: String): ApiResult<List<Appointment>> {
+    override suspend fun getAppointmentsByListing(listingId: String, userId: String?): ApiResult<List<Appointment>> {
         return try {
             val response = httpClient.get("$baseURL/appointments/listingappointments") {
-                url { parameters.append("listingId", listingId) }
+                url {
+                    parameters.append("listingId", listingId)
+                    userId?.let { parameters.append("userId", it) } // aggiunge userId solo se non nullo
+                }
                 accept(ContentType.Application.Json)
             }
 
-            return when (response.status) {
+            when (response.status) {
                 HttpStatusCode.OK -> {
                     val body: List<Appointment> = response.body()
                     ApiResult.Success(body)
                 }
-
                 else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
             }
         } catch (e: Exception) {
@@ -125,7 +127,7 @@ class AppointmentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun rejectAppointment(appointmentId: String): ApiResult<Unit> {
+    override suspend fun declineAppointment(appointmentId: String): ApiResult<Unit> {
         return try {
             val response = httpClient.post("$baseURL/appointments/decline") {
                 url { parameters.append("appointmentId", appointmentId) }

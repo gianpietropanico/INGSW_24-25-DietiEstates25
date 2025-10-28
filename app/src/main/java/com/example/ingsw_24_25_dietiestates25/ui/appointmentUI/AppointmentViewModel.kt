@@ -41,6 +41,7 @@ class AppointmentViewModel @Inject constructor(
         }
     }
 
+
     //Seleziona data per prenotazione o visualizzazione
     fun selectDate(date: LocalDate?) {
         _state.update { it.copy(selectedDate = date) }
@@ -93,7 +94,8 @@ class AppointmentViewModel @Inject constructor(
             property = PropertySummary(
                 city = listing.property.city,
                 street = listing.property.street,
-                civicNumber = listing.property.civicNumber
+                civicNumber = listing.property.civicNumber,
+                images = listing.property.images
             )
         )
 
@@ -120,7 +122,35 @@ class AppointmentViewModel @Inject constructor(
             }
         }
     }
+    fun loadAppointmentsForListing(listingId: String, isForBooking: Boolean) = viewModelScope.launch {
+        _state.update { it.copy(isLoading = true) }
 
+        val userId = if (!isForBooking) _currentUser.value?.id else null
+        val result = appointmentRepo.getAppointmentsByListing(listingId, userId)
+
+        when (result) {
+            is ApiResult.Success -> {
+                val appointments = result.data ?: emptyList()
+                val unavailableDates = appointments.map { it.date }.toSet()
+
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        appointments = appointments,
+                        unavailableDates = unavailableDates
+                    )
+                }
+            }
+
+            is ApiResult.UnknownError -> {
+                _state.update { it.copy(isLoading = false, resultMessage = result.message) }
+            }
+
+            else -> {
+                _state.update { it.copy(isLoading = false, resultMessage = "Errore nel caricamento") }
+            }
+        }
+    }
     fun resetResultMessage() {
         _state.update { it.copy(resultMessage = null, success = false) }
     }

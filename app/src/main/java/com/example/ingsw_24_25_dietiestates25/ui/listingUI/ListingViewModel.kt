@@ -71,18 +71,23 @@ class ListingViewModel @Inject constructor(
             _state.update { it.copy(uiState = ListingState.Loading) }
 
             try {
-                val property = _state.value.formState.toProperty()
-                val listing = _state.value.formState.toPropertyListing(agent, property)
+//                val property = _state.value.formState.toProperty()
+//                val listing = _state.value.formState.toPropertyListing(agent, property)
+//
+//                val base64Images =
+//                    imageUris.mapNotNull { uri -> uriToBase64WithSizeLimit(context, uri) }
 
-                val base64Images =
-                    imageUris.mapNotNull { uri -> uriToBase64WithSizeLimit(context, uri) }
+                val uploadedUrls = uploadImagesSequentially(imageUris, context)
+
+                val property = _state.value.formState.toProperty().copy(images = uploadedUrls)
+                val listing = _state.value.formState.toPropertyListing(agent, property)
 
                 val result = listingsRepo.addPropertyListing(listing)
 
                 if (result is ApiResult.Success && result.data != null) {
-                    base64Images.forEach { base64 ->
-                        imageRepo.insertHouseImages(result.data, base64Images)
-                    }
+//                    base64Images.forEach { base64 ->
+//                        imageRepo.insertHouseImages(result.data, base64Images)
+//                    }
                     _state.update {
                         it.copy(
                             formState = ListingFormState(),
@@ -113,6 +118,16 @@ class ListingViewModel @Inject constructor(
             }
         }
 
+    suspend fun uploadImagesSequentially(imageUris: List<Uri>, context: Context): List<String> {
+        val uploadedUrls = mutableListOf<String>()
+
+        for (uri in imageUris) {
+            val url = imageRepo.uploadImage(uri, context) // upload di un singolo file
+            if (url != null) uploadedUrls.add(url)
+        }
+
+        return uploadedUrls
+    }
     fun updateAddressFromCoordinates(context: Context, lat: Double, lng: Double) =
         viewModelScope.launch(Dispatchers.IO) {
             val geocoder = Geocoder(context, Locale.getDefault())

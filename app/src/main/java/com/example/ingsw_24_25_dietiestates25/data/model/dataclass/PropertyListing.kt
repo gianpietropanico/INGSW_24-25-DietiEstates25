@@ -46,7 +46,7 @@ fun PropertyListing.toLightCopy(): PropertyListing {
             latitude = this.property.latitude,
             longitude = this.property.longitude,
             pois = this.property.pois ?: emptyList(),
-            images = emptyList(), // 🔹 foto rimosse
+            images = emptyList(),
             numberOfRooms = this.property.numberOfRooms,
             numberOfBathrooms = this.property.numberOfBathrooms,
             size = this.property.size,

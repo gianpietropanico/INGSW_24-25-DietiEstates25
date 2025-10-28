@@ -51,8 +51,8 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 
 @Composable
 fun InboxScreen(
-    navController : NavController,
-    inboxVm : InboxViewModel
+    navController: NavController,
+    inboxVm: InboxViewModel
 ) {
     val user by inboxVm.user.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -81,7 +81,9 @@ fun InboxScreen(
         }
     ) { paddingValues ->
 
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             Column {
                 TabRow(selectedTabIndex = selectedTabIndex) {
                     Tab(
@@ -169,7 +171,7 @@ fun OfferItem(
                         .clip(RectangleShape),
                     contentScale = ContentScale.Crop
                 )
-            }else{
+            } else {
                 Image(
                     painter = painterResource(id = R.drawable.default_house),
                     contentDescription = "Profile Picture",
@@ -185,7 +187,9 @@ fun OfferItem(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Column(modifier = Modifier.weight(1f).height(65.dp)) {
+        Column(modifier = Modifier
+            .weight(1f)
+            .height(65.dp)) {
 
             Text(
                 text = offer.listing.title,
@@ -195,7 +199,7 @@ fun OfferItem(
             )
 
             Text(
-                text = offer.listing.property.street ,
+                text = offer.listing.property.street,
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -204,9 +208,9 @@ fun OfferItem(
 
             val currentUser = user!!.username == offer.messages.last().sender.username
             Text(
-                text =  if(!currentUser) {
+                text = if (!currentUser) {
                     offer.agent.username + " offered " + offer.messages.last().amount
-                } else{
+                } else {
                     "You offered " + offer.messages.last().amount
                 },
                 style = MaterialTheme.typography.bodySmall,
@@ -231,57 +235,72 @@ fun OfferItem(
 fun AppointmentItem(
     appointment: Appointment,
     currentUserId: String,
-    onClick: (Appointment) -> Unit // callback
+    onClick: (Appointment) -> Unit
 ) {
-//    val lastMessage = appointment.appointmentMessages.lastOrNull()
-//    val otherUser = if (appointment.agent.id == currentUserId) appointment.agent else appointment.user
-//
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clickable { onClick(appointment) } // chiama la callback
-//            .padding(12.dp),
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//
-//        Box(
-//            modifier = Modifier
-//                .size(40.dp)
-//                .clip(CircleShape)
-//                .background(Color(0xFF006666)),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Text(
-//                text = otherUser.username.firstOrNull()?.uppercase() ?: "?",
-//                color = Color.White,
-//                fontWeight = FontWeight.Bold
-//            )
-//        }
-//
-//        Spacer(modifier = Modifier.width(12.dp))
-//
-//        Column(modifier = Modifier.weight(1f)) {
-//            Text(
-//                text = otherUser.username,
-//                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-//            )
-//            Text(
-//                text = "Immobile: ${appointment.listing.id}",
-//                style = MaterialTheme.typography.bodySmall,
-//                color = Color.Gray,
-//                maxLines = 1,
-//                overflow = TextOverflow.Ellipsis
-//            )
-//        }
-//
-//        Spacer(modifier = Modifier.width(8.dp))
-//
-//        Text(
-//            text = lastMessage?.timestamp?.toDaysAgo() ?: "",
-//            style = MaterialTheme.typography.bodySmall,
-//            color = Color.Gray
-//        )
-//    }
+    val otherUser =
+        if (appointment.agent.id == currentUserId) appointment.user else appointment.agent
+    val lastMessage = appointment.appointmentMessages.lastOrNull()
+    val statusColor = when (appointment.status.name) {
+        "ACCEPTED" -> Color(0xFF2E7D32) // verde
+        "REJECTED" -> Color(0xFFC62828) // rosso
+        else -> Color(0xFF757575)       // grigio
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick(appointment) }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        // Avatar circolare con iniziale utente
+        Box(
+            modifier = Modifier
+                .size(50.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF006666)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = otherUser.username.firstOrNull()?.uppercase() ?: "?",
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = otherUser.username,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            Text(
+                text = appointment.listing.title,
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Gray
+            )
+            Text(
+                text = "Stato: ${
+                    appointment.status.name.lowercase().replaceFirstChar { it.uppercase() }
+                }",
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                color = statusColor
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = lastMessage?.timestamp?.toDaysAgo() ?: "",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+    }
+
 }
 
 fun Long.toDaysAgo(): String {

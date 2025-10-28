@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
@@ -125,17 +128,18 @@ fun ListingDetailContent(
 
             Spacer(Modifier.height(12.dp))
             Text("Images:", fontWeight = FontWeight.Bold)
-            Row {
-                propertyListing.property.images.forEach { imageUri ->
-                    Image(
-                        bitmap = bse64ToImageBitmap(imageUri),
-                        contentDescription = null,
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(propertyListing.property.images) { imageUrl ->
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Immagine immobile",
                         modifier = Modifier
                             .size(100.dp)
                             .clip(RoundedCornerShape(8.dp)),
                         contentScale = ContentScale.Crop
                     )
-                    Spacer(Modifier.width(8.dp))
                 }
             }
 

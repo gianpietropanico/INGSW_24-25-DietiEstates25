@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
@@ -45,7 +47,7 @@ fun ListingCard(
     propertyListing: PropertyListing,
     onClick: () -> Unit
 ) {
-    val firstImageBitmap = safeDecodeBase64(propertyListing.property.images.firstOrNull())
+    //val firstImageBitmap = safeDecodeBase64(propertyListing.property.images.firstOrNull())
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -63,23 +65,21 @@ fun ListingCard(
             Row(modifier = Modifier.height(120.dp)) {
                 // Primo tentativo di immagine Base64 sicuro
 
-                if (firstImageBitmap != null) {
-                    Image(
-                        bitmap = firstImageBitmap,
-                        contentDescription = propertyListing.title,
+                if (propertyListing.property.images.isNotEmpty()) {
+                    AsyncImage(
+                        model = propertyListing.property.images.first(),
+                        contentDescription = "Property Image",
+                        modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .width(150.dp)
-                            .fillMaxHeight()
+                        placeholder = painterResource(id = R.drawable.default_house),
+                        error = painterResource(id = R.drawable.default_house)
                     )
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.default_house),
-                        contentDescription = propertyListing.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .width(150.dp)
-                            .fillMaxHeight()
+                        contentDescription = "Default House",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
                 }
 

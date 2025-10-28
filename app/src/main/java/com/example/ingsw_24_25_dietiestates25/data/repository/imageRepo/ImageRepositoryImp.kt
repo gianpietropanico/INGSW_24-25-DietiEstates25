@@ -1,4 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo
+import android.content.Context
+import android.net.Uri
 import io.ktor.client.request.accept
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
@@ -16,7 +18,12 @@ import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.data.model.request.ImageRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
 
@@ -165,5 +172,47 @@ class ImageRepositoryImpl @Inject constructor(
             ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
         }
     }
+
+    override suspend fun uploadImage(uri: Uri, context: Context): String? {
+        return try {
+            val response: List<String> = uploadImages(listOf(uri), context)
+            response.firstOrNull()
+        } catch (e: Exception) {
+            Log.e("UploadImage", "Errore upload immagine", e)
+            null
+        }
+    }
+    override suspend fun uploadImages(imageUris: List<Uri>, context: Context): List<String> {
+        val urls = mutableListOf<String>()
+
+        for (uri in imageUris) {
+            val fileBytes = context.contentResolver.openInputStream(uri)?.readBytes() ?: continue
+            val fileName = uri.lastPathSegment ?: "image.jpg"
+
+            try {
+                val response = httpClient.submitFormWithBinaryData(
+                    url = "$baseURL/images/upload",
+                    formData = formData {
+                        append("file", fileBytes, Headers.build {
+                            append(HttpHeaders.ContentDisposition, "filename=$fileName")
+                        })
+                    }
+                )
+
+                if (response.status == HttpStatusCode.OK) {
+                    val uploaded: List<String> = response.body()
+                    urls.addAll(uploaded)
+                } else {
+                    val err = response.bodyAsText()
+                    throw Exception("Errore upload immagine: $err")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        return urls
+    }
+
 
 }

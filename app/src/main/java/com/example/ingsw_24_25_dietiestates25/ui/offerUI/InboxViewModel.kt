@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentMessage
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentStatus
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferMessage
@@ -278,20 +279,14 @@ class InboxViewModel  @Inject constructor (
     fun acceptAppointment(appointmentId: String) {
         viewModelScope.launch {
             try {
-                // Chiamata al backend tramite repository che restituisce ApiResult<Unit>
                 val result: ApiResult<Unit> = appointmentRepo.acceptAppointment(appointmentId)
-
-                // Gestione centralizzata dell'esito
                 handleResult(result)
 
                 if (result is ApiResult.Success) {
-                    // Aggiorna lo stato locale solo se il backend ha risposto con successo
                     _state.update { current ->
                         current.copy(
                             selectedAppointment = current.selectedAppointment?.copy(
-                                appointmentMessages = current.selectedAppointment.appointmentMessages.map {
-                                    if (it.id == appointmentId) it.copy(accepted = true) else it
-                                }
+                                status = AppointmentStatus.ACCEPTED
                             )
                         )
                     }
@@ -303,20 +298,17 @@ class InboxViewModel  @Inject constructor (
         }
     }
 
-    fun rejectAppointment(appointmentId: String) {
+    fun declineAppointment(appointmentId: String) {
         viewModelScope.launch {
             try {
-                val result: ApiResult<Unit> = appointmentRepo.rejectAppointment(appointmentId)
-
+                val result: ApiResult<Unit> = appointmentRepo.declineAppointment(appointmentId)
                 handleResult(result)
 
                 if (result is ApiResult.Success) {
                     _state.update { current ->
                         current.copy(
                             selectedAppointment = current.selectedAppointment?.copy(
-                                appointmentMessages = current.selectedAppointment.appointmentMessages.map {
-                                    if (it.id == appointmentId) it.copy(accepted = false) else it
-                                }
+                                status = AppointmentStatus.REJECTED
                             )
                         )
                     }
@@ -328,16 +320,16 @@ class InboxViewModel  @Inject constructor (
         }
     }
 
-    fun bookNewAppointment(propertyId: String) {
-        viewModelScope.launch {
-            try {
-                // TODO: aprire schermata calendario o fare chiamata backend
-                println("Prenotato nuovo appuntamento per propertyId = $propertyId")
-            } catch (e: Exception) {
-                println("Errore bookNewAppointment: ${e.message}")
-            }
-        }
-    }
+//    fun bookNewAppointment(propertyId: String) {
+//        viewModelScope.launch {
+//            try {
+//                // TODO: aprire schermata calendario o fare chiamata backend
+//                println("Prenotato nuovo appuntamento per propertyId = $propertyId")
+//            } catch (e: Exception) {
+//                println("Errore bookNewAppointment: ${e.message}")
+//            }
+//        }
+//    }
 
     fun setDialogHistoryOffer (showDialog : Boolean){
 
