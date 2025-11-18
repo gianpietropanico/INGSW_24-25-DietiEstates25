@@ -157,8 +157,7 @@ fun AppNavHost(
         composable(NavigationItem.AddPropertyListings.route){
             AddPropertyListingScreen(
                 listingVm = listingViewModel,
-                navController = navController,
-
+                navController = navController
             )
         }
 

@@ -43,7 +43,11 @@ fun ListingDetailScreen(
         }
 
         is ListingState.Success -> {
-                ListingDetailContent( navController = navController, listingVm = listingVm, inboxVm = inboxVm )
+                ListingDetailContent(
+                    navController = navController,
+                    listingVm = listingVm,
+                    inboxVm = inboxVm
+                )
         }
 
         is ListingState.Error -> {
@@ -55,7 +59,11 @@ fun ListingDetailScreen(
         }
 
         is ListingState.Idle -> {
-            ListingDetailContent( navController = navController, listingVm = listingVm, inboxVm = inboxVm )
+            ListingDetailContent(
+                navController = navController,
+                listingVm = listingVm,
+                inboxVm = inboxVm
+            )
         }
     }
 }

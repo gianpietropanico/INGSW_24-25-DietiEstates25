@@ -4,7 +4,7 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
 
 data class ListingFormState(
-    val title: String = "",
+    var title: String = "",
     val type: Type = Type.RENT,
     val price: String = "",
     val city: String = "",

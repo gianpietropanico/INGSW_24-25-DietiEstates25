@@ -62,10 +62,18 @@ android {
 
 dependencies {
 
+    // Pager moderno (ufficiale Jetpack Compose)
+    implementation("androidx.compose.foundation:foundation:1.6.0")
 
+    // ✅ Indicatori dei pager (Accompanist)
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.34.0")
 
     implementation(libs.generativeai)
     implementation(libs.androidx.runtime)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.runtime)
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.1.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     //Per calendario

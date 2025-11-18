@@ -1,5 +1,10 @@
 package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,18 +27,39 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.IosShare
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.MyLocation
+import androidx.compose.material.icons.outlined.PinDrop
+import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,27 +67,42 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
+import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
+import com.example.ingsw_24_25_dietiestates25.ui.utils.AgentCard
 
-import com.example.ingsw_24_25_dietiestates25.ui.utils.Chip
+
+import com.example.ingsw_24_25_dietiestates25.ui.utils.InfoHouse
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiColors
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiIcons
+import com.example.ingsw_24_25_dietiestates25.ui.utils.NearbyPlacesSection
 import com.example.ingsw_24_25_dietiestates25.ui.utils.PropertyFacilitiesChips
 
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 import com.example.ingsw_24_25_dietiestates25.ui.utils.getPoiBitmapDescriptor
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 
@@ -82,18 +123,14 @@ fun ListingDetailContent(
     val context = LocalContext.current
     var selectedPoi by remember { mutableStateOf<POI?>(null) }
     val mapHeight = 250.dp
+    val state by inboxVm.state.collectAsState()
 
-    val currentUser by listingVm.currentUser.collectAsState()
-    val currentUserRole = currentUser?.role
-
-    val state by listingVm.state.collectAsState()
-    val propertyListing = state.selectedListing
     val mapProperties = MapUtils.defaultMapProperties(context)
     val uiSettings = MapUtils.defaultUiSettings
     // LatLng della proprietà
     val latLng = LatLng(
-        propertyListing!!.property.latitude,
-        propertyListing!!.property.longitude
+        state.selectedProperty?.property!!.latitude,
+        state.selectedProperty?.property!!.longitude
     )
 
     // Stato della camera
@@ -101,215 +138,419 @@ fun ListingDetailContent(
         position = CameraPosition.fromLatLngZoom(latLng, 15f)
     }
 
+
     Box(modifier = Modifier.fillMaxSize()) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(WindowInsets.statusBars.asPaddingValues())
-                .padding(16.dp)
-                .verticalScroll(scrollState)
-                .padding(bottom = 100.dp)
-        ) {
-
-            // --- INFO BASE DELLA PROPRIETÀ ---
-            Text(propertyListing.title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-            Text("Type: ${propertyListing.type}")
-            Text("Price: ${propertyListing.price}")
-            Text("Rooms: ${propertyListing.property.numberOfRooms}")
-            Text("Bathrooms: ${propertyListing.property.numberOfBathrooms}")
-            Text("Size: ${propertyListing.property.size} m²")
-            Text("Energy Class: ${propertyListing.property.energyClass}")
-            Text("Address: ${propertyListing.property.street} ${propertyListing.property.civicNumber}, ${propertyListing.property.city}, ${propertyListing.property.province}, ${propertyListing.property.cap}, ${propertyListing.property.country}")
-
-            Spacer(Modifier.height(12.dp))
-            Text("Description:", fontWeight = FontWeight.Bold)
-            Text(propertyListing.property.description)
-
-            Spacer(Modifier.height(12.dp))
-            Text("Images:", fontWeight = FontWeight.Bold)
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(propertyListing.property.images) { imageUrl ->
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = "Immagine immobile",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            // --- MAPPA ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(mapHeight)
-            ) {
-                GoogleMap(
-                    modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState,
-                    uiSettings = uiSettings,
-                    properties = mapProperties,
-                    onMapClick = { selectedPoi = null }
-                ) {
-                    Marker(state = MarkerState(position = latLng), title = propertyListing.title)
-                    propertyListing.property.pois.forEach { poi ->
-                        Marker(
-                            state = MarkerState(LatLng(poi.lat, poi.lon)),
-                            icon = context.getPoiBitmapDescriptor(poi.type, poiIcons, poiColors),
-                            onClick = {
-                                selectedPoi = poi
-                                true
-                            }
-                        )
-                    }
-                }
-
-                // InfoBox POI
-                selectedPoi?.let { poi ->
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.White)
-                            .padding(12.dp)
-                            .zIndex(1f)
-                    ) {
-                        Column {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(poi.name, fontWeight = FontWeight.Bold)
-                                Text(
-                                    "X",
-                                    color = Color.Red,
-                                    modifier = Modifier.clickable { selectedPoi = null })
-                            }
-                            Spacer(Modifier.height(4.dp))
-                            Text(poi.type)
-                            Text("${poi.distance.toInt()} m away")
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            // --- FACILITIES ---
-            Text("Facilities:", fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-            PropertyFacilitiesChips(propertyListing.property)
-
-            Spacer(Modifier.height(12.dp))
-
-            // --- NEARBY PLACES ---
-            Text("Nearby Places:", fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                propertyListing.property.pois.forEach { poi ->
-                    Chip("${poi.name} (${poi.type}, ${poi.distance.toInt()} m)")
-                }
-            }
-            Spacer(Modifier.height(50.dp))
-        }
-
-
-        // --- BOTTOM BAR PERSONALIZZATA ---
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(16.dp)
+                .verticalScroll(scrollState),
+                //.padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(50))
-                    .border(1.dp, Color.Black, RoundedCornerShape(50))
-                    .background(Color.LightGray),
+                    .padding(top = 50.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (currentUserRole == Role.AGENT_USER) {
-                    // Pulsanti per agenti
-                    Button(
-                        onClick = {
-                            // Naviga allo screen offerte
-                            navController.navigate(NavigationItem.Inbox.route)
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        shape = RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Controlla Offerte", color = Color.Black)
-                    }
+                Spacer(Modifier.width(8.dp))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = bluPerchEcipiace,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clickable { navController.popBackStack() }
+                )
+                Spacer(Modifier.width(90.dp))
+                Text("Listing Details", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.width(76.dp))
+                Icon(
+                    imageVector = Icons.Default.IosShare,
+                    contentDescription = "Back",
+                    tint = bluPerchEcipiace,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clickable {  }
+                )
+            }
 
-                    Divider(
-                        color = Color.Black,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(1.dp)
-                    )
 
-                    Button(
-                        onClick = {
-                            // Naviga allo screen appuntamenti
-                            navController.navigate(NavigationItem.CheckListingAppointment.route)
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        shape = RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Controlla Appuntamenti", color = Color.Black)
-                    }
+            val imageList = state.selectedProperty?.property!!.images.ifEmpty {
+                List(3) { "drawable://default_house" }
+            }
 
-                } else {
-                    // Pulsanti per utenti normali
-                    Button(
-                        onClick = {
-                            // Imposta listing e naviga a prenotazione appuntamento
-                            listingVm.setSelectedListing(propertyListing)
-                            navController.navigate(NavigationItem.BookAppointment.route)
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        shape = RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Prenota Appuntamento", color = Color.Black)
-                    }
+            val pagerState = rememberPagerState(pageCount = { imageList.size })
 
-                    Divider(
-                        color = Color.Black,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(1.dp)
-                    )
-
-                    Button(
-                        onClick = {
-                            inboxVm.setSelectedProperty(propertyListing, true)
-                            navController.navigate(NavigationItem.MakeOffer.route)
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        shape = RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Fai Offerta", color = Color.Black)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(260.dp)
+                //.clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)) // leggermente arrotondato solo in basso
+            ) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.LightGray)
+                ) { page ->
+                    val img = imageList[page]
+                    if (img.startsWith("drawable://")) {
+                        Image(
+                            painter = painterResource(id = R.drawable.default_house),
+                            contentDescription = "Default image ${page + 1}",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        AsyncImage(
+                            model = img,
+                            contentDescription = "Immagine ${page + 1}",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            placeholder = painterResource(id = R.drawable.default_house),
+                            error = painterResource(id = R.drawable.default_house)
+                        )
                     }
                 }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(260.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 12.dp)
+                            .background(
+                                color = Color.Black.copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(50)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        HorizontalPagerIndicator(
+                            pagerState = pagerState,
+                            activeColor = Color.White,
+                            inactiveColor = Color.LightGray.copy(alpha = 0.8f),
+                            pageCount = imageList.size
+                        )
+                    }
+                }
+
+
+            }
+
+
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Text(state.selectedProperty!!.title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = state.selectedProperty?.property!!.description,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+                Spacer(Modifier.height(15.dp))
+                InfoHouse(state.selectedProperty!!.property)
+            }
+            AgentCard(state.selectedProperty?.agent)
+
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    //.padding(WindowInsets.statusBars.asPaddingValues())
+                    .padding(16.dp)
+                    .padding(bottom = 100.dp)
+            ) {
+                Text(
+                    text = "Home facilities : ",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+
+                Spacer(Modifier.height(12.dp))
+                PropertyFacilitiesChips(state.selectedProperty!!.property)
+
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = "Location :",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .padding(vertical = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.LocationOn,
+                        contentDescription = "Address Icon",
+                        tint = Color.Gray
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "${state.selectedProperty?.property!!.street} ${state.selectedProperty?.property!!.civicNumber}, " +
+                                "${state.selectedProperty?.property!!.city}, ${state.selectedProperty?.property!!.province}",
+                        modifier = Modifier.weight(1f),
+                        fontWeight = FontWeight.Medium
+                    )
+
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(mapHeight)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.LightGray)
+                ) {
+                    val isInPreview = true
+                    if (isInPreview) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "Anteprima mappa disabilitata",
+                                color = Color.DarkGray,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    } else {
+                        GoogleMap(
+                            modifier = Modifier.fillMaxSize(),
+                            cameraPositionState = cameraPositionState,
+                            uiSettings = uiSettings,
+                            properties = mapProperties,
+                            onMapClick = { selectedPoi = null }
+                        ) {
+                            Marker(
+                                state = MarkerState(position = latLng),
+                                title = state.selectedProperty?.title
+                            )
+                            state.selectedProperty?.property!!.pois.forEach { poi ->
+                                Marker(
+                                    state = MarkerState(LatLng(poi.lat, poi.lon)),
+                                    icon = context.getPoiBitmapDescriptor(
+                                        poi.type,
+                                        poiIcons,
+                                        poiColors
+                                    ),
+                                    onClick = {
+                                        selectedPoi = poi
+                                        true
+                                    }
+                                )
+                            }
+                        }
+
+                        selectedPoi?.let { poi ->
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color.White)
+                                    .padding(12.dp)
+                                    .zIndex(1f)
+                            ) {
+                                Column {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(poi.name, fontWeight = FontWeight.Bold)
+                                        Text(
+                                            "X",
+                                            color = Color.Red,
+                                            modifier = Modifier.clickable { selectedPoi = null })
+                                    }
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(poi.type)
+                                    Text("${poi.distance.toInt()} m away")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(30.dp))
+                NearbyPlacesSection(state.selectedProperty?.property!!.pois)
+
+
+            }
+
+
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .align(Alignment.BottomCenter)
+                .border(
+                    width = 0.2.dp,
+                    color = Color.LightGray,
+                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                )
+                .padding(horizontal = 6.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            Spacer(modifier = Modifier.width(1.dp))
+
+            Text(
+                text = "€ ${"%,.0f".format(state.selectedProperty?.price!!.toDouble())}",
+                color = bluPerchEcipiace,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 24.sp
+            )
+
+
+            Button(
+                onClick = {},
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 8.dp,
+                    pressedElevation = 2.dp,
+                    hoveredElevation = 10.dp
+                ),
+                modifier = Modifier.height(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Agent Icon",
+                    tint = bluPerchEcipiace,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Contact Agent",
+                    color = bluPerchEcipiace,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp
+                )
             }
         }
+
     }
 
 }
+
+//
+//@Composable
+//@Preview(
+//    showBackground = true,
+//    showSystemUi = true,
+//    name = "Listing Detail Preview (User)"
+//)
+//fun PreviewListingDetailContent() {
+//    val navController = rememberNavController()
+//
+//    // --- Mock utente corrente ---
+//    val fakeUser = User(
+//        id = "1",
+//        name = "Giuseppe",
+//        email = "giuseppe@example.com",
+//        role = Role.LOCAL_USER,
+//        username = "PEPPONE",
+//        surname = "reitano"
+//    )
+//
+//    // --- Mock agente ---
+//    val fakeAgent = User(
+//        id = "99",
+//        name = "Mario Rossi",
+//        email = "mario.rossi@agenzia.it",
+//        role = Role.AGENT_USER,
+//        username = "TORCI",
+//        surname = "DAJE"
+//    )
+//
+//    // --- Mock POI ---
+//    val fakePois = listOf(
+//        POI(
+//            name = "Politecnico di Torino",
+//            type = "University",
+//            lat = 45.062,
+//            lon = 7.662,
+//            distance = 250.0
+//        ),
+//        POI(
+//            name = "Bar Centrale",
+//            type = "Cafe",
+//            lat = 45.063,
+//            lon = 7.664,
+//            distance = 120.0
+//        )
+//    )
+//
+//    // --- Mock immagini ---
+//    val fakeImages = listOf(
+//        "https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
+//        "https://images.unsplash.com/photo-1568605114967-8130f3a36994"
+//    )
+//
+//    // --- Mock property ---
+//    val fakeProperty = Property(
+//        city = "Torino",
+//        cap = "10129",
+//        country = "Italia",
+//        province = "TO",
+//        street = "Corso Duca degli Abruzzi",
+//        civicNumber = "24",
+//        latitude = 45.062,
+//        longitude = 7.662,
+//        pois = fakePois,
+//        images = fakeImages,
+//        numberOfRooms = 3,
+//        numberOfBathrooms = 1,
+//        size = 85f,
+//        energyClass = EnergyClass.B,
+//        parking = true,
+//        garden = false,
+//        elevator = true,
+//        gatehouse = false,
+//        balcony = true,
+//        roof = false,
+//        airConditioning = true,
+//        heatingSystem = true,
+//        description = "Appartamento moderno e luminoso con cucina open-space e vista panoramica."
+//    )
+//
+//    // --- Mock listing completo ---
+//    val fakeListing = PropertyListing(
+//        id = "1",
+//        title = "Appartamento moderno vicino al Politecnico",
+//        type = Type.SELL, // enum tuo
+//        price = 3000000f,
+//        property = fakeProperty,
+//        agent = fakeAgent
+//    )
+//
+//    // --- Mostra il composable ---
+//    ListingDetailContent(
+//        navController = navController,
+//        currentUser = fakeUser,
+//        propertyListing = fakeListing
+//    )
+//}
+

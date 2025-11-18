@@ -26,26 +26,36 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 
 
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Role
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingFormState
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlueWithOpacity
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
@@ -56,6 +66,9 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.EnergyClassDropdown
 import com.example.ingsw_24_25_dietiestates25.ui.utils.TypeToggle
 import com.example.ingsw_24_25_dietiestates25.ui.utils.FacilityChip
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
+import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
+import com.example.ingsw_24_25_dietiestates25.ui.utils.EnergyClassRow
+import com.example.ingsw_24_25_dietiestates25.ui.utils.ListingTypeSelector
 
 
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -78,6 +91,31 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 
+//val title: String = "",
+//val type: Type = Type.RENT,
+//val price: String = "",
+//val city: String = "",
+//val cap: String = "",
+//val country: String = "",
+//val province: String = "",
+//val street: String = "",
+//val civicNumber: String = "",
+//val latitude: String = "",
+//val longitude: String = "",
+//val numberOfRooms: String = "",
+//val numberOfBathrooms: String = "",
+//val size: String = "",
+//val energyClass: EnergyClass = EnergyClass.A,
+//val parking: Boolean = false,
+//val garden: Boolean = false,
+//val elevator: Boolean = false,
+//val gatehouse: Boolean = false,
+//val balcony: Boolean = false,
+//val roof: Boolean = false,
+//val airConditioning: Boolean = false,
+//val heatingSystem: Boolean = false,
+//val description: String = ""
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AddPropertyListingScreen(
@@ -85,11 +123,13 @@ fun AddPropertyListingScreen(
     navController: NavController
 ) {
 
+
+
     val state by listingVm.state.collectAsState()
     val formState = state.formState
     val uiState = state.uiState
     val context = LocalContext.current
-
+    val isInPreview = true
     val currentUser by listingVm.currentUser.collectAsState()
 
 
@@ -102,23 +142,7 @@ fun AddPropertyListingScreen(
 
     val scrollState = rememberScrollState()
 
-    // Recupero valori dal ViewModel
-//    val title = formState.title
-//    val type = formState.type
-//    val price = formState.price
-//    val rooms = formState.numberOfRooms
-//    val bathrooms = formState.numberOfBathrooms
-//    val size = formState.size
-//    val energyClass = formState.energyClass
-//    val parking = formState.parking
-//    val garden = formState.garden
-//    val elevator = formState.elevator
-//    val gatehouse = formState.gatehouse
-//    val balcony = formState.balcony
-//    val roof = formState.roof
-//    val ac = formState.airConditioning
-//    val heating = formState.heatingSystem
-//    val description = formState.description
+
     val lat = formState.latitude
     val lng = formState.longitude
     val city = formState.city
@@ -149,47 +173,128 @@ fun AddPropertyListingScreen(
             .verticalScroll(scrollState)
     ) {
 
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back",
-            tint = primaryBlueWithOpacity.copy(alpha = 0.95f),
+
+        Row(
             modifier = Modifier
-                .size(28.dp)
-                .clickable { navController.popBackStack() }
-        )
+                .fillMaxWidth()
+                .padding(top = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-        Spacer(Modifier.height(12.dp))
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = bluPerchEcipiace,
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable { navController.popBackStack() }
+            )
+            Spacer(Modifier.width(85.dp))
+            Text("Create Listing", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
 
-        Text("Listing Type", fontWeight = FontWeight.Bold)
-
-        Spacer(Modifier.height(8.dp))
-
-        Row {
-            TypeToggle("Rent", selected = formState.type == Type.RENT) {
-                listingVm.updateForm { it.copy(type = Type.RENT) }
-            }
-            Spacer(Modifier.width(8.dp))
-
-            TypeToggle("Sell", selected = formState.type == Type.SELL) {
-                listingVm.updateForm { it.copy(type = Type.SELL) }
-            }
         }
-        Spacer(Modifier.height(12.dp))
+
+
+        Spacer(Modifier.height(30.dp))
 
         Text("Listing Title", fontWeight = FontWeight.Bold)
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(4.dp))
 
         OutlinedTextField(
             value = formState.title,
             onValueChange = { newValue ->
                 listingVm.updateForm { it.copy(title = newValue) }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.width(370.dp)
+        )
+        Spacer(Modifier.height(23.dp))
+
+        Text("Property description", fontWeight = FontWeight.Bold)
+
+        Spacer(Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = formState.description,
+            onValueChange = { newValue ->
+                listingVm.updateForm { it.copy(description = newValue) }
+            },
+            modifier = Modifier.height(120.dp)
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(24.dp))
+
+
+        Text("Photos of the Listing", fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(4.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+
+            imageUris.forEach { uri ->
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .padding(end = 8.dp)
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = uri),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    IconButton(
+                        onClick = { imageUris = imageUris - uri },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .background(Color.Red, CircleShape)
+                            .size(20.dp)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Remove", tint = Color.White)
+                    }
+                }
+            }
+
+
+
+            if (imageUris.size < maxImages) {
+
+
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFFBFC4D6).copy(alpha = 0.45f))
+                        .border(1.dp, Color(0xFFBFC4D6).copy(alpha = 0.45f), RoundedCornerShape(12.dp))
+                        .clickable { pickImage() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add photo",
+                        tint = Color(0xFF2C2F4A),
+                        modifier = Modifier.size(27.dp)
+                    )
+                }
+
+
+
+
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+
+
+        Spacer(Modifier.height(24.dp))
 
 
         Text("Location", fontWeight = FontWeight.Bold)
@@ -222,10 +327,11 @@ fun AddPropertyListingScreen(
 
         val context = LocalContext.current
 
-
-        val locationPermissions = rememberMultiplePermissionsState(
-            listOf(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION)
-        )
+        val locationPermissions = if (!isInPreview) {
+            rememberMultiplePermissionsState(
+                listOf(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION)
+            )
+        } else null
 
         val uiSettings = MapUtils.defaultUiSettings
         val mapProperties = MapUtils.defaultMapProperties(context)
@@ -336,7 +442,7 @@ fun AddPropertyListingScreen(
 
             FloatingActionButton(
                 onClick = {
-                    if (locationPermissions.allPermissionsGranted) startListeningToLocations()
+                    if (locationPermissions!!.allPermissionsGranted) startListeningToLocations()
                     else locationPermissions.launchMultiplePermissionRequest()
                 },
                 modifier = Modifier
@@ -347,7 +453,7 @@ fun AddPropertyListingScreen(
                 Icon(
                     painter = painterResource(id = R.drawable.locator),
                     contentDescription = "My Location",
-                    tint = if (locationPermissions.allPermissionsGranted) Color(0xFF1C73E8) else Color.Gray
+                    tint = if (locationPermissions!!.allPermissionsGranted) Color(0xFF1C73E8) else Color.Gray
                 )
             }
         }
@@ -386,51 +492,6 @@ fun AddPropertyListingScreen(
 
         Spacer(Modifier.height(16.dp))
 
-
-        Text("Property photos", fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            imageUris.forEach { uri ->
-                Box {
-                    Image(
-                        painter = rememberAsyncImagePainter(model = uri),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-
-                    IconButton(
-                        onClick = { imageUris = imageUris - uri },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .background(Color.Red, CircleShape)
-                            .size(20.dp)
-                    ) {
-                        Icon(Icons.Default.Close, contentDescription = "Remove", tint = Color.White)
-                    }
-                }
-                Spacer(Modifier.width(8.dp))
-            }
-
-
-            if (imageUris.size < maxImages) {
-                IconButton(
-                    onClick = pickImage,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Add photo",
-                        tint = primaryBlueWithOpacity
-                    )
-                }
-            }
-        }
-
         Spacer(Modifier.height(16.dp))
 
 
@@ -439,35 +500,90 @@ fun AddPropertyListingScreen(
         Spacer(Modifier.height(8.dp))
 
         CounterRow(
-            label = "Rooms",
+            label = "Rooms :       ",
             count = formState.numberOfRooms.toIntOrNull() ?: 0,
-            onValueChange = { newCount -> listingVm.updateForm { it.copy(numberOfRooms = newCount.toString()) } }
+            onValueChange = {
+                    newCount -> listingVm.updateForm { it.copy(numberOfRooms = newCount.toString()) }
+            }
         )
+
+        Spacer(Modifier.height(12.dp))
 
         CounterRow(
-            label = "Bathrooms",
+            label = "Bathrooms : ",
             count = formState.numberOfBathrooms.toIntOrNull() ?: 0,
-            onValueChange = { newCount -> listingVm.updateForm { it.copy(numberOfBathrooms = newCount.toString()) } }
+            onValueChange = {
+                    newCount -> listingVm.updateForm { it.copy(numberOfBathrooms = newCount.toString()) }
+            }
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(24.dp))
 
-        Text("Size", fontWeight = FontWeight.Bold)
-
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = formState.size,
-            onValueChange = { newValue ->
-                listingVm.updateForm { it.copy(size = newValue) }
-            },
-            label = { Text("Size (m²)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        EnergyClassRow(
+            selectedClass = formState.energyClass,
+            onClassSelected = { newClass ->
+                listingVm.updateForm { it.copy(energyClass = newClass) }
+            }
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(24.dp))
 
-        EnergyClassDropdown(listingVm = listingVm)
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                "Listing Type : ",
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(Modifier.width(70.dp))
+
+            TypeToggle(
+                label = "Rent",
+                selected = formState.type == Type.RENT,
+                onClick = {
+                    listingVm.updateForm { it.copy(type = Type.RENT) }
+                }
+            )
+
+            Spacer(Modifier.width(8.dp))
+
+            TypeToggle(
+                label = "Sell",
+                selected = formState.type == Type.SELL,
+                onClick = {
+                    listingVm.updateForm { it.copy(type = Type.SELL) }
+                }
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            Text("Property size (m²):", fontWeight = FontWeight.Medium)
+
+            Spacer(Modifier.width(26.dp))
+            OutlinedTextField(
+                value = formState.size,
+                onValueChange = { newValue ->
+                    //listingVm.updateForm { it.copy(size = newValue) }
+                },
+                modifier = Modifier.width(370.dp),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+
+        }
+
+
+        Spacer(Modifier.height(12.dp))
 
         Spacer(Modifier.height(12.dp))
 
@@ -477,79 +593,115 @@ fun AddPropertyListingScreen(
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            FacilityChip("Parking", formState.parking) {
-                listingVm.updateForm { it.copy(parking = !it.parking) }
-            }
+
+            val chipModifier = Modifier
+                .width(150.dp)
+                .height(48.dp)
+
             FacilityChip(
-                "Garden",
-                formState.garden
-            ) { listingVm.updateForm { it.copy(garden = !it.garden) } }
+                label = "Parking",
+                selected = formState.parking,
+                onClick = {
+                    listingVm.updateForm { it.copy(parking = !it.parking) }
+                },
+                chipModifier = chipModifier
+            )
+
+            Spacer(Modifier.width(20.dp))
+
             FacilityChip(
-                "Elevator",
-                formState.elevator
-            ) { listingVm.updateForm { it.copy(elevator = !it.elevator) } }
-            FacilityChip("Gatehouse", formState.gatehouse) {
-                listingVm.updateForm {
-                    it.copy(
-                        gatehouse = !it.gatehouse
-                    )
-                }
-            }
+                label = "Garden",
+                selected = formState.garden,
+                onClick = {
+                    listingVm.updateForm { it.copy(garden = !it.garden) }
+                },
+                chipModifier = chipModifier
+            )
+
+
             FacilityChip(
-                "Balcony",
-                formState.balcony
-            ) { listingVm.updateForm { it.copy(balcony = !it.balcony) } }
+                label = "Elevator",
+                selected = formState.elevator,
+                onClick = {
+                    listingVm.updateForm { it.copy(elevator = !it.elevator) }
+                },
+                chipModifier = chipModifier
+            )
+            Spacer(Modifier.width(20.dp))
             FacilityChip(
-                "Roof",
-                formState.roof
-            ) { listingVm.updateForm { it.copy(roof = !it.roof) } }
-            FacilityChip("A/C", formState.airConditioning) {
-                listingVm.updateForm {
-                    it.copy(
-                        airConditioning = !it.airConditioning
-                    )
-                }
-            }
+                label = "Gatehouse",
+                selected = formState.gatehouse,
+                onClick = {
+                    listingVm.updateForm { it.copy(gatehouse = !it.gatehouse) }
+                },
+                chipModifier = chipModifier
+            )
+
             FacilityChip(
-                "Heating system",
-                formState.heatingSystem
-            ) { listingVm.updateForm { it.copy(heatingSystem = !it.heatingSystem) } }
+                label = "Balcony",
+                selected = formState.balcony,
+                onClick = {
+                    listingVm.updateForm { it.copy(balcony = !it.balcony) }
+                },
+                chipModifier = chipModifier
+            )
+            Spacer(Modifier.width(20.dp))
+            FacilityChip(
+                label = "Roof",
+                selected = formState.roof,
+                onClick = {
+                    listingVm.updateForm { it.copy(roof = !it.roof) }
+                },
+                chipModifier = chipModifier
+            )
+
+            FacilityChip(
+                label = "A/C",
+                selected = formState.airConditioning,
+                onClick = {
+                    listingVm.updateForm { it.copy(airConditioning = !it.airConditioning) }
+                },
+                chipModifier = chipModifier
+            )
+            Spacer(Modifier.width(20.dp))
+            FacilityChip(
+                label = "Heating",
+                selected = formState.heatingSystem,
+                onClick = {
+                    listingVm.updateForm { it.copy(heatingSystem = !it.heatingSystem) }
+                },
+                chipModifier = chipModifier
+            )
         }
 
-        Spacer(Modifier.height(16.dp))
 
 
-        Text(if (formState.type == Type.SELL) "Sell price" else "Rent price")
+
+        Spacer(Modifier.height(24.dp))
+        Text(if (formState.type == Type.SELL) "Sell price" else "Rent price", fontWeight = FontWeight.Bold)
 
         Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
             value = formState.price,
-            onValueChange = { newValue -> listingVm.updateForm { it.copy(price = newValue) } },
+            onValueChange = { newValue ->
+                listingVm.updateForm { it.copy(price = newValue) }
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            leadingIcon = {
+                Text(
+                    "€",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         )
-
-        Spacer(Modifier.height(16.dp))
-
-
-        Text("Property description", fontWeight = FontWeight.Bold)
-
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = formState.description,
-            onValueChange = { newValue -> listingVm.updateForm { it.copy(description = newValue) } },
-            modifier = Modifier.height(120.dp)
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-
-
+        Spacer(Modifier.height(24.dp))
         Button(
             onClick = {
                 listingVm.addPropertyListing(
@@ -560,15 +712,33 @@ fun AddPropertyListingScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
-                .background(AscientGradient),
-            shape = RoundedCornerShape(25.dp)
-        ) { Text("Publish") }
+                .height(56.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.White
+            ),
+            contentPadding = PaddingValues(),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(AscientGradient, RoundedCornerShape(28.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Publish",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp
+                )
+            }
+        }
 
         Spacer(Modifier.height(16.dp))
 
 
     }
+
     when (uiState) {
         is ListingState.Loading -> LoadingOverlay(isVisible = true)
         is ListingState.Success -> {
@@ -587,5 +757,66 @@ fun AddPropertyListingScreen(
     }
 }
 
-
-
+//
+//@Preview(
+//    name = "Add Property Listing Screen",
+//    showSystemUi = true,
+//    showBackground = true
+//)
+//@Composable
+//fun PreviewAddPropertyListingScreenTest() {
+//    val navController = rememberNavController()
+//
+//    val fakeUser = User(
+//        id = "1",
+//        name = "Giuseppe",
+//        email = "giuseppe@example.com",
+//        role = Role.LOCAL_USER,
+//        username = "PEPPONE",
+//        surname = "reitano"
+//    )
+//
+//    val fakeFormState = ListingFormState(
+//        title = "Modern Loft in Turin",
+//        type = Type.RENT,
+//        price = "1200",
+//        city = "Turin",
+//        cap = "10123",
+//        country = "Italy",
+//        province = "TO",
+//        street = "Via Roma",
+//        civicNumber = "15",
+//        latitude = "45.0703",
+//        longitude = "7.6869",
+//        numberOfRooms = "3",
+//        numberOfBathrooms = "2",
+//        size = "85",
+//        energyClass = EnergyClass.A,
+//        parking = true,
+//        garden = false,
+//        elevator = true,
+//        gatehouse = false,
+//        balcony = true,
+//        roof = false,
+//        airConditioning = true,
+//        heatingSystem = true,
+//        description = "Beautiful loft apartment located in the heart of Turin, featuring a spacious living area, " +
+//                "modern kitchen, and a bright balcony overlooking the city. Ideal for young professionals or couples."
+//    )
+//
+//
+//
+//    MaterialTheme {
+//        Surface(
+//            modifier = Modifier.fillMaxSize(),
+//            color = MaterialTheme.colorScheme.background
+//        ) {
+//            AddPropertyListingScreenTest(
+//                // listingVm = /* mock ViewModel, se vuoi riattivarlo */,
+//                navController = navController,
+//                currentUser = fakeUser,
+//                formState = fakeFormState
+//            )
+//        }
+//    }
+//}

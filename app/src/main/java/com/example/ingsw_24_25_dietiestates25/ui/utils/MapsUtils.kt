@@ -1,7 +1,9 @@
 package com.example.ingsw_24_25_dietiestates25.ui.utils
 
 import android.content.Context
+import androidx.compose.runtime.Composable
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -49,3 +51,4 @@ object MapUtils {
 
 
 }
+
