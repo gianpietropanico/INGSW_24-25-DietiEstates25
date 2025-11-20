@@ -3,6 +3,7 @@ package com.example.ingsw_24_25_dietiestates25.ui.listingUI
 import android.content.Context
 import android.location.Geocoder
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
@@ -80,6 +81,7 @@ class ListingViewModel @Inject constructor(
                 val uploadedUrls = uploadImagesSequentially(imageUris, context)
 
                 val property = _state.value.formState.toProperty().copy(images = uploadedUrls)
+
                 val listing = _state.value.formState.toPropertyListing(agent, property)
 
                 val result = listingsRepo.addPropertyListing(listing)
@@ -118,16 +120,27 @@ class ListingViewModel @Inject constructor(
             }
         }
 
+//    suspend fun uploadImagesSequentially(imageUris: List<Uri>, context: Context): List<String> {
+//        val uploadedUrls = mutableListOf<String>()
+//
+//        for (uri in imageUris) {
+//            return imageRepo.uploadImages(imageUris, context)
+//        }
+//
+//        return uploadedUrls
+//    }
+
     suspend fun uploadImagesSequentially(imageUris: List<Uri>, context: Context): List<String> {
         val uploadedUrls = mutableListOf<String>()
 
         for (uri in imageUris) {
-            val url = imageRepo.uploadImage(uri, context) // upload di un singolo file
-            if (url != null) uploadedUrls.add(url)
+            val url = imageRepo.uploadImage(uri, context)
+            url?.let { uploadedUrls.add(it) } // aggiunge solo se non null
         }
 
         return uploadedUrls
     }
+
     fun updateAddressFromCoordinates(context: Context, lat: Double, lng: Double) =
         viewModelScope.launch(Dispatchers.IO) {
             val geocoder = Geocoder(context, Locale.getDefault())
@@ -152,9 +165,12 @@ class ListingViewModel @Inject constructor(
 
 
     fun setSelectedListing(listing: PropertyListing) {
+
         _state.update {
             it.copy(selectedListing = listing)
         }
+
+        Log.d("SETLISTING","${_state.value.selectedListing}")
 
     }
 
@@ -227,6 +243,3 @@ private fun ListingFormState.toPropertyListing(agent: User?, property: Property)
         property = property,
         agent = agent
     )
-
-
-

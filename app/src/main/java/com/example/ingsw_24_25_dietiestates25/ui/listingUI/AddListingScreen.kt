@@ -442,8 +442,15 @@ fun AddPropertyListingScreen(
 
             FloatingActionButton(
                 onClick = {
-                    if (locationPermissions!!.allPermissionsGranted) startListeningToLocations()
-                    else locationPermissions.launchMultiplePermissionRequest()
+                    val lp = locationPermissions
+
+                    if (lp == null) return@FloatingActionButton
+
+                    if (lp.allPermissionsGranted) {
+                        startListeningToLocations()
+                    } else {
+                        lp.launchMultiplePermissionRequest()
+                    }
                 },
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -453,9 +460,12 @@ fun AddPropertyListingScreen(
                 Icon(
                     painter = painterResource(id = R.drawable.locator),
                     contentDescription = "My Location",
-                    tint = if (locationPermissions!!.allPermissionsGranted) Color(0xFF1C73E8) else Color.Gray
+                    tint = if (locationPermissions?.allPermissionsGranted == true)
+                        Color(0xFF1C73E8)
+                    else Color.Gray
                 )
             }
+
         }
 
 
@@ -573,7 +583,7 @@ fun AddPropertyListingScreen(
             OutlinedTextField(
                 value = formState.size,
                 onValueChange = { newValue ->
-                    //listingVm.updateForm { it.copy(size = newValue) }
+                    listingVm.updateForm { it.copy(size = newValue) }
                 },
                 modifier = Modifier.width(370.dp),
                 singleLine = true,

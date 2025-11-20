@@ -12,8 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.HomeViewModel
-import com.example.ingsw_24_25_dietiestates25.ResultsViewModel
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.ui.ResultsViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.HomeScreen
 import com.example.ingsw_24_25_dietiestates25.ui.ResultsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.*
@@ -39,7 +38,6 @@ import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.MakeOfferScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.OfferChatScreen
-import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
 import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
 
 

@@ -1,6 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.ui
 
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -37,18 +35,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.ResultsViewModel
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
 import com.example.ingsw_24_25_dietiestates25.data.model.request.PropertySearchRequest
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 import com.example.ingsw_24_25_dietiestates25.ui.theme.Rubik
@@ -56,10 +48,6 @@ import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 import com.example.ingsw_24_25_dietiestates25.ui.theme.testColor
 import com.example.ingsw_24_25_dietiestates25.ui.theme.unselectedFacility
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils
-import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiColors
-import com.example.ingsw_24_25_dietiestates25.ui.utils.MapUtils.poiIcons
-import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
-import com.example.ingsw_24_25_dietiestates25.ui.utils.getPoiBitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 
@@ -72,13 +60,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
-import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
-import com.example.ingsw_24_25_dietiestates25.ui.theme.grayWithOpacity
-import com.example.ingsw_24_25_dietiestates25.ui.theme.inActiveTextColor
-import com.example.ingsw_24_25_dietiestates25.ui.utils.safeDecodeBase64
-import com.google.maps.android.compose.MarkerInfoWindowContent
-import kotlinx.coroutines.delay
+import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -315,12 +298,17 @@ fun ResultsScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+
                                 items(state.properties) { property ->
                                     PropertyItem(property) {
+
+                                        Log.d("CLICK ITEM", "valore dell'annuncio $property")
+
                                         listingVm.setSelectedListing(property)
                                         navController.navigate(NavigationItem.ListingDetail.route)
                                     }
                                 }
+
                             }
                         }
                     }
@@ -406,6 +394,7 @@ fun PropertyItem(
     onClick: () -> Unit
 
 ) {
+
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -442,6 +431,9 @@ fun PropertyItem(
                     contentScale = ContentScale.Crop
                 )
             }
+
+
+
 //            if (firstImageBitmap != null) {
 //                Image(
 //                    bitmap = firstImageBitmap,
@@ -531,12 +523,10 @@ fun PropertyItem(
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Text(
-                        text = "${propertyListing.price.toInt()} $",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = Rubik
-                        ),
-                        color = Color.Black
+                        text = "€ ${"%,.0f".format(propertyListing.price.toDouble())}",
+                        color = bluPerchEcipiace,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp
                     )
                 }
             }

@@ -1,9 +1,8 @@
-package com.example.ingsw_24_25_dietiestates25
+package com.example.ingsw_24_25_dietiestates25.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRepo.PropertyListingRepository
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.request.PropertySearchRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
@@ -111,7 +110,7 @@ class ResultsViewModel @Inject constructor(
                 is ApiResult.UnknownError<*> -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        properties = emptyList(), // ✅ lista vuota, non errore
+                        properties = emptyList(),
                         errorMessage = null
                     )
                 }

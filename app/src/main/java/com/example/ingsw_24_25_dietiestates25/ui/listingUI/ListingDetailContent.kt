@@ -111,29 +111,27 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-
 @Composable
 fun ListingDetailContent(
     navController: NavHostController,
     listingVm: ListingViewModel,
     inboxVm : InboxViewModel
 ) {
-
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     var selectedPoi by remember { mutableStateOf<POI?>(null) }
     val mapHeight = 250.dp
-    val state by inboxVm.state.collectAsState()
+
+    val state by listingVm.state.collectAsState()
+
+
+    val selectedListing = state.selectedListing ?: return
 
     val mapProperties = MapUtils.defaultMapProperties(context)
     val uiSettings = MapUtils.defaultUiSettings
-    // LatLng della proprietà
-    val latLng = LatLng(
-        state.selectedProperty?.property!!.latitude,
-        state.selectedProperty?.property!!.longitude
-    )
 
-    // Stato della camera
+    val latLng = LatLng(selectedListing.property.latitude, selectedListing.property.longitude)
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(latLng, 15f)
     }
@@ -177,8 +175,10 @@ fun ListingDetailContent(
             }
 
 
-            val imageList = state.selectedProperty?.property!!.images.ifEmpty {
-                List(3) { "drawable://default_house" }
+            val imageList = selectedListing.property.images.ifEmpty {
+                List(3) {
+                    "drawable://default_house"
+                }
             }
 
             val pagerState = rememberPagerState(pageCount = { imageList.size })
@@ -249,19 +249,19 @@ fun ListingDetailContent(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Text(state.selectedProperty!!.title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(selectedListing.title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    text = state.selectedProperty?.property!!.description,
+                    text = selectedListing.property.description,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
                 Spacer(Modifier.height(15.dp))
-                InfoHouse(state.selectedProperty!!.property)
+                InfoHouse(selectedListing.property)
             }
-            AgentCard(state.selectedProperty?.agent)
+            AgentCard(selectedListing.agent)
 
 
             Column(
@@ -279,7 +279,7 @@ fun ListingDetailContent(
                 )
 
                 Spacer(Modifier.height(12.dp))
-                PropertyFacilitiesChips(state.selectedProperty!!.property)
+                PropertyFacilitiesChips(selectedListing.property)
 
                 Spacer(Modifier.height(12.dp))
                 Text(
@@ -303,8 +303,8 @@ fun ListingDetailContent(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = "${state.selectedProperty?.property!!.street} ${state.selectedProperty?.property!!.civicNumber}, " +
-                                "${state.selectedProperty?.property!!.city}, ${state.selectedProperty?.property!!.province}",
+                        text = "${selectedListing.property.street} ${selectedListing.property.civicNumber}, " +
+                                "${selectedListing.property.city}, ${selectedListing.property.province}",
                         modifier = Modifier.weight(1f),
                         fontWeight = FontWeight.Medium
                     )
@@ -320,19 +320,7 @@ fun ListingDetailContent(
                         .clip(RoundedCornerShape(12.dp))
                         .background(Color.LightGray)
                 ) {
-                    val isInPreview = true
-                    if (isInPreview) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                "Anteprima mappa disabilitata",
-                                color = Color.DarkGray,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    } else {
+
                         GoogleMap(
                             modifier = Modifier.fillMaxSize(),
                             cameraPositionState = cameraPositionState,
@@ -342,9 +330,9 @@ fun ListingDetailContent(
                         ) {
                             Marker(
                                 state = MarkerState(position = latLng),
-                                title = state.selectedProperty?.title
+                                title = state.selectedListing?.title
                             )
-                            state.selectedProperty?.property!!.pois.forEach { poi ->
+                            selectedListing.property.pois.forEach { poi ->
                                 Marker(
                                     state = MarkerState(LatLng(poi.lat, poi.lon)),
                                     icon = context.getPoiBitmapDescriptor(
@@ -387,11 +375,11 @@ fun ListingDetailContent(
                                 }
                             }
                         }
-                    }
+
                 }
 
                 Spacer(Modifier.height(30.dp))
-                NearbyPlacesSection(state.selectedProperty?.property!!.pois)
+                NearbyPlacesSection(selectedListing.property.pois)
 
 
             }
@@ -417,7 +405,7 @@ fun ListingDetailContent(
             Spacer(modifier = Modifier.width(1.dp))
 
             Text(
-                text = "€ ${"%,.0f".format(state.selectedProperty?.price!!.toDouble())}",
+                text = "€ ${"%,.0f".format(selectedListing.price.toDouble())}",
                 color = bluPerchEcipiace,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 24.sp

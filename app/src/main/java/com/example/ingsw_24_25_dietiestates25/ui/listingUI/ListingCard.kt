@@ -34,10 +34,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
+import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.theme.primaryBlu
 
 @Composable
@@ -110,11 +112,12 @@ fun ListingCard(
                     )
 
                     Text(
-                        text = "${propertyListing.price} €",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold
+                        text = "€ ${"%,.0f".format(propertyListing.price.toDouble())}",
+                        color = bluPerchEcipiace,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 18.sp
                     )
+//
                 }
             }
 
