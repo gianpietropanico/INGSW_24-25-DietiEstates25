@@ -331,7 +331,7 @@ fun AppNavHost(
             BookAppointmentScreen(
                 navController = navController,
                 appointmentVM = appointmentViewModel,
-                listingVm = listingViewModel,
+                inboxVm = inboxViewModel,
                 weatherVM = weatherViewModel
             )
         }

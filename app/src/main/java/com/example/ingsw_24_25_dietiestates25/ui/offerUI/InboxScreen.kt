@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 
@@ -85,52 +86,25 @@ fun InboxScreen(
             .fillMaxSize()
             .padding(paddingValues)) {
             Column {
-                TabRow(selectedTabIndex = selectedTabIndex) {
-                    Tab(
-                        selected = selectedTabIndex == 0,
-                        onClick = {
-                            selectedTabIndex = 0
-                            inboxVm.loadOffers()
-                        },
-                        text = { Text("Messages ${state.offers.size}") }
-                    )
-                    Tab(
-                        selected = selectedTabIndex == 1,
-                        onClick = {
-                            selectedTabIndex = 1
-                            inboxVm.loadAppointments()
-                        },
-                        text = { Text("Appointment ${state.appointments.size}") }
+                Text(
+                    "Messages ${state.offers.size}",
+                    modifier = Modifier
+                        .padding(16.dp),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
 
-                    )
-                }
 
                 LazyColumn {
-                    if (selectedTabIndex == 0) {
-
-                        items(state.offers) { offer ->
-                            OfferItem(
-                                offer,
-                                inboxVm,
-                                navController
-                            )
-                            HorizontalDivider()
-                        }
-
-                    } else {
-                        items(state.appointments) { appointment ->
-                            AppointmentItem(
-                                appointment = appointment,
-                                currentUserId = user!!.id,
-                                onClick = {
-                                    inboxVm.setSelectedAppointment(appointment)
-                                    navController.navigate("appointmentChat")
-                                }
-                            )
-                            HorizontalDivider()
-                        }
+                    items(state.offers) { offer ->
+                        OfferItem(
+                            offer,
+                            inboxVm,
+                            navController
+                        )
+                        HorizontalDivider()
                     }
                 }
+
             }
         }
     }
@@ -142,6 +116,7 @@ fun OfferItem(
     inboxVm: InboxViewModel,
     navController: NavController
 ) {
+
     val user by inboxVm.user.collectAsState()
 
     Row(
@@ -162,23 +137,19 @@ fun OfferItem(
                 .background(Color(0xFF006666)),
             contentAlignment = Alignment.Center
         ) {
-            if (!offer.listing.property.images.isEmpty()) {
-                Image(
-                    bitmap = bse64ToImageBitmap(offer.listing.property.images.first()),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RectangleShape),
-                    contentScale = ContentScale.Crop
+
+            if (offer.listing.property.images.isNotEmpty()) {
+                AsyncImage(
+                    model = offer.listing.property.images.first(),
+                    contentDescription = "Property Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.default_house),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RectangleShape),
-                    contentScale = ContentScale.Crop
+                    contentDescription = "Default House",
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
@@ -209,7 +180,7 @@ fun OfferItem(
             val currentUser = user!!.username == offer.messages.last().sender.username
             Text(
                 text = if (!currentUser) {
-                    offer.agent.username + " offered " + offer.messages.last().amount
+                    offer.agentUser.username + " offered " + offer.messages.last().amount
                 } else {
                     "You offered " + offer.messages.last().amount
                 },

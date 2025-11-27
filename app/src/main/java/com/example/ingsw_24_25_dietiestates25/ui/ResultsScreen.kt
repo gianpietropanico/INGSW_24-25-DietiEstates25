@@ -300,13 +300,16 @@ fun ResultsScreen(
                             ) {
 
                                 items(state.properties) { property ->
-                                    PropertyItem(property) {
-
-                                        Log.d("CLICK ITEM", "valore dell'annuncio $property")
-
-                                        listingVm.setSelectedListing(property)
-                                        navController.navigate(NavigationItem.ListingDetail.route)
-                                    }
+                                    PropertyItem(
+                                        propertyListing = property,
+                                        clickOnCard = {
+                                            listingVm.setSelectedListing(property)
+                                            navController.navigate(NavigationItem.ListingDetail.route)
+                                        },
+                                        clickOnButton = {
+                                            navController.navigate(NavigationItem.OfferChat.route)
+                                        }
+                                    )
                                 }
 
                             }
@@ -319,10 +322,11 @@ fun ResultsScreen(
 }
 
 @Composable
-fun MapSheet(properties: List<PropertyListing>,
-             rm: ResultsViewModel,
-             navController: NavController
-             ) {
+fun MapSheet(
+    properties: List<PropertyListing>,
+    rm: ResultsViewModel,
+    navController: NavController
+) {
 
     val context = LocalContext.current
     val mapHeight = 250.dp
@@ -391,8 +395,8 @@ fun MapSheet(properties: List<PropertyListing>,
 @Composable
 fun PropertyItem(
     propertyListing: PropertyListing,
-    onClick: () -> Unit
-
+    clickOnCard: () -> Unit,
+    clickOnButton: () -> Unit
 ) {
 
     Card(
@@ -400,11 +404,9 @@ fun PropertyItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onClick() },
+            .clickable { clickOnCard() },
         elevation = CardDefaults.cardElevation(6.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column  {
 
@@ -431,28 +433,6 @@ fun PropertyItem(
                     contentScale = ContentScale.Crop
                 )
             }
-
-
-
-//            if (firstImageBitmap != null) {
-//                Image(
-//                    bitmap = firstImageBitmap,
-//                    contentDescription = propertyListing.title,
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(200.dp)
-//                )
-//            } else {
-//                Image(
-//                    painter = painterResource(id = R.drawable.default_house),
-//                    contentDescription = "No image",
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(200.dp)
-//                )
-//            }
 
             Column(
                 modifier = Modifier
@@ -506,7 +486,7 @@ fun PropertyItem(
                             .clip(RoundedCornerShape(20.dp))
                             .background(brush = AscientGradient)
                             .clickable {
-                                // TODO: Azione prenotazione
+                                clickOnButton()
                             },
                         contentAlignment = Alignment.Center
                     ) {

@@ -26,25 +26,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.vectorResource
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferSummary
 
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Euro
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.IconButton
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
-import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.DisposableEffect
@@ -53,22 +47,18 @@ import androidx.compose.runtime.collectAsState
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferStatus
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
 import com.example.ingsw_24_25_dietiestates25.ui.theme.DarkRed
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.ButtonColors
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
+
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 
@@ -87,6 +77,12 @@ fun MakeOfferScreen(
     var showHistoryOffers by remember { mutableStateOf(false) }
     var isPermittedAmount by remember { mutableStateOf(if (amount.isNotEmpty()) inboxVm.checkPrice(amount.toDouble()) else true) }
 
+    val listingOffer =  if( state.selectedOffer == null ){
+        state.selectedProperty
+    }else{
+        state.selectedOffer!!.listing
+    }
+
     LaunchedEffect(state.created) {
         if (state.created  ) {
             navController.navigate(NavigationItem.InboxScreen.route)
@@ -104,7 +100,6 @@ fun MakeOfferScreen(
             .fillMaxSize()
 
     ) {
-        //Spacer(modifier = Modifier.height(20.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -130,8 +125,7 @@ fun MakeOfferScreen(
 
             Text(
                 text = "Make an offer",
-                style = MaterialTheme.typography.headlineSmall .copy(fontWeight = FontWeight.Normal),
-                color = bluPerchEcipiace
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
 
         }
@@ -161,9 +155,9 @@ fun MakeOfferScreen(
                         .background(Color(0xFF006666)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (!state.selectedOffer!!.listing.property.images.isEmpty()) {
+                    if ( listingOffer!!.property.images.isEmpty()) {
                         AsyncImage(
-                            model = state.selectedOffer!!.listing.property.images.first(),
+                            model = listingOffer.property.images.first(),
                             contentDescription = "Property Image",
                             modifier = Modifier.fillMaxSize().clip(RectangleShape),
                             contentScale = ContentScale.Crop,
@@ -178,25 +172,7 @@ fun MakeOfferScreen(
                             contentScale = ContentScale.Crop
                         )
                     }
-//                    if (state.selectedProperty!!.property.images.isEmpty()) {
-//                        Image(
-//                            bitmap = bse64ToImageBitmap(state.selectedProperty!!.property.images.first()),
-//                            contentDescription = "Profile Picture",
-//                            modifier = Modifier
-//                                .fillMaxSize()
-//                                .clip(RectangleShape),
-//                            contentScale = ContentScale.Crop
-//                        )
-//                    }else{
-//                        Image(
-//                            painter = painterResource(id = R.drawable.default_house),
-//                            contentDescription = "Profile Picture",
-//                            modifier = Modifier
-//                                .fillMaxSize()
-//                                .clip(RectangleShape),
-//                            contentScale = ContentScale.Crop
-//                        )
-//                    }
+
 
 
                 }
@@ -415,15 +391,17 @@ fun MakeOfferScreen(
 
                         Box(modifier = Modifier.fillMaxWidth()) {
 
-                            if(amount.isEmpty())
-                            Text(
-                                text = "Insert your price",
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    fontSize = 14.sp,
-                                    color = Color.Gray
-                                )
-                            )
+                            if(amount.isEmpty()) {
 
+                                Text(
+                                    text = "Insert your price",
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        fontSize = 14.sp,
+                                        color = Color.Gray
+                                    )
+                                )
+
+                            }
 
                             BasicTextField(
                                 value = amount,
@@ -485,8 +463,10 @@ fun MakeOfferScreen(
                 )
                 .clickable(enabled = isEnabled) {
                     if ( inboxVm.checkPrice(amount.toDouble()) ){
+
                         if( state.createOffer ){
                             inboxVm.createOffer(amount.toDouble())
+
                         }else{
                             inboxVm.makeOffer(amount.toDouble())
                         }

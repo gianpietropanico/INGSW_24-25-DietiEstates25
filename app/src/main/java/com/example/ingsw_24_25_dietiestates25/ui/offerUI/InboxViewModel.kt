@@ -74,16 +74,9 @@ class InboxViewModel  @Inject constructor (
         return price - (price * discountPercent)
     }
 
-    fun checkPrice( price : Double): Boolean{
-        val discount = calculateDiscount(state.value.selectedProperty!!.price.toDouble() , 10)
-
-        if( price < discount){
-            false
-        }else{
-            true
-        }
-
-        return false
+    fun checkPrice(price: Double): Boolean {
+        val discount = calculateDiscount(state.value.selectedProperty!!.price.toDouble(), 10)
+        return price >= discount
     }
 
     fun createOffer (amount : Double){
@@ -245,11 +238,12 @@ class InboxViewModel  @Inject constructor (
 
         if(offer == null ) {
             Log.d("OFFERCHATINIT", "errore nell'inizializzazione di offerchat : offer = null")
+
         }else {
 
             viewModelScope.launch {
 
-                val offerUser = if ( offer.buyerUser.username ==  user.value!!.username) offer.agent else offer.buyerUser
+                val offerUser = if ( offer.buyerUser.username ==  user.value!!.username) offer.agentUser else offer.buyerUser
 
                 _state.update {
                     it.copy(
@@ -264,6 +258,9 @@ class InboxViewModel  @Inject constructor (
         }
 
     }
+
+
+
 
     fun getUsername( ): String{
         return user.value!!.username
@@ -360,7 +357,15 @@ class InboxViewModel  @Inject constructor (
             }
         }
     }
+    fun setSelectedListing(listing: PropertyListing) {
 
+        _state.update {
+            it.copy(selectedProperty = listing)
+        }
+
+        Log.d("SETLISTING","${_state.value.selectedProperty}")
+
+    }
     fun clearState (){
         _state.value = InboxState()
     }

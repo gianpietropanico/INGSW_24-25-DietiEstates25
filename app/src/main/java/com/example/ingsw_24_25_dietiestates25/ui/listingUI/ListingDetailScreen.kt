@@ -32,12 +32,6 @@ fun ListingDetailScreen(
         Log.d("LISTING DETAIL SCREEN ","${state.selectedListing}")
     }
 
-
-
-//    LaunchedEffect(listing) {
-//        listing?.id?.let { listingVm.getListingById(it) }
-//    }
-
     when (uiState) {
         is ListingState.Loading -> {
             LoadingOverlay(isVisible = true)

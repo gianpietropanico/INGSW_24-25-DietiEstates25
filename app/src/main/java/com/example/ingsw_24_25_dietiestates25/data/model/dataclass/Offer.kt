@@ -7,8 +7,9 @@ data class Offer(
     val id: String,
     val listing: PropertyListing,
     val buyerUser: User,
-    val agent : User,
-    val messages: MutableList<OfferMessage> = mutableListOf()
+    val agentUser : User,
+    val messages: MutableList<OfferMessage> = mutableListOf(),
+    val appointmentSummary: AppointmentSummary? = null
 )
 
 @Serializable

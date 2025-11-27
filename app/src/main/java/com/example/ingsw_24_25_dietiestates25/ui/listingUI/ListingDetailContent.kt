@@ -80,6 +80,8 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferMessage
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
@@ -111,6 +113,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlin.String
+
 @Composable
 fun ListingDetailContent(
     navController: NavHostController,
@@ -143,7 +147,6 @@ fun ListingDetailContent(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState),
-                //.padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
@@ -411,9 +414,11 @@ fun ListingDetailContent(
                 fontSize = 24.sp
             )
 
-
             Button(
-                onClick = {},
+                onClick = {
+                    inboxVm.setSelectedProperty(selectedListing, true)
+                    navController.navigate(NavigationItem.OfferChat.route)
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(
