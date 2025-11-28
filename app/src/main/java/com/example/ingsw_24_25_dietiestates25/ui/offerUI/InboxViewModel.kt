@@ -282,12 +282,14 @@ class InboxViewModel  @Inject constructor (
                 if (result is ApiResult.Success) {
                     _state.update { current ->
                         current.copy(
-                            selectedAppointment = current.selectedAppointment?.copy(
-                                status = AppointmentStatus.ACCEPTED
-                            )
+                            appointments = current.appointments.map {
+                                if (it.id.toString() == appointmentId) it.copy(status = AppointmentStatus.ACCEPTED)
+                                else it
+                            },
+                            selectedAppointment = current.selectedAppointment?.takeIf { it.id.toString() == appointmentId }
+                                ?.copy(status = AppointmentStatus.ACCEPTED)
                         )
                     }
-                    println("Appuntamento accettato con id = $appointmentId")
                 }
             } catch (e: Exception) {
                 println("Errore acceptAppointment: ${e.message}")
@@ -304,15 +306,17 @@ class InboxViewModel  @Inject constructor (
                 if (result is ApiResult.Success) {
                     _state.update { current ->
                         current.copy(
-                            selectedAppointment = current.selectedAppointment?.copy(
-                                status = AppointmentStatus.REJECTED
-                            )
+                            appointments = current.appointments.map {
+                                if (it.id.toString() == appointmentId) it.copy(status = AppointmentStatus.REJECTED)
+                                else it
+                            },
+                            selectedAppointment = current.selectedAppointment?.takeIf { it.id.toString() == appointmentId }
+                                ?.copy(status = AppointmentStatus.REJECTED)
                         )
                     }
-                    println("Appuntamento rifiutato con id = $appointmentId")
                 }
             } catch (e: Exception) {
-                println("Errore rejectAppointment: ${e.message}")
+                println("Errore declineAppointment: ${e.message}")
             }
         }
     }

@@ -85,7 +85,12 @@ fun InboxScreen(
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)) {
-            Column {
+            Column (
+                modifier = Modifier
+                    .fillMaxSize()
+                    .systemBarsPadding() // Qui il contenuto parte sotto notch
+                    .padding(bottom = paddingValues.calculateBottomPadding()) // e sopra il bottom bar
+            ){
                 Text(
                     "Messages ${state.offers.size}",
                     modifier = Modifier

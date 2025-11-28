@@ -324,60 +324,60 @@ fun ListingDetailContent(
                         .background(Color.LightGray)
                 ) {
 
-                        GoogleMap(
-                            modifier = Modifier.fillMaxSize(),
-                            cameraPositionState = cameraPositionState,
-                            uiSettings = uiSettings,
-                            properties = mapProperties,
-                            onMapClick = { selectedPoi = null }
-                        ) {
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState,
+                        uiSettings = uiSettings,
+                        properties = mapProperties,
+                        onMapClick = { selectedPoi = null }
+                    ) {
+                        Marker(
+                            state = MarkerState(position = latLng),
+                            title = state.selectedListing?.title
+                        )
+                        selectedListing.property.pois.forEach { poi ->
                             Marker(
-                                state = MarkerState(position = latLng),
-                                title = state.selectedListing?.title
-                            )
-                            selectedListing.property.pois.forEach { poi ->
-                                Marker(
-                                    state = MarkerState(LatLng(poi.lat, poi.lon)),
-                                    icon = context.getPoiBitmapDescriptor(
-                                        poi.type,
-                                        poiIcons,
-                                        poiColors
-                                    ),
-                                    onClick = {
-                                        selectedPoi = poi
-                                        true
-                                    }
-                                )
-                            }
-                        }
-
-                        selectedPoi?.let { poi ->
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Color.White)
-                                    .padding(12.dp)
-                                    .zIndex(1f)
-                            ) {
-                                Column {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Text(poi.name, fontWeight = FontWeight.Bold)
-                                        Text(
-                                            "X",
-                                            color = Color.Red,
-                                            modifier = Modifier.clickable { selectedPoi = null })
-                                    }
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(poi.type)
-                                    Text("${poi.distance.toInt()} m away")
+                                state = MarkerState(LatLng(poi.lat, poi.lon)),
+                                icon = context.getPoiBitmapDescriptor(
+                                    poi.type,
+                                    poiIcons,
+                                    poiColors
+                                ),
+                                onClick = {
+                                    selectedPoi = poi
+                                    true
                                 }
+                            )
+                        }
+                    }
+
+                    selectedPoi?.let { poi ->
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White)
+                                .padding(12.dp)
+                                .zIndex(1f)
+                        ) {
+                            Column {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(poi.name, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        "X",
+                                        color = Color.Red,
+                                        modifier = Modifier.clickable { selectedPoi = null })
+                                }
+                                Spacer(Modifier.height(4.dp))
+                                Text(poi.type)
+                                Text("${poi.distance.toInt()} m away")
                             }
                         }
+                    }
 
                 }
 
@@ -546,4 +546,3 @@ fun ListingDetailContent(
 //        propertyListing = fakeListing
 //    )
 //}
-
