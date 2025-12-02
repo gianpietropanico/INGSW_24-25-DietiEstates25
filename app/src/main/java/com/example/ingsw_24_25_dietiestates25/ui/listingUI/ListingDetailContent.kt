@@ -416,8 +416,9 @@ fun ListingDetailContent(
 
             Button(
                 onClick = {
-                    inboxVm.setSelectedProperty(selectedListing, true)
+                    inboxVm.setOfferScreen(selectedListing)
                     navController.navigate(NavigationItem.OfferChat.route)
+
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 shape = RoundedCornerShape(12.dp),

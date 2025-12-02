@@ -10,8 +10,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -42,11 +47,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 
 
@@ -88,15 +96,60 @@ fun InboxScreen(
             Column (
                 modifier = Modifier
                     .fillMaxSize()
-                    .systemBarsPadding() // Qui il contenuto parte sotto notch
-                    .padding(bottom = paddingValues.calculateBottomPadding()) // e sopra il bottom bar
+                    .systemBarsPadding()
+                    .padding(bottom = paddingValues.calculateBottomPadding())
             ){
-                Text(
-                    "Messages ${state.offers.size}",
+                Row(
                     modifier = Modifier
-                        .padding(16.dp),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Inbox",
+                            style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                        Text(
+                            text = "${state.offerMessages.size} messages",
+                            style = MaterialTheme.typography.headlineSmall.copy(color = Color.Gray)
+                        )
+                    }
+
+
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(40))
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFF5B99C0),
+                                        Color(0xFF1688CF)
+                                    ),
+                                    start = Offset(0f,0f),
+                                    end = Offset(1000f, 0f)
+                                )
+                            )
+                            .clickable( )
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "Appointments",
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+
 
 
                 LazyColumn {
@@ -282,4 +335,62 @@ fun AppointmentItem(
 fun Long.toDaysAgo(): String {
     val days = (System.currentTimeMillis() - this) / (1000 * 60 * 60 * 24)
     return if (days == 0L) "Oggi" else "$days giorni fa"
+}
+
+
+@Composable
+fun InboxHeader(
+    offersCount: Int
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Inbox",
+                style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Bold)
+            )
+            Text(
+                text = "12 messages",
+                style = MaterialTheme.typography.headlineSmall.copy(color = Color.Gray)
+            )
+        }
+
+        // Pulsante Appointments
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(40))
+                .background(Color(0xFFE3F2FD))
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.CalendarMonth,
+                contentDescription = null,
+                tint = Color(0xFF1565C0)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "Appointments",
+                color = Color(0xFF1565C0),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InboxHeaderPreview() {
+    MaterialTheme {
+        // Fake state → puoi cambiarlo a piacere
+        InboxHeader(
+            offersCount = 12
+        )
+    }
 }

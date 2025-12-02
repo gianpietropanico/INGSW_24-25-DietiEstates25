@@ -15,4 +15,7 @@ interface OfferRepository {
     suspend fun getOffersByUser(userName: String): ApiResult<List<Offer>>
     suspend fun getAgentNameByEmail(email: String): ApiResult<String>
     suspend fun loadOfferChat(offerId : String): ApiResult<Offer>
+
+    suspend fun getOffer(propertyId : String, userId : String ): ApiResult<Offer?>
+
 }
