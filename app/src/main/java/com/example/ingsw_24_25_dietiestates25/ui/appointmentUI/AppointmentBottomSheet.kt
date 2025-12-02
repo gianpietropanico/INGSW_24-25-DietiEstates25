@@ -24,10 +24,10 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListi
 import com.example.ingsw_24_25_dietiestates25.ui.theme.AscientGradient
 import com.example.ingsw_24_25_dietiestates25.ui.theme.BlueGray
 import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherCard
-import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherForecast
-
 import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppointmentBottomSheet(
@@ -45,6 +45,8 @@ fun AppointmentBottomSheet(
             weatherVM.loadWeatherInfo(listing, day)
         }
     }
+
+    val daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), day)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -68,7 +70,6 @@ fun AppointmentBottomSheet(
             }
         }
     ) {
-
         Column(
             modifier = Modifier
                 .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -76,56 +77,66 @@ fun AppointmentBottomSheet(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
 
                 // ---------- Title ----------
                 Column {
                     Text(
-                        text = "Riepilogo",
+                        text = "Summary",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 24.sp
                         )
                     )
                     Text(
                         text = "${day.dayOfMonth}/${day.monthValue}/${day.year}",
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Gray)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.Black,
+                            fontSize = 20.sp
+                        )
                     )
                 }
 
                 // ---------- IMMAGINE E INFO PROPRIETÀ ----------
                 if (isForBooking && propertyListing != null) {
-
                     if (propertyListing.property.images.isNotEmpty()) {
                         AsyncImage(
                             model = propertyListing.property.images.first(),
                             contentDescription = "Foto proprietà",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(180.dp)
-                                .clip(RoundedCornerShape(14.dp)),
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(12.dp)),
                             contentScale = ContentScale.Crop
                         )
                     }
 
-                    Column(modifier = Modifier.padding(top = 10.dp)) {
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
                         Text(
                             text = propertyListing.title,
                             style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 22.sp
                             )
                         )
                         Text(
                             text = "${propertyListing.property.city}, ${propertyListing.property.street} ${propertyListing.property.civicNumber}",
-                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = Color.Black,
+                                fontSize = 20.sp
+                            )
                         )
                     }
                 }
 
-                // ---------- LISTA APPUNTAMENTI (solo modalità agente) ----------
+                // ---------- LISTA APPUNTAMENTI ----------
                 if (!isForBooking) {
                     Text(
                         "Appuntamenti del giorno:",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
+                        )
                     )
 
                     if (appointmentsForDay.isEmpty()) {
@@ -134,23 +145,24 @@ fun AppointmentBottomSheet(
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(Color(0xFFF3F3F3))
-                                .padding(16.dp),
+                                .padding(14.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "Nessun appuntamento",
-                                color = Color.Gray
+                                color = Color.Gray,
+                                fontSize = 13.sp
                             )
                         }
                     } else {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .heightIn(max = 180.dp)
+                                .heightIn(max = 160.dp)
                         ) {
                             items(appointmentsForDay) { app ->
                                 AppointmentCard(appointment = app)
-                                Spacer(Modifier.height(10.dp))
+                                Spacer(Modifier.height(8.dp))
                             }
                         }
                     }
@@ -159,35 +171,49 @@ fun AppointmentBottomSheet(
                 // ---------- METEO ----------
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(3.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    elevation = CardDefaults.cardElevation(2.dp),
                     colors = CardDefaults.cardColors(containerColor = BlueGray)
                 ) {
+                    Box(modifier = Modifier.padding(10.dp)) {
+                        when {
+                            daysBetween > 8 -> {
+                                Text(
+                                    text = "Weather not available",
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    fontSize = 12.sp
+                                )
+                            }
+                            weatherVM.state.isLoading -> {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.align(Alignment.Center),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                            }
+                            weatherVM.state.error != null -> {
+                                Text(
+                                    weatherVM.state.error ?: "",
+                                    color = Color.Red,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.align(Alignment.Center),
+                                    fontSize = 12.sp
+                                )
+                            }
+                            else -> {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    WeatherCard(
+                                        state = weatherVM.state,
+                                        backgroundColor = BlueGray,
 
-                    Box(modifier = Modifier.padding(14.dp)) {
-
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            WeatherCard(
-                                state = weatherVM.state,
-                                backgroundColor = BlueGray
-                            )
-                            WeatherForecast(state = weatherVM.state)
-                        }
-
-                        if (weatherVM.state.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.Center),
-                                color = Color.White
-                            )
-                        }
-
-                        weatherVM.state.error?.let { err ->
-                            Text(
-                                err,
-                                color = Color.Red,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -198,7 +224,7 @@ fun AppointmentBottomSheet(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp)
+                        .height(50.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(AscientGradient)
                         .clickable {
@@ -211,7 +237,8 @@ fun AppointmentBottomSheet(
                         text = "Conferma",
                         color = Color.White,
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
                         )
                     )
                 }

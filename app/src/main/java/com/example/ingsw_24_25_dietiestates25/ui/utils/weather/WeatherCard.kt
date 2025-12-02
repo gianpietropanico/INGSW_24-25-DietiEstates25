@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.R
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
-
 @Composable
 fun WeatherCard(
     state: WeatherState,
@@ -29,42 +28,48 @@ fun WeatherCard(
         Card(
             backgroundColor = backgroundColor,
             shape = RoundedCornerShape(10.dp),
-            modifier = modifier.padding(16.dp)
+            modifier = modifier.padding(10.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Orario
                 Text(
-                    text = " ${
-                        data.time.format(
-                            DateTimeFormatter.ofPattern("HH:mm")
-                        )
-                    }",
+                    text = data.time.format(DateTimeFormatter.ofPattern("HH:mm")),
                     modifier = Modifier.align(Alignment.End),
-                    color = Color.White
+                    color = Color.White,
+                    fontSize = 14.sp
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Icona meteo
                 Image(
                     painter = painterResource(id = data.weatherType.iconRes),
                     contentDescription = null,
-                    modifier = Modifier.width(200.dp)
+                    modifier = Modifier.width(120.dp)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Temperatura
                 Text(
                     text = "${data.temperatureCelsius}°C",
-                    fontSize = 50.sp,
+                    fontSize = 28.sp,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Descrizione meteo
+                Text(
+                    text = data.weatherType.weatherDesc,
+                    fontSize = 14.sp,
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = data.weatherType.weatherDesc,
-                    fontSize = 20.sp,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(32.dp))
+
+                // Dati extra (pressione, umidità, vento)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
@@ -74,21 +79,21 @@ fun WeatherCard(
                         unit = "hpa",
                         icon = ImageVector.vectorResource(id = R.drawable.ic_pressure),
                         iconTint = Color.White,
-                        textStyle = TextStyle(color = Color.White)
+                        textStyle = TextStyle(color = Color.White, fontSize = 12.sp)
                     )
                     WeatherDataDisplay(
                         value = data.humidity.roundToInt(),
                         unit = "%",
                         icon = ImageVector.vectorResource(id = R.drawable.ic_drop),
                         iconTint = Color.White,
-                        textStyle = TextStyle(color = Color.White)
+                        textStyle = TextStyle(color = Color.White, fontSize = 12.sp)
                     )
                     WeatherDataDisplay(
                         value = data.windSpeed.roundToInt(),
                         unit = "km/h",
                         icon = ImageVector.vectorResource(id = R.drawable.ic_wind),
                         iconTint = Color.White,
-                        textStyle = TextStyle(color = Color.White)
+                        textStyle = TextStyle(color = Color.White, fontSize = 12.sp)
                     )
                 }
             }
