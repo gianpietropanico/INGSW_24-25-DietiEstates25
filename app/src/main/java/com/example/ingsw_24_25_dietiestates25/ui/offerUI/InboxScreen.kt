@@ -68,10 +68,12 @@ fun InboxScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val state by inboxVm.state.collectAsState()
 
+    // Stato per la tab selezionata
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     LaunchedEffect(Unit) {
         inboxVm.loadOffers()
-        inboxVm.loadAppointments()
-    }
+        inboxVm.loadAppointments()}
 
     Scaffold(
         bottomBar = {
@@ -90,18 +92,15 @@ fun InboxScreen(
         }
     ) { paddingValues ->
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Column(
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
+            Column (
                 modifier = Modifier
                     .fillMaxSize()
                     .systemBarsPadding()
                     .padding(bottom = paddingValues.calculateBottomPadding())
-            ) {
-                // Header
+            ){
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,20 +120,24 @@ fun InboxScreen(
                         )
                     }
 
-                    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(40))
                             .background(
                                 brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFF5B99C0), Color(0xFF1688CF)),
-                                    start = Offset(0f, 0f),
+                                    colors = listOf(
+                                        Color(0xFF5B99C0),
+                                        Color(0xFF1688CF)
+                                    ),
+                                    start = Offset(0f,0f),
                                     end = Offset(1000f, 0f)
                                 )
                             )
                             .clickable(
                                 onClick = {
                                     navController.navigate(NavigationItem.CheckAllAppointments.route)
+                                    Log.d("InboxScreen", "Appointments clicked")
                                 }
                             )
                             .padding(horizontal = 16.dp, vertical = 10.dp),
@@ -154,28 +157,19 @@ fun InboxScreen(
                     }
                 }
 
-                // Lista offerte e appuntamenti
+
+
                 LazyColumn {
                     items(state.offers) { offer ->
                         OfferItem(
-                            offer = offer,
-                            inboxVm = inboxVm,
-                            navController = navController
-                        )
-                        HorizontalDivider()
-                    }
-
-                    items(state.appointments) { appointment ->
-                        AppointmentItem(
-                            appointment = appointment,
-                            currentUserId = user?.id ?: "",
-                            onClick = { navController.navigate(NavigationItem.AppointmentChat.route) },
-                            inboxVm = inboxVm,
-                            navController = navController
+                            offer,
+                            inboxVm,
+                            navController
                         )
                         HorizontalDivider()
                     }
                 }
+
             }
         }
     }
@@ -277,17 +271,15 @@ fun OfferItem(
 fun AppointmentItem(
     appointment: Appointment,
     currentUserId: String,
-    onClick: (Appointment) -> Unit,
-    inboxVm: InboxViewModel,
-    navController: NavController
+    onClick: (Appointment) -> Unit
 ) {
     val otherUser =
         if (appointment.agent.id == currentUserId) appointment.user else appointment.agent
     val lastMessage = appointment.appointmentMessages.lastOrNull()
     val statusColor = when (appointment.status.name) {
-        "ACCEPTED" -> Color(0xFF2E7D32)
-        "REJECTED" -> Color(0xFFC62828)
-        else -> Color(0xFF757575)
+        "ACCEPTED" -> Color(0xFF2E7D32) // verde
+        "REJECTED" -> Color(0xFFC62828) // rosso
+        else -> Color(0xFF757575)       // grigio
     }
 
     Row(
@@ -298,6 +290,7 @@ fun AppointmentItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
+        // Avatar circolare con iniziale utente
         Box(
             modifier = Modifier
                 .size(50.dp)
@@ -327,7 +320,9 @@ fun AppointmentItem(
                 color = Color.Gray
             )
             Text(
-                text = "Stato: ${appointment.status.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                text = "Stato: ${
+                    appointment.status.name.lowercase().replaceFirstChar { it.uppercase() }
+                }",
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
                 color = statusColor
             )
@@ -341,6 +336,7 @@ fun AppointmentItem(
             color = Color.Gray
         )
     }
+
 }
 
 fun Long.toDaysAgo(): String {
