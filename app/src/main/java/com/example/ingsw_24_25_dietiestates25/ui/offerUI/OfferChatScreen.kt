@@ -292,7 +292,7 @@ fun OfferChatScreen(
                                 )
                             )
                             .clickable(enabled = !isDisabled) {
-                                inboxVm.setSelectedProperty(listingOffer, true)
+                                inboxVm.setOfferScreen(listingOffer)
                                 navController.navigate(NavigationItem.MakeOffer.route)
                             },
                         contentAlignment = Alignment.Center

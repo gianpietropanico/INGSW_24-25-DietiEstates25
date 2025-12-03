@@ -226,13 +226,52 @@ class InboxViewModel  @Inject constructor (
         }
     }
 
-    fun setSelectedProperty (propertyListing : PropertyListing, createOffer :Boolean){
+    fun setOfferScreen(property: PropertyListing) {
+        viewModelScope.launch {
+            _state.update { it.copy(selectedProperty = property) }
 
-        _state.update { current ->
-            current.copy(selectedProperty = propertyListing, createOffer = createOffer)
+            val userId = userSessionManager.getCurrentUser()?.id.toString()
+
+            when (val result = offerRepo.getOffer(property.id, userId)) {
+
+
+                is ApiResult.Success -> {
+
+                    val offer = result.data
+
+                    println("===== DEBUG OFFER =====")
+                    println("offer           = $offer")
+                    println("offer?.listing  = ${offer?.listing}")
+                    println("offer?.messages = ${offer?.messages}")
+                    println("offer?.buyerUser = ${offer?.buyerUser}")
+                    println("offer?.agentUser = ${offer?.agentUser}")
+                    println("offer?.buyerUser?.username = ${offer?.buyerUser?.username}")
+                    println("offer?.agentUser?.username = ${offer?.agentUser?.username}")
+                    println("user.value?.username = ${user.value?.username}")
+                    println("=========================")
+
+                    val offerUser = if ( result.data!!.buyerUser.username ==  user.value!!.username) result.data.agentUser else result.data.buyerUser
+                    _state.update { it.copy(
+                        selectedOffer = result.data,
+                        selectedProperty = result.data.listing,
+                        offerMessages = result.data.messages,
+                        selectedOfferUser = offerUser
+                        ,createOffer = false) }
+
+                }
+
+                is ApiResult.UnknownError -> {
+                    _state.update { it.copy(selectedProperty = property, createOffer = true) }
+                }
+
+                is ApiResult.Authorized<*> -> TODO()
+                is ApiResult.Created<*> -> TODO()
+                is ApiResult.Unauthorized<*> -> TODO()
+            }
         }
-
     }
+
+
 
     fun offerChatInit (offer : Offer?){
 
@@ -340,6 +379,7 @@ class InboxViewModel  @Inject constructor (
                     historyOffersDialog = false
                 )
             }
+
         }else{
 
             viewModelScope.launch {

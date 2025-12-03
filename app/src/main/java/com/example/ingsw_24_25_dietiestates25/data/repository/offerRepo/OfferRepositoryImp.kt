@@ -164,6 +164,28 @@ class OfferRepositoryImp @Inject constructor(
         }
     }
 
+    override suspend fun getOffer(propertyId: String, userId: String): ApiResult<Offer?> {
+        return try {
+            val response = httpClient.get("$baseURL/offers/singlebyuser") {
+                url {
+                    parameters.append("propertyId", propertyId)
+                    parameters.append("userId", userId)
+                }
+                accept(ContentType.Application.Json)
+            }
+
+            when (response.status) {
+                HttpStatusCode.OK -> ApiResult.Success(response.body<Offer>())
+                HttpStatusCode.NotFound -> ApiResult.UnknownError(null)
+                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+            }
+
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+        }
+    }
+
+
     override suspend fun getAgentNameByEmail(email: String): ApiResult<String> {
         return try {
             val response = httpClient.get("$baseURL/agents/name") {
