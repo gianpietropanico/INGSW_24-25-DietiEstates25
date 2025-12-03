@@ -217,7 +217,14 @@ fun BookAppointmentScreen(
                 weatherVM = weatherVM,
                 appointmentVM = appointmentVM,
                 isForBooking = true,
-                onDismiss = { appointmentVM.selectDate(null) }
+                onConfirm = {
+                    propertyListing?.let { appointmentVM.bookAppointment(it) }
+                    appointmentVM.selectDate(null)
+                    navController.popBackStack() // torna a OfferChatScreen
+                },
+                onDismiss = {
+                    appointmentVM.selectDate(null)
+                }
             )
         }
 
