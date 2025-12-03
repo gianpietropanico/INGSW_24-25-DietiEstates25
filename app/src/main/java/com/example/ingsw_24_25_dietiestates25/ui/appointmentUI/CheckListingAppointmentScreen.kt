@@ -153,7 +153,7 @@ fun CheckListingAppointmentScreen(
                 onConfirm = {
                     propertyListing?.let { appointmentVM.bookAppointment(it) }
                     appointmentVM.selectDate(null)
-                    navController.popBackStack() // torna a OfferChatScreen
+                    navController.popBackStack()
                 },
                 onDismiss = {
                     appointmentVM.selectDate(null)
