@@ -37,6 +37,7 @@ fun AppointmentBottomSheet(
     weatherVM: WeatherViewModel,
     appointmentVM: AppointmentViewModel,
     isForBooking: Boolean = false,
+    onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
 
@@ -79,7 +80,7 @@ fun AppointmentBottomSheet(
 
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
 
-                // ---------- Title ----------
+                // ---------- Titolo ----------
                 Column {
                     Text(
                         text = "Summary",
@@ -97,7 +98,7 @@ fun AppointmentBottomSheet(
                     )
                 }
 
-                // ---------- IMMAGINE E INFO PROPRIETÀ ----------
+                // ---------- Immagine e info proprietà ----------
                 if (isForBooking && propertyListing != null) {
                     if (propertyListing.property.images.isNotEmpty()) {
                         AsyncImage(
@@ -129,7 +130,7 @@ fun AppointmentBottomSheet(
                     }
                 }
 
-                // ---------- LISTA APPUNTAMENTI ----------
+                // ---------- Lista appuntamenti ----------
                 if (!isForBooking) {
                     Text(
                         "Appuntamenti del giorno:",
@@ -168,7 +169,7 @@ fun AppointmentBottomSheet(
                     }
                 }
 
-                // ---------- METEO ----------
+                // ---------- Meteo ----------
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
@@ -210,7 +211,6 @@ fun AppointmentBottomSheet(
                                     WeatherCard(
                                         state = weatherVM.state,
                                         backgroundColor = BlueGray,
-
                                     )
                                 }
                             }
@@ -219,7 +219,7 @@ fun AppointmentBottomSheet(
                 }
             }
 
-            // ---------- PULSANTE CONFERMA ----------
+            // ---------- Pulsante conferma ----------
             if (isForBooking) {
                 Box(
                     modifier = Modifier
@@ -228,8 +228,7 @@ fun AppointmentBottomSheet(
                         .clip(RoundedCornerShape(10.dp))
                         .background(AscientGradient)
                         .clickable {
-                            propertyListing?.let { appointmentVM.bookAppointment(it) }
-                            onDismiss()
+                            onConfirm()
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -246,3 +245,4 @@ fun AppointmentBottomSheet(
         }
     }
 }
+

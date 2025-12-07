@@ -154,4 +154,8 @@ class AppointmentViewModel @Inject constructor(
     fun resetResultMessage() {
         _state.update { it.copy(resultMessage = null, success = false) }
     }
+
+    fun clearResult() {
+        _state.update { it.copy(resultMessage = null, success = false) }
+    }
 }

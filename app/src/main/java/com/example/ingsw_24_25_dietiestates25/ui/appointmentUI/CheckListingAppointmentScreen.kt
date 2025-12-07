@@ -150,7 +150,14 @@ fun CheckListingAppointmentScreen(
                 weatherVM,
                 appointmentVM = appointmentVM,
                 isForBooking = false,
-                onDismiss = { appointmentVM.selectDate(null) }
+                onConfirm = {
+                    propertyListing?.let { appointmentVM.bookAppointment(it) }
+                    appointmentVM.selectDate(null)
+                    navController.popBackStack()
+                },
+                onDismiss = {
+                    appointmentVM.selectDate(null)
+                }
             )
         }
     }

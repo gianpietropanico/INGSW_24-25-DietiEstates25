@@ -101,7 +101,12 @@ fun AppointmentCard(
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    "Booking by: ${appointment.user.name}",
+                    "Booking by: ${appointment.user.username}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+                Text(
+                    "Status: ${appointment.status}",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )
