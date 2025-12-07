@@ -3,6 +3,7 @@ package com.example.ingsw_24_25_dietiestates25.data.repository.propertyListingRe
 
 import android.content.Context
 import android.net.Uri
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Agency
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.request.PropertySearchRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
@@ -17,6 +18,8 @@ interface PropertyListingRepository {
 
     suspend fun getListingById( id:String ): ApiResult<PropertyListing>
     suspend fun searchWithFilters(request: PropertySearchRequest): Any
+
+    suspend fun getListingAgency( listingId : String) : ApiResult<Agency>
 
 
 }

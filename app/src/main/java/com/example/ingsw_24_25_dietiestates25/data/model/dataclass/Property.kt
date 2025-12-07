@@ -33,7 +33,6 @@ data class Property(
 )
 
 @Serializable
-
 data class PropertySummary(
     val city: String,
     val street: String,

@@ -141,6 +141,38 @@ class InboxViewModel  @Inject constructor (
         }
     }
 
+    fun loadAppointmentsForUser(userId : String) = viewModelScope.launch {
+        _state.update { it.copy(isLoading = true) }
+
+        val result = appointmentRepo.getAppointmentsByUser(userId)
+        when (result) {
+            is ApiResult.Success -> {
+                val appointments = result.data ?: emptyList()
+                //val unavailableDates = appointments.map { it.date }.toSet()
+
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        userAppointments = appointments,
+                        //unavailableDates = unavailableDates
+                    )
+                }
+            }
+
+            is ApiResult.UnknownError -> {
+                _state.update {
+                    it.copy(isLoading = false, resultMessage = result.message)
+                }
+            }
+
+            else -> {
+                _state.update {
+                    it.copy(isLoading = false, resultMessage = "Errore nel caricamento")
+                }
+            }
+        }
+    }
+
     fun acceptOffer(accepted : Boolean){
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
@@ -223,6 +255,10 @@ class InboxViewModel  @Inject constructor (
             is ApiResult.Created -> {
                 _state.update { it.copy(isLoading = false, resultMessage = result.message, created = true) }
             }
+
+            is ApiResult.NotFound<*> -> {
+                _state.update { it.copy(isLoading = false, resultMessage = result.message,success = false, localError = true) }
+            }
         }
     }
 
@@ -267,6 +303,7 @@ class InboxViewModel  @Inject constructor (
                 is ApiResult.Authorized<*> -> TODO()
                 is ApiResult.Created<*> -> TODO()
                 is ApiResult.Unauthorized<*> -> TODO()
+                is ApiResult.NotFound<*> -> TODO()
             }
         }
     }

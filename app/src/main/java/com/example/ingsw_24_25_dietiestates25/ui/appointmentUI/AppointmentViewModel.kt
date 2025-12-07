@@ -55,7 +55,7 @@ class AppointmentViewModel @Inject constructor(
         when (result) {
             is ApiResult.Success -> {
                 val appointments = result.data ?: emptyList()
-                val unavailableDates = appointments.map { it.date }.toSet() // ✅ Fix qui
+                val unavailableDates = appointments.map { it.date }.toSet()
 
                 _state.update {
                     it.copy(

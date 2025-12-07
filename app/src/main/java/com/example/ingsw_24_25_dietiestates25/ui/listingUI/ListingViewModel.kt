@@ -166,12 +166,17 @@ class ListingViewModel @Inject constructor(
 
     fun setSelectedListing(listing: PropertyListing) {
 
-        _state.update {
-            it.copy(selectedListing = listing)
+        //QUI DEVO INSERIRE una chiamata alla repository che mi prende che tipo di agenzia è
+        viewModelScope.launch(Dispatchers.IO) {
+            val agency = listingsRepo.getListingAgency(listing.id)
+            Log.d("LISTINGVM GET AGENCY","${agency.data?.name}")
+
+            _state.update {
+                it.copy(selectedListing = listing, agency = agency.data)
+            }
+
+            Log.d("SETLISTING", "${_state.value.selectedListing}")
         }
-
-        Log.d("SETLISTING","${_state.value.selectedListing}")
-
     }
 
     fun resetForm() {

@@ -242,9 +242,7 @@ fun ListingDetailContent(
                     }
                 }
 
-
             }
-
 
 
             Column(
@@ -264,7 +262,9 @@ fun ListingDetailContent(
                 Spacer(Modifier.height(15.dp))
                 InfoHouse(selectedListing.property)
             }
-            AgentCard(selectedListing.agent)
+
+
+            AgentCard(selectedListing.agent, state.agency)
 
 
             Column(

@@ -11,5 +11,7 @@ sealed class ApiResult<T>(val data: T? = null, val message: String? = null) {
     class Success<T>(data: T, message: String? = "ok") : ApiResult<T>(data = data, message = message)
 
     class Created<T>(data: T, message: String? ="created") : ApiResult<T>(data=data , message = message)
+
+    class NotFound<T>(message: String? = "No data found") : ApiResult<T>(message = message)
 }
 

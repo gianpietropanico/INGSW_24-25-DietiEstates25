@@ -132,7 +132,9 @@ fun InboxScreen(
                                     end = Offset(1000f, 0f)
                                 )
                             )
-                            .clickable( )
+                            .clickable {
+                                navController.navigate(NavigationItem.AppointmentChatScreen.route)
+                            }
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {

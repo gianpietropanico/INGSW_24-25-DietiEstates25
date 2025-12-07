@@ -38,6 +38,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.MakeOfferScreen
 import com.example.ingsw_24_25_dietiestates25.ui.offerUI.OfferChatScreen
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.UserAppointmentsScreen
 import com.example.ingsw_24_25_dietiestates25.ui.utils.weather.WeatherViewModel
 
 
@@ -78,7 +79,7 @@ enum class Screen {
     APPOINTMENTCHAT,
     BOOKAPPOINTMENT,
     CHECKAPPOINTMENT,
-
+    APPOINTMENTCHATSCREEN,
     CHECKALLAPPOINTMENT
 }
 
@@ -111,6 +112,8 @@ sealed class NavigationItem(val route: String) {
     object CheckListingAppointment : NavigationItem(Screen.CHECKAPPOINTMENT.name)
 
     object CheckAllAppointments : NavigationItem(Screen.CHECKALLAPPOINTMENT.name)
+
+    object AppointmentChatScreen : NavigationItem(Screen.APPOINTMENTCHATSCREEN.name)
 }
 
 
@@ -341,6 +344,15 @@ fun AppNavHost(
                 navController = navController,
                 appointmentVM = appointmentViewModel,
                 listingVm = listingViewModel,
+                weatherVM = weatherViewModel
+            )
+        }
+
+        composable(NavigationItem.AppointmentChatScreen.route){
+            UserAppointmentsScreen(
+                navController = navController,
+                appointmentVM = appointmentViewModel,
+                inboxVm = inboxViewModel,
                 weatherVM = weatherViewModel
             )
         }

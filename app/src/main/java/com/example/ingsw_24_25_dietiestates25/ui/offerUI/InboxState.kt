@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.offerUI
 
+import androidx.annotation.EmptySuper
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentMessage
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentSummary
@@ -31,6 +32,8 @@ data class InboxState (
     var selectedOffer : Offer? = null,
     var selectedOfferUser : User? = null,
     val selectedAppointment: Appointment? = null,
-    val selectedProperty : PropertyListing? = null
+    val selectedProperty : PropertyListing? = null,
+
+    var userAppointments : List<Appointment> = emptyList()
 
 )

@@ -4,6 +4,7 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.AppointmentSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferSummary
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.data.model.request.AppointmentRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.request.OfferRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
@@ -143,4 +144,7 @@ class AppointmentRepositoryImpl @Inject constructor(
             ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
         }
     }
+
+
+
 }

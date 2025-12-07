@@ -23,7 +23,7 @@ import javax.inject.Inject
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.plugins.ResponseException
 import io.ktor.http.HttpStatusCode
-
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Agency
 
 
 class PropertyListingRepositoryImpl @Inject constructor(
@@ -32,6 +32,53 @@ class PropertyListingRepositoryImpl @Inject constructor(
 ) : PropertyListingRepository {
 
     private val baseURL = "http://10.0.2.2:8080"
+
+    override suspend fun getListingAgency(listingId: String): ApiResult<Agency> {
+        return try {
+
+            val response = httpClient.get("$baseURL/propertylisting/getlistingagency/$listingId") {
+                accept(ContentType.Application.Json)
+            }
+
+            return when (response.status) {
+
+                HttpStatusCode.OK -> {
+                    val apiResponse: ListResponse<Agency> = response.body()
+                    val agency = apiResponse.data!!
+
+                    Log.d("ListingRepo", "Agency: $agency")
+
+                    ApiResult.Success(agency, apiResponse.message ?: "Agenzia recuperata con successo")
+                }
+
+                HttpStatusCode.NotFound -> {
+                    val err = response.bodyAsText()
+                    ApiResult.NotFound("Agenzia non trovata: $err")
+                }
+
+                HttpStatusCode.Unauthorized -> {
+                    ApiResult.Unauthorized("Accesso non autorizzato per questa risorsa")
+                }
+
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                }
+            }
+
+        } catch (e: ResponseException) {
+            when (e.response.status) {
+                HttpStatusCode.NotFound -> ApiResult.NotFound("Agenzia non trovata")
+                HttpStatusCode.Unauthorized -> ApiResult.Unauthorized("Non autorizzato")
+                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+        }
+    }
+
 
     override suspend fun addPropertyListing(propertyListing: PropertyListing): ApiResult<String> {
         return try {

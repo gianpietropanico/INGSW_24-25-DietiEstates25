@@ -1,6 +1,7 @@
 package com.example.ingsw_24_25_dietiestates25.ui.utils
 
 import android.R.attr.rating
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -87,6 +88,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ingsw_24_25_dietiestates25.R
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Agency
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.EnergyClass
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
@@ -396,8 +398,10 @@ fun EnergyClassDropdown(listingVm: ListingViewModel) {
 
 @Composable
 fun AgentCard(
-    agent: User?
+    agent: User?,
+    agency : Agency?
 ) {
+    Log.d("AGENT CARD","${agency}    ${agent}")
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -428,7 +432,7 @@ fun AgentCard(
                 ) {
                     if (agent?.profilePicture != null) {
                         Image(
-                            bitmap = bse64ToImageBitmap(agent.profilePicture!!),
+                            bitmap = bse64ToImageBitmap(agent.profilePicture),
                             contentDescription = "Profile Picture",
                             modifier = Modifier
                                 .fillMaxSize()
@@ -459,14 +463,18 @@ fun AgentCard(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.Start
                     ) {
+                        if (agent?.name == null ) agent!!.username else agent.name?.let {
+                            Text(
+                                text = it,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        }
+
+
                         Text(
-                            text = "TORCI",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
-                        Text(
-                            text = "agenzia.com",
-                            color = Color.Gray,
+                            text = agency?.name ?: "ERRORE",
+                            color = if(agency == null )Color.Red else Color.Gray,
                             fontSize = 14.sp
                         )
                     }
@@ -833,5 +841,5 @@ fun InfoHousePreview() {
         surname = "DAJE"
     )
 
-    AgentCard( fakeAgent )
+    //AgentCard( fakeAgent )
 }

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.outlined.MailOutline
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
@@ -66,6 +67,10 @@ fun OfferChatScreen(
     val state by inboxVm.state.collectAsState()
     val currentUser = inboxVm.getCurrentUser()
 
+    LaunchedEffect(Unit) {
+        inboxVm.loadAppointmentsForUser( currentUser!!.id)
+    }
+
     when {
         (state.selectedProperty == null && state.selectedOffer == null) -> {
             Log.d("OFFERCHATSCREEN","Offer is null")
@@ -94,6 +99,7 @@ fun OfferChatScreen(
                 isDisabled = lastMessage.status == OfferStatus.ACCEPTED
 
                 listingOffer = state.selectedOffer!!.listing
+
 
                 if(state.selectedOffer!!.buyerUser.username == currentUser!!.username)
                     chatUser = state.selectedOffer!!.agentUser
@@ -361,30 +367,29 @@ fun OfferChatScreen(
                             )
                         }
 
-                        state.selectedAppointment?.let { appointment ->
+                        items(state.userAppointments) { appointment ->
 
                             val isAgent = appointment.agent.username == currentUser!!.username
 
-                            item {
-                                AppointmentSummaryCard(
-                                    summary = AppointmentSummary(
-                                        date = appointment.date,
-                                        status = when (appointment.status) {
-                                            AppointmentStatus.ACCEPTED -> true
-                                            AppointmentStatus.REJECTED -> false
-                                            AppointmentStatus.PENDING -> null
-                                        }
-                                    ),
-                                    isAgent = isAgent,
-                                    onAccept = {
-                                        inboxVm.acceptAppointment(appointment.id)
-                                    },
-                                    onReject = {
-                                        inboxVm.declineAppointment(appointment.id)
+                            AppointmentSummaryCard(
+                                summary = AppointmentSummary(
+                                    date = appointment.date,
+                                    status = when (appointment.status) {
+                                        AppointmentStatus.ACCEPTED -> true
+                                        AppointmentStatus.REJECTED -> false
+                                        AppointmentStatus.PENDING -> null
                                     }
-                                )
-                            }
+                                ),
+                                isAgent = isAgent,
+                                onAccept = {
+                                    inboxVm.acceptAppointment(appointment.id)
+                                },
+                                onReject = {
+                                    inboxVm.declineAppointment(appointment.id)
+                                }
+                            )
                         }
+
 
 
                         if (isDisabled) {

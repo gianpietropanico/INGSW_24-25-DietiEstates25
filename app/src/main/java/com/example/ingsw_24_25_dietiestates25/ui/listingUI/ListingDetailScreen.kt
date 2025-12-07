@@ -30,6 +30,7 @@ fun ListingDetailScreen(
     LaunchedEffect(Unit) {
         Log.d("LISTING DETAIL SCREEN "," Stato della UI : $uiState")
         Log.d("LISTING DETAIL SCREEN ","${state.selectedListing}")
+        Log.d("LISTINGVM GET AGENCY","${state.agency}")
     }
 
     when (uiState) {
