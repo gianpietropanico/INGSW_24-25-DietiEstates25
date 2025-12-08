@@ -211,6 +211,35 @@ fun  SignUpScreen (
                 )
             }
 
+            Row {
+                Text(
+                    text = "If you have an Agency ",
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        color = Color.DarkGray
+                    )
+                )
+
+                Text(
+                    text = "send a Request!",
+                    fontSize = 14.sp,
+                    lineHeight =  20.sp,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        color = primaryBlueWithOpacity.copy(alpha = 0.95f),
+                    ),
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(NavigationItem.AgencySignIn.route)
+                            am.clearResultMessage()
+                        }
+                )
+            }
+
         }
 
         //Funzione per mettere a schermo il caricamento

@@ -1,4 +1,5 @@
 package com.example.ingsw_24_25_dietiestates25.ui.authUI
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -69,8 +70,6 @@ fun  AgencySignInScreen (
     var passwordVisible by remember { mutableStateOf(false) }
     var agencyName by remember { mutableStateOf("") }
 
-//    state.localError = true
-//    state.resultMessage = "VABBè FORZA NAPOLI SKIBIDIPOOPPY"
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -162,6 +161,7 @@ fun  AgencySignInScreen (
             GradientButton(
                 text = "Send Request",
                 onClick = {
+
                     val profilePicBase64 = drawableToBase64(context, R.drawable.account_circle_blue)
                     state.confirmPassword = confirmPassword
                     am.sendAgencyRequest(agencyName, email, password, profilePicBase64!!)
