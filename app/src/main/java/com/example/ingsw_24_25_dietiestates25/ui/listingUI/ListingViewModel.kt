@@ -100,7 +100,7 @@ class ListingViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             uiState = ListingState.Error(
-                                result.message ?: "Non autorizzato"
+                                result.message ?: "Unauthorized"
                             )
                         )
                     }
@@ -108,12 +108,12 @@ class ListingViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             uiState = ListingState.Error(
-                                result.message ?: "Errore sconosciuto"
+                                result.message ?: "Unknown Error"
                             )
                         )
                     }
                 } else {
-                    _state.update { it.copy(uiState = ListingState.Error("Errore inatteso")) }
+                    _state.update { it.copy(uiState = ListingState.Error("Unexpected error")) }
                 }
             } catch (e: Exception) {
                 _state.update { it.copy(uiState = ListingState.Error("Unknown Error: ${e.message}")) }
@@ -193,7 +193,7 @@ class ListingViewModel @Inject constructor(
             is ApiResult.Unauthorized -> _state.update {
                 it.copy(
                     uiState = ListingState.Error(
-                        result.message ?: "Accesso non autorizzato"
+                        result.message ?: "Unauthorized access"
                     )
                 )
             }
@@ -201,12 +201,12 @@ class ListingViewModel @Inject constructor(
             is ApiResult.UnknownError -> _state.update {
                 it.copy(
                     uiState = ListingState.Error(
-                        result.message ?: "Errore sconosciuto"
+                        result.message ?: "Unknown Error"
                     )
                 )
             }
 
-            else -> _state.update { it.copy(uiState = ListingState.Error("Errore inatteso")) }
+            else -> _state.update { it.copy(uiState = ListingState.Error("Unexpected error")) }
         }
     }
 }

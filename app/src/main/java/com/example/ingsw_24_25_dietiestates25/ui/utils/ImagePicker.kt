@@ -10,8 +10,8 @@ fun rememberImagePicker(onImageSelected: (Uri?) -> Unit): () -> Unit {
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        onImageSelected(uri) // Passa l'URI dell'immagine selezionata alla UI
+        onImageSelected(uri)
     }
 
-    return { imagePickerLauncher.launch("image/*") } // Lancia il selettore della galleria
+    return { imagePickerLauncher.launch("image/*") }
 }

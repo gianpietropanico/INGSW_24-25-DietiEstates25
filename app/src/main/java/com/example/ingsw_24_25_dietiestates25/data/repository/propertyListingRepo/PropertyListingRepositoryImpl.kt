@@ -48,41 +48,40 @@ class PropertyListingRepositoryImpl @Inject constructor(
 
                     Log.d("ListingRepo", "Agency: $agency")
 
-                    ApiResult.Success(agency, apiResponse.message ?: "Agenzia recuperata con successo")
+                    ApiResult.Success(agency, apiResponse.message ?: "Agency retrieved successfully")
                 }
 
                 HttpStatusCode.NotFound -> {
                     val err = response.bodyAsText()
-                    ApiResult.NotFound("Agenzia non trovata: $err")
+                    ApiResult.NotFound("Agency not found: $err")
                 }
 
                 HttpStatusCode.Unauthorized -> {
-                    ApiResult.Unauthorized("Accesso non autorizzato per questa risorsa")
+                    ApiResult.Unauthorized("Unauthorized access to this resource")
                 }
 
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
 
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.NotFound -> ApiResult.NotFound("Agenzia non trovata")
-                HttpStatusCode.Unauthorized -> ApiResult.Unauthorized("Non autorizzato")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                HttpStatusCode.NotFound -> ApiResult.NotFound("Agency not found")
+                HttpStatusCode.Unauthorized -> ApiResult.Unauthorized("Unauthorized")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
 
     override suspend fun addPropertyListing(propertyListing: PropertyListing): ApiResult<String> {
         return try {
-
 
             val response = httpClient.post("$baseURL/propertylisting/addpropertylisting") {
                 contentType(ContentType.Application.Json)
@@ -95,25 +94,25 @@ class PropertyListingRepositoryImpl @Inject constructor(
                     val id: String = response.body()
                     Log.d("ListingRepo", id)
 
-                    ApiResult.Success(id, "Operazione completata con successo")
+                    ApiResult.Success(id, "Operation completed successfully")
                 }
                 HttpStatusCode.Conflict -> {
                     val err = response.bodyAsText()
-                    ApiResult.Unauthorized("Inserimento fallito: $err")
+                    ApiResult.Unauthorized("Insert failed: $err")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Inserimento fallito")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Insert failed")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -131,24 +130,24 @@ class PropertyListingRepositoryImpl @Inject constructor(
                     if (body.success && body.data != null) {
                         ApiResult.Success(body.data)
                     } else {
-                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto dal server")
+                        ApiResult.UnknownError(body.message ?: "Unknown server error")
                     }
                 }
                 HttpStatusCode.NotFound -> {
-                    ApiResult.UnknownError("Nessuna proprietà trovata per l'agente $agentEmail")
+                    ApiResult.UnknownError("No properties found for agent $agentEmail")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata per l'agente $agentEmail")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("No properties found for agent $agentEmail")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -162,19 +161,19 @@ class PropertyListingRepositoryImpl @Inject constructor(
             when (response.status) {
                 HttpStatusCode.OK -> {
                     val listing: PropertyListing = response.body()
-                    ApiResult.Success(listing, "Proprietà recuperata con successo")
+                    ApiResult.Success(listing, "Property retrieved successfully")
                 }
                 HttpStatusCode.NotFound -> {
-                    ApiResult.UnknownError("Proprietà con id $id non trovata")
+                    ApiResult.UnknownError("Property with id $id not found")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -187,24 +186,24 @@ class PropertyListingRepositoryImpl @Inject constructor(
             return when (response.status) {
                 HttpStatusCode.OK -> {
                     val listings: List<PropertyListing> = response.body()
-                    ApiResult.Success(listings, "Lista di tutte le proprietà recuperata con successo")
+                    ApiResult.Success(listings, "List of all properties retrieved successfully")
                 }
                 HttpStatusCode.NotFound -> {
-                    ApiResult.UnknownError("Nessuna proprietà trovata")
+                    ApiResult.UnknownError("No properties found")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("No properties found")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -224,24 +223,24 @@ class PropertyListingRepositoryImpl @Inject constructor(
             return when (response.status) {
                 HttpStatusCode.OK -> {
                     val listings: List<PropertyListing> = response.body()
-                    ApiResult.Success(listings, "Proprietà recuperate con successo nel raggio indicato")
+                    ApiResult.Success(listings, "Properties retrieved successfully within the specified radius")
                 }
                 HttpStatusCode.NotFound -> {
-                    ApiResult.UnknownError("Nessuna proprietà trovata entro il raggio di $radius km")
+                    ApiResult.UnknownError("No properties found within a $radius km radius")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata entro il raggio di $radius km")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("No properties found within a $radius km radius")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -260,17 +259,17 @@ class PropertyListingRepositoryImpl @Inject constructor(
                     if (listings.success && listings.data != null) {
                         ApiResult.Success(listings.data)
                     } else {
-                        ApiResult.UnknownError(listings.message ?: "Errore sconosciuto dal server")
+                        ApiResult.UnknownError(listings.message ?: "Unknown server error")
                     }
                 }
-                HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata")
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("No properties found")
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -286,11 +285,11 @@ class PropertyListingRepositoryImpl @Inject constructor(
                     val listings: List<PropertyListing> = response.body()
                     ApiResult.Success(listings)
                 }
-                HttpStatusCode.NotFound -> ApiResult.UnknownError("Nessuna proprietà trovata")
-                else -> ApiResult.UnknownError("Errore HTTP ${response.status.value}")
+                HttpStatusCode.NotFound -> ApiResult.UnknownError("No properties found")
+                else -> ApiResult.UnknownError("HTTP Error ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 

@@ -207,15 +207,15 @@ fun CounterButton(
 ) {
     Box(
         modifier = Modifier
-            .size(44.dp)                              // ← più largo
-            .clip(RoundedCornerShape(12.dp))          // ← leggermente più morbido
+            .size(44.dp)
+            .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFBFC4D6).copy(alpha = 0.45f))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = symbol,
-            fontSize = 22.sp,                         // ← leggermente più grande
+            fontSize = 22.sp,
             fontWeight = FontWeight.Medium,
             color = Color(0xFF2C2F4A)
         )
@@ -473,7 +473,7 @@ fun AgentCard(
 
 
                         Text(
-                            text = agency?.name ?: "ERRORE",
+                            text = agency?.name ?: "ERROR",
                             color = if(agency == null )Color.Red else Color.Gray,
                             fontSize = 14.sp
                         )
@@ -486,7 +486,7 @@ fun AgentCard(
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // --- Valutazione numerica ---
+                        //Valutazione numerica
                         Row(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
@@ -512,7 +512,7 @@ fun AgentCard(
 
                         Spacer(modifier = Modifier.height(4.dp))
 
-                        // --- Stelle ---
+                        //Stelle
                         Row(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically,
@@ -530,7 +530,7 @@ fun AgentCard(
 
                         Spacer(modifier = Modifier.height(4.dp))
 
-                        // --- Numero recensioni ---
+                        // Numero recensioni
                         Text(
                             text = "73 ratings",
                             fontWeight = FontWeight.Light,
@@ -800,7 +800,7 @@ fun InfoHousePreview() {
         )
     )
 
-    // --- Mock immagini ---
+    //Mock immagini
     val fakeImages = listOf(
         "https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
         "https://images.unsplash.com/photo-1568605114967-8130f3a36994"

@@ -196,7 +196,7 @@ fun OfferChatScreen(
                             contentAlignment = Alignment.Center
                         ) {
 
-                            // ⚠️ DIPENDENZA → listing.property.images viene da Offer
+                            //DIPENDENZA → listing.property.images viene da Offer
                             if (!state.selectedProperty!!.property.images.isEmpty()) {
                                 AsyncImage(
                                     model = state.selectedProperty!!.property.images.first(),
@@ -625,10 +625,10 @@ fun AppointmentSummaryCard(
 
 @Composable
 fun OfferCardMessage(
-    message : OfferMessage,   // ⚠️ OfferMessage = modello OFFER
+    message : OfferMessage,   //OfferMessage = modello OFFER
     currentUser : User,
-    offerUser : User,         // ⚠️ deriva da OFFER
-    offer: Offer,             // ⚠️ dipendenza diretta
+    offerUser : User,         //deriva da OFFER
+    offer: Offer,             //dipendenza diretta
     inboxVm: InboxViewModel,
     navController : NavController
 ) {
@@ -636,7 +636,7 @@ fun OfferCardMessage(
     val isMine = message.sender.username == currentUser.username
     val bubbleColor = if (isMine) Color(0xFFF2F2F2) else Color.White
 
-    // ⚠️ DIPENDENZA: status dell'offerta
+    //DIPENDENZA: status dell'offerta
     val textColor = when (message.status) {
         OfferStatus.ACCEPTED ->  Color(0xFF2E7D32)
         OfferStatus.REJECTED -> DarkRed
@@ -658,7 +658,7 @@ fun OfferCardMessage(
                     .padding(bottom = 4.dp)
             ) {
 
-                // ⚠️ DIPENDENZA → offerUser viene da OFFER
+                //DIPENDENZA → offerUser viene da OFFER
                 val picture = offerUser.profilePicture
 
                 if (picture != null) {
@@ -700,7 +700,7 @@ fun OfferCardMessage(
                 Row {
 
                     Text(
-                        text = "${message.amount!!.toInt()} €", // ⚠️ importo OFFER
+                        text = "${message.amount!!.toInt()} €", //importo OFFER
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Black
                         )
@@ -708,12 +708,12 @@ fun OfferCardMessage(
 
                     Spacer(Modifier.width(10.dp))
 
-                    // ⚠️ DIPENDENZA → prende la penultima offerta
+                    //DIPENDENZA → prende la penultima offerta
                     val secondToLast = offer.messages.getOrNull(offer.messages.size - 2)
 
                     Text(
                         text = if (secondToLast == null)
-                            "${offer.listing.price.toInt()} €" // ⚠️ prezzo OFFER
+                            "${offer.listing.price.toInt()} €" //prezzo OFFER
                         else
                             "${secondToLast.amount!!.toInt()} €",
                         style = MaterialTheme.typography.bodyLarge.copy(
@@ -725,14 +725,14 @@ fun OfferCardMessage(
                 }
 
                 Text(
-                    text = returnStatus(message.status!!.name), // ⚠️ OFFER STATUS
+                    text = returnStatus(message.status!!.name), //OFFER STATUS
                     style = MaterialTheme.typography.bodyLarge.copy(
                         color = textColor,
                         fontWeight = FontWeight.SemiBold
                     )
                 )
 
-                if (!isMine && message.status == OfferStatus.PENDING) { // ⚠️ DIPENDENZA
+                if (!isMine && message.status == OfferStatus.PENDING) { //DIPENDENZA
                     val buttonShape = RoundedCornerShape(4.dp)
                     Column {
 
@@ -742,7 +742,7 @@ fun OfferCardMessage(
                                 .height(30.dp)
                                 .clip(buttonShape)
                                 .background(AscientGradient)
-                                .clickable { inboxVm.acceptOffer(true) }, // ⚠️ logica OFFER
+                                .clickable { inboxVm.acceptOffer(true) }, //logica OFFER
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -768,7 +768,7 @@ fun OfferCardMessage(
                                     .height(30.dp)
                                     .clip(buttonShape)
                                     .border(1.dp, AscientGradient, buttonShape)
-                                    .clickable { inboxVm.acceptOffer(false) }, // ⚠️ logica OFFER
+                                    .clickable { inboxVm.acceptOffer(false) }, //logica OFFER
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(

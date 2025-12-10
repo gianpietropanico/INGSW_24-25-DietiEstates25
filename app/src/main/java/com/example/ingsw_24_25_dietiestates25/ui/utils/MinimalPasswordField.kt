@@ -90,7 +90,7 @@ fun MinimalPasswordField(
 
             IconButton(
                 onClick = onVisibilityToggle,
-                modifier = Modifier.size(24.dp) // puoi aggiustare la dimensione
+                modifier = Modifier.size(24.dp)
             ) {
                 Icon(
                     imageVector = if (passwordVisible) ImageVector.vectorResource(id = R.drawable.visibility_on) else ImageVector.vectorResource(id = R.drawable.visibility_off),

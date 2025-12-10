@@ -41,12 +41,12 @@ class AppointmentRepositoryImpl @Inject constructor(
             when (response.status) {
                 HttpStatusCode.OK -> {
                     val body: Appointment = response.body()
-                    ApiResult.Success(body, "Richiesta di appuntamento creato con successo")
+                    ApiResult.Success(body, "Appointment request successfully created")
                 }
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -55,7 +55,7 @@ class AppointmentRepositoryImpl @Inject constructor(
             val response = httpClient.get("$baseURL/appointments/listingappointments") {
                 url {
                     parameters.append("listingId", listingId)
-                    userId?.let { parameters.append("userId", it) } // aggiunge userId solo se non nullo
+                    userId?.let { parameters.append("userId", it) }
                 }
                 accept(ContentType.Application.Json)
             }
@@ -65,10 +65,10 @@ class AppointmentRepositoryImpl @Inject constructor(
                     val body: List<Appointment> = response.body()
                     ApiResult.Success(body)
                 }
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -85,10 +85,10 @@ class AppointmentRepositoryImpl @Inject constructor(
                     ApiResult.Success(body)
                 }
 
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -104,10 +104,10 @@ class AppointmentRepositoryImpl @Inject constructor(
                     ApiResult.Success(body)
                 }
 
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -119,12 +119,12 @@ class AppointmentRepositoryImpl @Inject constructor(
             }
 
             if (response.status.isSuccess()) {
-                ApiResult.Success(Unit, "Appuntamento accettato con successo")
+                ApiResult.Success(Unit, "Appointment successfully accepted")
             } else {
-                ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -136,15 +136,12 @@ class AppointmentRepositoryImpl @Inject constructor(
             }
 
             if (response.status.isSuccess()) {
-                ApiResult.Success(Unit, "Appuntamento rifiutata con successo")
+                ApiResult.Success(Unit, "Appointment successfully declined")
             } else {
-                ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
-
-
-
 }

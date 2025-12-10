@@ -28,7 +28,7 @@ fun ListingDetailScreen(
     val uiState = state.uiState
 
     LaunchedEffect(Unit) {
-        Log.d("LISTING DETAIL SCREEN "," Stato della UI : $uiState")
+        Log.d("LISTING DETAIL SCREEN "," UI's state : $uiState")
         Log.d("LISTING DETAIL SCREEN ","${state.selectedListing}")
         Log.d("LISTINGVM GET AGENCY","${state.agency}")
     }

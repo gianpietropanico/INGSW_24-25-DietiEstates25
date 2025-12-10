@@ -156,10 +156,14 @@ fun InboxScreen(
 
                 LazyColumn {
                     items(state.offers) { offer ->
-                        OfferItem(
-                            offer,
-                            inboxVm,
-                            navController
+                        OfferItem(offer, inboxVm, navController)
+                        HorizontalDivider()
+                    }
+                    items(state.appointments) { appointment ->
+                        AppointmentItem(
+                            appointment = appointment,
+                            currentUserId = user?.id ?: "",
+                            onClick = { navController.navigate(NavigationItem.OfferChat.route) }
                         )
                         HorizontalDivider()
                     }

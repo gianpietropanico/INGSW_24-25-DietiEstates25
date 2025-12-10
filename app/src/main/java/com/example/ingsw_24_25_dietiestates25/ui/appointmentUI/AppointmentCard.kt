@@ -67,7 +67,7 @@ fun AppointmentCard(
             if (appointment.listing.property.images.isNotEmpty()) {
                 AsyncImage(
                     model = appointment.listing.property.images.first(),
-                    contentDescription = "Immagine della proprietà",
+                    contentDescription = "Property imageProperty image",
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(10.dp)),
@@ -76,7 +76,7 @@ fun AppointmentCard(
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.default_house),
-                    contentDescription = "Immagine di default",
+                    contentDescription = "Default image",
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(10.dp)),

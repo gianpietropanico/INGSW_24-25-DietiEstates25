@@ -19,7 +19,7 @@ import java.net.URL
 fun drawableToBase64(context: Context, @DrawableRes drawableId: Int): String? {
     val bitmap = BitmapFactory.decodeResource(context.resources, drawableId)
     if (bitmap == null) {
-        Log.e("drawableToBase64", "Bitmap null: drawableId=$drawableId")
+        Log.e("drawableToBase64", "Bitmap is null: drawableId=$drawableId")
         return null
     }
     val stream = ByteArrayOutputStream()
@@ -33,7 +33,6 @@ fun bse64ToImageBitmap(base64: String): ImageBitmap {
     val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     return bitmap.asImageBitmap()
 }
-
 
 suspend fun downloadImageAsBase64(imageUrl: String): String? = withContext(Dispatchers.IO) {
     try {
@@ -74,13 +73,13 @@ fun safeDecodeBase64(base64: String?): ImageBitmap? {
     if (base64.isNullOrEmpty()) return null
     return try {
         if (base64.length > 1_000_000) {
-            Log.w("ImageDecode", "Immagine troppo grande, uso default")
+            Log.w("ImageDecode", "Image too large, using default")
             null
         } else {
             bse64ToImageBitmap(base64)
         }
     } catch (e: Exception) {
-        Log.e("ImageDecode", "Errore decoding immagine: ${e.message}")
+        Log.e("ImageDecode", "Error decoding image: ${e.message}")
         null
     }
 }

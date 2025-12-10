@@ -95,7 +95,7 @@ fun WelcomeScreen(
             Spacer(modifier = Modifier.height(4.dp))
             Icon(
                 painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Icona personalizzata",
+                contentDescription = "Custom icon",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(210.dp)
             )
@@ -184,7 +184,7 @@ fun WelcomeScreen(
                 onGithubClick = {
                     am.startGithubLogin(context)
                 },
-                iconSize = 60.dp, // personalizzabile
+                iconSize = 60.dp,
                 spacing = 45.dp
             )
 

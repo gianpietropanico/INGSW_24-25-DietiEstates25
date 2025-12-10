@@ -38,21 +38,21 @@ class AdminRepoImp  @Inject constructor(
                     if (body.success && body.data != null) {
                         ApiResult.Success(body.data)
                     } else {
-                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto")
+                        ApiResult.UnknownError(body.message ?: "Unknown Error")
                     }
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status}: $err")
                 }
             }
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
-                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Access denied")
+                else -> ApiResult.UnknownError("HTTP Error: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic Error: ${e.localizedMessage}")
         }
     }
 
@@ -72,28 +72,28 @@ class AdminRepoImp  @Inject constructor(
                     if (body.success && body.data != null) {
                         ApiResult.Success(body.data)
                     } else {
-                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto")
+                        ApiResult.UnknownError(body.message ?: "Unknown Error")
                     }
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status}: $err")
                 }
             }
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
-                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Access denied")
+                else -> ApiResult.UnknownError("HTTP Error: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic Error: ${e.localizedMessage}")
         }
     }
 
 
     override suspend fun addSuppAdmin(admin: User, recipientEmail: String, userEmail: String): ApiResult<Unit> {
         if (recipientEmail.isEmpty() || userEmail.isEmpty()) {
-            return ApiResult.UnknownError("Devi compilare tutti i campi")
+            return ApiResult.UnknownError("You must fill in all the fields")
         }
 
         return try {
@@ -112,18 +112,18 @@ class AdminRepoImp  @Inject constructor(
 
             return if (response.status.isSuccess()) {
                 val msg = response.bodyAsText()
-                ApiResult.Success(Unit, msg.ifEmpty { "Operazione completata" })
+                ApiResult.Success(Unit, msg.ifEmpty { "Operation completed" })
             } else {
                 val err = response.bodyAsText()
-                ApiResult.UnknownError("Errore HTTP ${response.status}: $err")
+                ApiResult.UnknownError("HTTP Error ${response.status}: $err")
             }
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
-                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Access denied")
+                else -> ApiResult.UnknownError("HTTP Error: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic Error: ${e.localizedMessage}")
         }
     }
 
@@ -147,19 +147,19 @@ class AdminRepoImp  @Inject constructor(
                 HttpStatusCode.OK -> {
                     val body: ListResponse<Unit> = response.body()
                     if (body.success) {
-                        ApiResult.Success(Unit, body.message ?: "Operazione completata")
+                        ApiResult.Success(Unit, body.message ?: "Operation completed")
                     } else {
-                        ApiResult.UnknownError(body.message ?: "Errore sconosciuto")
+                        ApiResult.UnknownError(body.message ?: "Unknown Error")
                     }
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status}: $err")
                 }
             }
 
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic Error: ${e.localizedMessage}")
         }
     }
 

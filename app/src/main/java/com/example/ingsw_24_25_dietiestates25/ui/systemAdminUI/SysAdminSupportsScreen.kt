@@ -105,8 +105,8 @@ fun SysAdminSupportsScreen(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = bluPerchEcipiace,
-                    modifier = Modifier.weight(1f), // prende lo spazio rimanente
-                    textAlign = TextAlign.Center     // centra dentro allo spazio
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
                 )
             }
 

@@ -99,7 +99,7 @@ fun  SignUpScreen (
             Spacer(modifier = Modifier.height(4.dp))
             Icon(
                 painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Icona personalizzata",
+                contentDescription = "Custom icon",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(210.dp)
             )
@@ -109,7 +109,7 @@ fun  SignUpScreen (
                 onValueChange = { email = it },
                 label = "Email",
                 leadingIcon = ImageVector.vectorResource(id = R.drawable.mail),
-                placeholder = "Inserisci la tua email",
+                placeholder = "Insert your email",
                 modifier = Modifier.width(320.dp),
                 onError = state.localError
             )
@@ -178,7 +178,7 @@ fun  SignUpScreen (
                                   },
                 onGithubClick = {  am.startGithubLogin(context)
                                 },
-                iconSize = 60.dp, // personalizzabile
+                iconSize = 60.dp,
                 spacing = 45.dp
             )
 

@@ -38,19 +38,19 @@ class OfferRepositoryImp @Inject constructor(
             when (response.status) {
                 HttpStatusCode.Created -> {
                     val offer: Offer = response.body()
-                    ApiResult.Success(offer, "Offerta creata con successo")
+                    ApiResult.Success(offer, "Offer successfully created")
                 }
                 HttpStatusCode.OK -> {
                     val msg: String = response.bodyAsText()
-                    ApiResult.Success(null, msg) // o gestisci diversamente
+                    ApiResult.Success(null, msg)
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -63,17 +63,17 @@ class OfferRepositoryImp @Inject constructor(
             }
 
             if (response.status.isSuccess()) {
-                ApiResult.Success(Unit, "Messaggio aggiunto con successo")
+                ApiResult.Success(Unit, "Message added successfully")
             } else {
                 val err = response.bodyAsText()
-                ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
-    override suspend fun loadOfferChat(offerId : String): ApiResult<Offer>{
+    override suspend fun loadOfferChat(offerId: String): ApiResult<Offer> {
         return try {
             val response = httpClient.get("$baseURL/offers/single") {
                 url { parameters.append("offerId", offerId) }
@@ -85,10 +85,10 @@ class OfferRepositoryImp @Inject constructor(
                     val body: Offer = response.body()
                     ApiResult.Success(body)
                 }
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -100,12 +100,12 @@ class OfferRepositoryImp @Inject constructor(
             }
 
             if (response.status.isSuccess()) {
-                ApiResult.Success(Unit, "Offerta accettata con successo")
+                ApiResult.Success(Unit, "Offer successfully accepted")
             } else {
-                ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -117,16 +117,16 @@ class OfferRepositoryImp @Inject constructor(
             }
 
             if (response.status.isSuccess()) {
-                ApiResult.Success(Unit, "Offerta rifiutata con successo")
+                ApiResult.Success(Unit, "Offer successfully declined")
             } else {
-                ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
-    override suspend fun getOffersSummary(propertyId: String): ApiResult<List<OfferSummary>>{
+    override suspend fun getOffersSummary(propertyId: String): ApiResult<List<OfferSummary>> {
         return try {
             val response = httpClient.get("$baseURL/offers/summary") {
                 url { parameters.append("propertyId", propertyId) }
@@ -138,10 +138,10 @@ class OfferRepositoryImp @Inject constructor(
                     val body: List<OfferSummary> = response.body()
                     ApiResult.Success(body)
                 }
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -157,10 +157,10 @@ class OfferRepositoryImp @Inject constructor(
                     val body: List<Offer> = response.body()
                     ApiResult.Success(body)
                 }
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 
@@ -177,14 +177,13 @@ class OfferRepositoryImp @Inject constructor(
             when (response.status) {
                 HttpStatusCode.OK -> ApiResult.Success(response.body<Offer>())
                 HttpStatusCode.NotFound -> ApiResult.UnknownError(null)
-                else -> ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
 
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
-
 
     override suspend fun getAgentNameByEmail(email: String): ApiResult<String> {
         return try {
@@ -198,17 +197,17 @@ class OfferRepositoryImp @Inject constructor(
             return when (response.status) {
                 HttpStatusCode.OK -> {
                     val agentName = response.body<String>()
-                    ApiResult.Success(agentName, "Agente trovato con successo")
+                    ApiResult.Success(agentName, "Agent successfully found")
                 }
                 HttpStatusCode.NotFound -> {
-                    ApiResult.UnknownError("Nessun agente trovato con email $email")
+                    ApiResult.UnknownError("No agent found with email $email")
                 }
                 else -> {
-                    ApiResult.UnknownError("Errore server: ${response.status}")
+                    ApiResult.UnknownError("Server error: ${response.status}")
                 }
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore durante la richiesta: ${e.localizedMessage}")
+            ApiResult.UnknownError("Error during request: ${e.localizedMessage}")
         }
     }
 }

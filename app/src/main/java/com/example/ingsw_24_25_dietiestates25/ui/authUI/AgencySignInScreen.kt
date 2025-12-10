@@ -85,7 +85,7 @@ fun  AgencySignInScreen (
             Spacer(modifier = Modifier.height(8.dp))
             Icon(
                 painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Icona personalizzata",
+                contentDescription = "Custom Icon",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(210.dp)
             )
@@ -95,7 +95,7 @@ fun  AgencySignInScreen (
                 onValueChange = { email = it },
                 label = "Email",
                 leadingIcon = ImageVector.vectorResource(id = R.drawable.mail),
-                placeholder = "Inserisci la tua email",
+                placeholder = "Insert your email",
                 modifier = Modifier.width(320.dp),
                 onError = state.localError
             )
@@ -135,7 +135,7 @@ fun  AgencySignInScreen (
                 onValueChange = { agencyName = it },
                 label = "Agency Name",
                 leadingIcon = ImageVector.vectorResource(id = R.drawable.home_icon),
-                placeholder = "Inserisci il nome della tua agenzia",
+                placeholder = "Enter the name of your agency",
                 modifier = Modifier.width(320.dp),
                 onError = state.localError
             )
