@@ -29,6 +29,7 @@ enum class OfferStatus {
     @SerialName("REJECTED")
     REJECTED
 }
+
 @Serializable
 data class OfferSummary(
     val amount: Double?,

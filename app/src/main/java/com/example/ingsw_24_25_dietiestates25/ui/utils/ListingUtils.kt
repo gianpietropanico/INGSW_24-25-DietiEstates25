@@ -463,13 +463,13 @@ fun AgentCard(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.Start
                     ) {
-                        if (agent?.name == null ) agent!!.username else agent.name?.let {
-                            Text(
-                                text = it,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
-                        }
+
+                        Text(
+                            text = agent?.username ?: "ERRORE",
+                            color = if(agent?.username == null ) Color.Red else Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
 
 
                         Text(

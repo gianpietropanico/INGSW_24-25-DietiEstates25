@@ -34,6 +34,7 @@ data class InboxState (
     val selectedAppointment: Appointment? = null,
     val selectedProperty : PropertyListing? = null,
 
-    var userAppointments : List<Appointment> = emptyList()
+    var userAppointments : List<Appointment> = emptyList(),
+    var buttonOfferEnabled: Boolean = true
 
 )

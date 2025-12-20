@@ -75,7 +75,8 @@ fun MakeOfferScreen(
     val state by inboxVm.state.collectAsState()
     val previousRoute = navController.previousBackStackEntry?.destination?.route
     var showHistoryOffers by remember { mutableStateOf(false) }
-    var isPermittedAmount by remember { mutableStateOf(if (amount.isNotEmpty()) inboxVm.checkPrice(amount.toDouble()) else true) }
+    //var isPermittedAmount by remember { mutableStateOf(if (amount.isNotEmpty()) inboxVm.checkPrice(amount.toDouble()) else true) }
+    val buttonOfferIsEnabled = state.buttonOfferEnabled
 
     val listingOffer =  if( state.selectedOffer == null ){
         state.selectedProperty
@@ -245,6 +246,7 @@ fun MakeOfferScreen(
                         selectedIndex = 0
                         amount = inboxVm.calculateDiscount(state.selectedProperty!!.price.toDouble(), 4).toInt()
                             .toString()
+                        state.buttonOfferEnabled = true
                     }
                     .padding(8.dp)
                     .height(65.dp)
@@ -285,6 +287,7 @@ fun MakeOfferScreen(
                     .clickable {
                         selectedIndex = 1
                         amount = inboxVm.calculateDiscount(state.selectedProperty!!.price.toDouble(), 7).toString()
+                        state.buttonOfferEnabled = true
                     }
                     .padding(8.dp)
                     .height(65.dp)
@@ -327,6 +330,7 @@ fun MakeOfferScreen(
                         selectedIndex = 2
                         customPrice = true
                         amount = state.selectedProperty!!.price.toInt().toString()
+                        state.buttonOfferEnabled = true
                     }
                     .padding(8.dp)
                     .height(65.dp)
@@ -407,9 +411,10 @@ fun MakeOfferScreen(
                                 value = amount,
                                 onValueChange = { newValue ->
                                     amount = newValue
-                                    isPermittedAmount = newValue.toDoubleOrNull()?.let {
-                                        inboxVm.checkPrice(it)
-                                    } ?: false
+
+                                    newValue.toDoubleOrNull()?.let { value ->
+                                        inboxVm.checkPrice(value)
+                                    }
                                 },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
@@ -430,7 +435,7 @@ fun MakeOfferScreen(
                         modifier = Modifier.fillMaxWidth(1f)
                     )
 
-                    if(!isPermittedAmount && amount.isNotEmpty())
+                    if(!buttonOfferIsEnabled && amount.isNotEmpty())
                     Text(
                         text =  "You have to insert a mininum amount of ${inboxVm.calculateDiscount(state.selectedProperty!!.price.toDouble(), 10)}",
                         style = MaterialTheme.typography.labelLarge.copy(
@@ -448,7 +453,7 @@ fun MakeOfferScreen(
         }
 
         Spacer(modifier = Modifier.height(12.dp))
-        val isEnabled = amount.isNotBlank() && amount.toDoubleOrNull() != null
+        var isEnabled = amount.isNotBlank() && amount.toDoubleOrNull() != null
         val displayAmount = amount.toDoubleOrNull()?.toInt()?.toString()?.plus(" €") ?: ""
 
         Box(
@@ -458,11 +463,11 @@ fun MakeOfferScreen(
                 .align(Alignment.CenterHorizontally)
                 .clip(RoundedCornerShape(8.dp))
                 .background(
-                    if (isEnabled || isPermittedAmount ) AscientGradient
+                    if (isEnabled && buttonOfferIsEnabled ) AscientGradient
                     else Brush.linearGradient(listOf(Color.LightGray, Color.LightGray))
                 )
                 .clickable(enabled = isEnabled) {
-                    if ( inboxVm.checkPrice(amount.toDouble()) ){
+                    if ( buttonOfferIsEnabled ){
 
                         if( state.createOffer ){
                             inboxVm.createOffer(amount.toDouble())
