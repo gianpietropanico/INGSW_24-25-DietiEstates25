@@ -162,7 +162,7 @@ class InboxViewModel  @Inject constructor (
 
             else -> {
                 _state.update {
-                    it.copy(isLoading = false, resultMessage = "Errore nel caricamento")
+                    it.copy(isLoading = false, resultMessage = "Error loading")
                 }
             }
         }
@@ -299,7 +299,7 @@ class InboxViewModel  @Inject constructor (
     fun offerChatInit (offer : Offer?){
 
         if(offer == null ) {
-            Log.d("OFFERCHATINIT", "errore nell'inizializzazione di offerchat : offer = null")
+            Log.d("OFFERCHATINIT", "error initializing offerchat : offer = null")
 
         }else {
 
@@ -366,7 +366,7 @@ class InboxViewModel  @Inject constructor (
                     }
                 }
             } catch (e: Exception) {
-                println("Errore declineAppointment: ${e.message}")
+                println("Error declineAppointment: ${e.message}")
             }
         }
     }

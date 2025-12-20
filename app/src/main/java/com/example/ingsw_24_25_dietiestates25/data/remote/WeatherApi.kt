@@ -77,7 +77,7 @@ class WeatherApiClient @Inject constructor(){
                     pressures = listOf(1013.0)
                 ),
                 isFallback = true,
-                message = "⚠️ Dati meteo non disponibili. Mostro valori stimati."
+                message = "Weather data not available. Showing estimated values."
             )
         }
     }

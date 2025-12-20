@@ -118,16 +118,16 @@ fun SysAdminHomeScreen(
                     Button(
                         onClick = {  navController.navigate(NavigationItem.SysAdminSupp.route)},
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFEFF9FA), // sfondo azzurrino
-                            contentColor = Color(0xFF004C77)    // testo e icona blu
+                            containerColor = Color(0xFFEFF9FA),
+                            contentColor = Color(0xFF004C77)
                         ),
                         shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(1.dp, Color(0xFF3A7CA5)), // bordo blu
+                        border = BorderStroke(1.dp, Color(0xFF3A7CA5)),
                         modifier = Modifier
                             .height(48.dp)
                             .width(350.dp)
                             .shadow(
-                                elevation = 8.dp, // più marcata
+                                elevation = 8.dp,
                                 shape = RoundedCornerShape(16.dp),
                                 clip = true,
                                 ambientColor = Color.Black,
@@ -154,11 +154,11 @@ fun SysAdminHomeScreen(
 
                     onClick = { navController.navigate(NavigationItem.SysAdminAgency.route)},
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFEFF9FA), // sfondo azzurrino
-                        contentColor = Color(0xFF004C77)    // testo e icona blu
+                        containerColor = Color(0xFFEFF9FA),
+                        contentColor = Color(0xFF004C77)
                     ),
                     shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, Color(0xFF3A7CA5)), // bordo blu
+                    border = BorderStroke(1.dp, Color(0xFF3A7CA5)),
                     modifier = Modifier
                         .width(350.dp)
                         .height(48.dp)
@@ -189,7 +189,8 @@ fun SysAdminHomeScreen(
                     val color = false
 
                     Text(
-                        text = "SIAMO FORTISSIMI",
+                        //text = "SIAMO FORTISSIMI",
+                        text = "......................",
                         color = if (color) Color.Green else DarkRed,
                         style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp),
                         textAlign = TextAlign.Center,

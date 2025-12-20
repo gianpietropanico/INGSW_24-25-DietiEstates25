@@ -190,7 +190,7 @@ fun ListingDetailContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(260.dp)
-                //.clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)) // leggermente arrotondato solo in basso
+                //.clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
             ) {
                 HorizontalPager(
                     state = pagerState,

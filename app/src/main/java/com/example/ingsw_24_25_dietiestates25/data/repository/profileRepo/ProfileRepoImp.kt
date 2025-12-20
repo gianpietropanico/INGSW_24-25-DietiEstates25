@@ -26,7 +26,7 @@ import javax.inject.Inject
 class ProfileRepoImp @Inject constructor(
     private val httpClient: HttpClient,
     private val sessionManager: UserSessionManager
-) :ProfileRepo {
+) : ProfileRepo {
 
     private val baseURL = "http://10.0.2.2:8080"
     private val userSessionManager = sessionManager
@@ -34,29 +34,29 @@ class ProfileRepoImp @Inject constructor(
     override suspend fun logout() {
         try {
             userSessionManager.clear()
-            Log.d("AuthRepository", "Logout completato con successo")
+            Log.d("AuthRepository", "Logout completed successfully")
         } catch (e: Exception) {
-            Log.e("AuthRepository", "Errore durante il logout", e)
+            Log.e("AuthRepository", "Error during logout", e)
         }
     }
 
     override suspend fun updateUserInfo(value: String, type: String): ApiResult<Unit> {
         return try {
-            Log.d("updateUserInfo", "tipo richiesta: $type")
+            Log.d("updateUserInfo", "Request type: $type")
 
-            // Validazione per nome e cognome
+            // Name and surname validation
             if (type == "Name And Surname") {
                 val clean = value.trim().replace("\\s+".toRegex(), " ")
                 val parts = clean.split(" ", limit = 2)
-                Log.d("updateUserInfo", "Validazione full name: $clean")
+                Log.d("updateUserInfo", "Full name validation: $clean")
 
                 if (parts.size < 2) {
-                    return ApiResult.Unauthorized("Inserisci sia nome che cognome")
+                    return ApiResult.Unauthorized("Please enter both name and surname")
                 }
             }
 
             val email = userSessionManager.currentUser.value?.email
-                ?: return ApiResult.Unauthorized("Utente non loggato")
+                ?: return ApiResult.Unauthorized("User not logged in")
 
             val request = UserInfoRequest(
                 email = email,
@@ -73,7 +73,7 @@ class ProfileRepoImp @Inject constructor(
             return when (response.status) {
                 HttpStatusCode.OK -> {
                     updateSessionManagerInfo(value, type)
-                    ApiResult.Success(Unit, "Operation Successfull, Info updated")
+                    ApiResult.Success(Unit, "Operation Successful, Info updated")
                 }
                 HttpStatusCode.Conflict -> {
                     val err = response.bodyAsText()
@@ -81,16 +81,16 @@ class ProfileRepoImp @Inject constructor(
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
                 HttpStatusCode.Conflict -> ApiResult.Unauthorized("Update failed")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -108,27 +108,26 @@ class ProfileRepoImp @Inject constructor(
                 if (body.success && body.data != null) {
                     ApiResult.Success(body.data)
                 } else {
-                    ApiResult.UnknownError(body.message ?: "Errore sconosciuto dal server")
+                    ApiResult.UnknownError(body.message ?: "Unknown server error")
                 }
             } else {
-                ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
 
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
-                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Access denied")
+                else -> ApiResult.UnknownError("HTTP Error: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
-
 
     override suspend fun resetPassword(oldPassword: String, newPassword: String): ApiResult<Unit> {
         return try {
             val email = userSessionManager.currentUser.value?.email
-                ?: return ApiResult.Unauthorized("Utente non loggato")
+                ?: return ApiResult.Unauthorized("User not logged in")
 
             val request = AuthRequest(
                 email = email,
@@ -143,31 +142,30 @@ class ProfileRepoImp @Inject constructor(
             }
 
             return when (response.status) {
-                HttpStatusCode.OK -> ApiResult.Success(Unit, "Operation Successfull, Password changed")
+                HttpStatusCode.OK -> ApiResult.Success(Unit, "Operation Successful, Password changed")
                 HttpStatusCode.Conflict -> {
                     val err = response.bodyAsText()
                     ApiResult.Unauthorized("Reset failed: $err")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
                 HttpStatusCode.Conflict -> ApiResult.Unauthorized("Reset failed")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
-
-    private fun updateSessionManagerInfo(value : String , type: String) {
+    private fun updateSessionManagerInfo(value: String, type: String) {
         when (type.lowercase()) {
             "username" -> userSessionManager.currentUser.value!!.username = value
-            "name and surname" ->{
+            "name and surname" -> {
                 val parts = value.trim().split("\\s+".toRegex()).filter { it.isNotBlank() }
                 userSessionManager.currentUser.value!!.name = parts.getOrNull(0) ?: ""
                 userSessionManager.currentUser.value!!.surname = parts.getOrNull(1) ?: ""

@@ -63,7 +63,7 @@ fun CheckAllAppointmentsBottomSheet(
                 .fillMaxWidth()
         ) {
             Text(
-                "Riepilogo: ${day.dayOfMonth}/${day.monthValue}/${day.year}",
+                "Summary: ${day.dayOfMonth}/${day.monthValue}/${day.year}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -72,9 +72,9 @@ fun CheckAllAppointmentsBottomSheet(
 
 
 
-            Text("Appuntamenti del giorno:", fontWeight = FontWeight.Bold)
+            Text("Today's appointments:", fontWeight = FontWeight.Bold)
             if (appointmentsForDay.isEmpty()) {
-                Text("Nessun appuntamento")
+                Text("No appointment")
             } else {
                 LazyColumn {
                     items(appointmentsForDay) { app ->

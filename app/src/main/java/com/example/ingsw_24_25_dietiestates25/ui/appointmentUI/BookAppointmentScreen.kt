@@ -112,7 +112,6 @@ fun BookAppointmentScreen(
                         .clickable { navController.popBackStack() }
                 )
 
-                // CENTER: Title (centrato davvero)
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)

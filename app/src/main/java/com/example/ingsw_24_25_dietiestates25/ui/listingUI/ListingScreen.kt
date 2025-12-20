@@ -157,12 +157,12 @@ fun ListingScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        text = "Nessun annuncio ancora",
+                        text = "No listings yet",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Aggiungi il tuo primo immobile con il + in basso",
+                        text = "Add your first property using the + below",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                         textAlign = TextAlign.Center

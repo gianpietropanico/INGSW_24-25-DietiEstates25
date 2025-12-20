@@ -37,7 +37,7 @@ class ImageRepositoryImpl @Inject constructor(
 
     override suspend fun insertProfilePicture(ownerIdentifier: String, profilePicture: String, type: String): ApiResult<Unit> {
         return try {
-            Log.d("ImageRepository", "INSERISCO IMMAGINE")
+            Log.d("ImageRepository", "INSERTING IMAGE")
 
             val request = if (ownerIdentifier.contains("@")) {
                 ImageRequest(
@@ -60,33 +60,33 @@ class ImageRepositoryImpl @Inject constructor(
             return when (response.status) {
                 HttpStatusCode.OK, HttpStatusCode.Created -> {
                     if (type == "agency") {
-                        Log.d("ImageRepository", "SALVO IMMAGINE AGENCY")
+                        Log.d("ImageRepository", "SAVING AGENCY IMAGE")
                         userSessionManager.saveAgencyProfilePic(profilePicture)
                     } else {
-                        Log.d("ImageRepository", "SALVO IMMAGINE USER")
+                        Log.d("ImageRepository", "SAVING USER IMAGE")
                         userSessionManager.saveProfilePic(profilePicture)
                     }
-                    ApiResult.Success(Unit, "Operation Successfull")
+                    ApiResult.Success(Unit, "Operation Successful")
                 }
                 HttpStatusCode.Conflict -> {
                     val err = response.bodyAsText()
-                    Log.e("ImageRepository", "Errore inserimento immagine: $err")
-                    ApiResult.Unauthorized("Errore Inserimento immagine: $err")
+                    Log.e("ImageRepository", "Image upload error: $err")
+                    ApiResult.Unauthorized("Image upload error: $err")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    Log.e("ImageRepository", "Errore HTTP ${response.status}: $err")
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    Log.e("ImageRepository", "HTTP Error ${response.status}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Errore Inserimento immagine")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Image upload error")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            Log.e("ImageRepository", "Errore generico durante inserimento immagine", e)
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            Log.e("ImageRepository", "Generic error during image upload", e)
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -105,33 +105,33 @@ class ImageRepositoryImpl @Inject constructor(
 
             return when (response.status) {
                 HttpStatusCode.OK, HttpStatusCode.Created -> {
-                    ApiResult.Success(Unit, "Immagine casa inserita con successo")
+                    ApiResult.Success(Unit, "House image successfully inserted")
                 }
                 HttpStatusCode.Conflict -> {
                     val err = response.bodyAsText()
-                    Log.e("ImageRepository", "Errore inserimento immagine casa: $err")
-                    ApiResult.Unauthorized("Errore inserimento immagine casa: $err")
+                    Log.e("ImageRepository", "House image upload error: $err")
+                    ApiResult.Unauthorized("House image upload error: $err")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    Log.e("ImageRepository", "Errore HTTP ${response.status}: $err")
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    Log.e("ImageRepository", "HTTP Error ${response.status}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Errore inserimento immagine casa")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("House image upload error")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            Log.e("ImageRepository", "Errore generico durante inserimento immagine casa", e)
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            Log.e("ImageRepository", "Generic error during house image upload", e)
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
     override suspend fun getImage(userId: String, type: String): ApiResult<Unit> {
         return try {
-            Log.d("ImageRepository", "PRENDO IMMAGINE")
+            Log.d("ImageRepository", "FETCHING IMAGE")
 
             val response = httpClient.get("$baseURL/user/profile/image/$userId") {
                 accept(ContentType.Text.Plain)
@@ -142,34 +142,34 @@ class ImageRepositoryImpl @Inject constructor(
                     val profilePicture = response.bodyAsText()
 
                     if (type == "agency") {
-                        Log.d("ImageRepository", "SALVO IMMAGINE AGENCY")
+                        Log.d("ImageRepository", "SAVING AGENCY IMAGE")
                         userSessionManager.saveAgencyProfilePic(profilePicture)
                     } else {
-                        Log.d("ImageRepository", "SALVO IMMAGINE USER")
+                        Log.d("ImageRepository", "SAVING USER IMAGE")
                         userSessionManager.saveProfilePic(profilePicture)
                     }
 
-                    ApiResult.Success(Unit, "Operation Successfull")
+                    ApiResult.Success(Unit, "Operation Successful")
                 }
                 HttpStatusCode.Conflict -> {
                     val err = response.bodyAsText()
-                    Log.e("ImageRepository", "Errore nel retrieve immagine: $err")
-                    ApiResult.Unauthorized("Errore nel retrieve immagine: $err")
+                    Log.e("ImageRepository", "Image retrieve error: $err")
+                    ApiResult.Unauthorized("Image retrieve error: $err")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    Log.e("ImageRepository", "Errore HTTP ${response.status}: $err")
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    Log.e("ImageRepository", "HTTP Error ${response.status}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ResponseException) {
             when (e.response.status) {
-                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Errore nel retrieve immagine")
-                else -> ApiResult.UnknownError("Errore HTTP ${e.response.status.value}")
+                HttpStatusCode.Conflict -> ApiResult.Unauthorized("Image retrieve error")
+                else -> ApiResult.UnknownError("HTTP Error ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            Log.e("ImageRepository", "Errore generico durante recupero immagine", e)
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            Log.e("ImageRepository", "Generic error during image retrieve", e)
+            ApiResult.UnknownError("Generic error: ${e.localizedMessage}")
         }
     }
 
@@ -178,10 +178,11 @@ class ImageRepositoryImpl @Inject constructor(
             val response: List<String> = uploadImages(listOf(uri), context)
             response.firstOrNull()
         } catch (e: Exception) {
-            Log.e("UploadImage", "Errore upload immagine", e)
+            Log.e("UploadImage", "Image upload error", e)
             null
         }
     }
+
     override suspend fun uploadImages(imageUris: List<Uri>, context: Context): List<String> {
         val urls = mutableListOf<String>()
 
@@ -204,7 +205,7 @@ class ImageRepositoryImpl @Inject constructor(
                     urls.addAll(uploaded)
                 } else {
                     val err = response.bodyAsText()
-                    throw Exception("Errore upload immagine: $err")
+                    throw Exception("Image upload error: $err")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -213,6 +214,4 @@ class ImageRepositoryImpl @Inject constructor(
 
         return urls
     }
-
-
 }

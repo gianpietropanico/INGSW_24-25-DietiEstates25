@@ -142,7 +142,7 @@ fun AppointmentChatScreen(
                 }
             }
 
-            //Action buttons (only for agent and PENDING)
+            //Action buttons
             if (isAgent && appointment.status == AppointmentStatus.PENDING) {
                 Row(
                     modifier = Modifier

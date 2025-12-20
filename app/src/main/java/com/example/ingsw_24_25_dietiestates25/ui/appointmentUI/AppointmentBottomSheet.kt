@@ -80,7 +80,7 @@ fun AppointmentBottomSheet(
 
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
 
-                // ---------- Titolo ----------
+                //Titolo
                 Column {
                     Text(
                         text = "Summary",
@@ -98,12 +98,12 @@ fun AppointmentBottomSheet(
                     )
                 }
 
-                // ---------- Immagine e info proprietà ----------
+                //Immagine e info proprietà
                 if (isForBooking && propertyListing != null) {
                     if (propertyListing.property.images.isNotEmpty()) {
                         AsyncImage(
                             model = propertyListing.property.images.first(),
-                            contentDescription = "Foto proprietà",
+                            contentDescription = "Property photos",
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp)
@@ -130,10 +130,10 @@ fun AppointmentBottomSheet(
                     }
                 }
 
-                // ---------- Lista appuntamenti ----------
+                //Lista appuntamenti
                 if (!isForBooking) {
                     Text(
-                        "Appuntamenti del giorno:",
+                        "Today's appointments:",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp
@@ -150,7 +150,7 @@ fun AppointmentBottomSheet(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Nessun appuntamento",
+                                text = "No appointments",
                                 color = Color.Gray,
                                 fontSize = 13.sp
                             )
@@ -169,7 +169,7 @@ fun AppointmentBottomSheet(
                     }
                 }
 
-                // ---------- Meteo ----------
+                //Meteo
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
@@ -219,7 +219,7 @@ fun AppointmentBottomSheet(
                 }
             }
 
-            // ---------- Pulsante conferma ----------
+            //Pulsante conferma
             if (isForBooking) {
                 Box(
                     modifier = Modifier
@@ -233,7 +233,7 @@ fun AppointmentBottomSheet(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Conferma",
+                        text = "Confirm",
                         color = Color.White,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.SemiBold,

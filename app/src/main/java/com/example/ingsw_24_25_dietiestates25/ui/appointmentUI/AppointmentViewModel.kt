@@ -74,7 +74,7 @@ class AppointmentViewModel @Inject constructor(
 
             else -> {
                 _state.update {
-                    it.copy(isLoading = false, resultMessage = "Errore nel caricamento")
+                    it.copy(isLoading = false, resultMessage = "Error loading")
                 }
             }
         }
@@ -109,7 +109,7 @@ class AppointmentViewModel @Inject constructor(
         val result = appointmentRepo.bookAppointment(appointmentRequest)
         if (result is ApiResult.Success) {
             _state.update {
-                it.copy(isLoading = false, success = true, resultMessage = "Appuntamento prenotato!")
+                it.copy(isLoading = false, success = true, resultMessage = "Appointment booked!")
             }
             loadAppointmentsForUser(user) // aggiorna lista
         } else {
@@ -117,7 +117,7 @@ class AppointmentViewModel @Inject constructor(
                 it.copy(
                     isLoading = false,
                     success = false,
-                    resultMessage = result.message ?: "Errore durante la prenotazione"
+                    resultMessage = result.message ?: "Error during booking"
                 )
             }
         }
@@ -147,7 +147,7 @@ class AppointmentViewModel @Inject constructor(
             }
 
             else -> {
-                _state.update { it.copy(isLoading = false, resultMessage = "Errore nel caricamento") }
+                _state.update { it.copy(isLoading = false, resultMessage = "Error loading") }
             }
         }
     }

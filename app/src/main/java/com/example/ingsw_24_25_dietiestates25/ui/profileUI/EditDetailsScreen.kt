@@ -242,7 +242,7 @@ fun ProfileEditDetailsScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "LA TUA PASSWORD DI DEFAULT È : ${pm.getUserId()}",
+                    text = "YOUR DEFAULT PASSWORD IS : ${pm.getUserId()}",
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,

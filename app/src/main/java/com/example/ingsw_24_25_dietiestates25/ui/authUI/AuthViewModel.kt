@@ -85,7 +85,7 @@ class AuthViewModel @Inject constructor (
             }
 
         } else {
-            _authState.update { it.copy(isLoading = false, resultMessage = "Le password non combaciano", localError = true) }
+            _authState.update { it.copy(isLoading = false, resultMessage = "The passwords do not match", localError = true) }
         }
     }
 
@@ -96,7 +96,7 @@ class AuthViewModel @Inject constructor (
         if ( password == _authState.value.confirmPassword) {
 
             viewModelScope.launch {
-                Log.d("sendAgencyRequest", "Inizio richiesta con email=$email, agencyName=$agencyName")
+                Log.d("sendAgencyRequest", "Start request with email=$email, agencyName=$agencyName")
 
                 _authState.update { it.copy(isLoading = true, resultMessage = null) }
                 val result = authRepository.sendAgencyRequest(email, password, agencyName)
@@ -112,8 +112,8 @@ class AuthViewModel @Inject constructor (
                 handleResult(result)
             }
         } else {
-            Log.d("sendAgencyRequest", "Password e conferma NON combaciano")
-            _authState.update { it.copy(isLoading = false, resultMessage = "Le password non combaciano", localError = true) }
+            Log.d("sendAgencyRequest", "Password and confirmation do NOT match")
+            _authState.update { it.copy(isLoading = false, resultMessage = "The passwords do not match", localError = true) }
         }
     }
 
@@ -174,7 +174,7 @@ class AuthViewModel @Inject constructor (
             }
 
         } else {
-            _authState.update { it.copy(isLoading = false, resultMessage = "Problema con OUATH ", localError = true) }
+            _authState.update { it.copy(isLoading = false, resultMessage = "Problem with OUATH ", localError = true) }
         }
     }
 
@@ -221,7 +221,7 @@ class AuthViewModel @Inject constructor (
 
             val state = fetchState()
             if (state.isNullOrBlank()) {
-                _authState.update { it.copy(isLoading = false, resultMessage = "Impossibile generare CRSF", isAuthenticated = false) }
+                _authState.update { it.copy(isLoading = false, resultMessage = "Impossible generate CRSF", isAuthenticated = false) }
                 return@launch
             }
 
@@ -254,7 +254,7 @@ class AuthViewModel @Inject constructor (
     fun onOAuthResponse(code: String?, state: String?) {
         if (code.isNullOrBlank() || state.isNullOrBlank()) {
 
-            _authState.update { it.copy(isLoading = false, resultMessage = "Autenticazione fallita.", isAuthenticated = false) }
+            _authState.update { it.copy(isLoading = false, resultMessage = "Authentication failed.", isAuthenticated = false) }
 
             return
         }
@@ -299,17 +299,17 @@ class AuthViewModel @Inject constructor (
             object : FacebookCallback<LoginResult> {
                 override fun onCancel() {
                     Log.d("FacebookLogin", "Login cancelled.")
-                    unAuthorized("Operazione annullata")
+                    unAuthorized("Operation canceled")
                 }
 
                 override fun onError(error: FacebookException) {
                     Log.e("FacebookLogin", "Login error: ${error.message}")
-                    unAuthorized("Errore durante il login con Facebook")
+                    unAuthorized("Error logging in with Facebook")
                 }
                 override fun onSuccess(result: LoginResult) {
                     GraphRequest.newMeRequest(result.accessToken) { obj, _ ->
-                        val email = obj?.getString("email") ?: "Email non disponibile"
-                        val name = obj?.getString("name") ?: "Nome non disponibile"
+                        val email = obj?.getString("email") ?: "Email not available"
+                        val name = obj?.getString("name") ?: "Nome not available"
                         val profilePic = obj
                             ?.getJSONObject("picture")
                             ?.getJSONObject("data")
@@ -342,7 +342,7 @@ class AuthViewModel @Inject constructor (
             )
         } else {
             Log.e("FacebookLogin", "Activity does not implement ActivityResultRegistryOwner")
-            unAuthorized("Errore interno: activity incompatibile")
+            unAuthorized("Internal error: incompatible activity")
         }
     }
 
@@ -393,7 +393,7 @@ class AuthViewModel @Inject constructor (
 
             } catch (e: Exception) {
                 Log.e(tag, "Login failed: ${e.message}")
-                unAuthorized("Errore durante il login con Google")
+                unAuthorized("Error logging in with Google")
             }
         }
     }

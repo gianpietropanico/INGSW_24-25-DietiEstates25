@@ -19,11 +19,9 @@ data class ResultsState(
     val isLoading: Boolean = false,
     val properties: List<PropertyListing> = emptyList(),
     val errorMessage: String? = null,
-    val selectedListing : PropertyListing? = null,
+    val selectedListing: PropertyListing? = null,
     val uiState: ListingState = ListingState.Idle,
 )
-
-
 
 @HiltViewModel
 class ResultsViewModel @Inject constructor(
@@ -32,7 +30,6 @@ class ResultsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(ResultsState())
     val state: StateFlow<ResultsState> = _state.asStateFlow()
-
 
     fun searchProperties(type: String, location: String) {
         viewModelScope.launch {
@@ -60,7 +57,7 @@ class ResultsViewModel @Inject constructor(
                 else -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = "Errore sconosciuto"
+                        errorMessage = "Unknown error"
                     )
                 }
             }
@@ -81,19 +78,17 @@ class ResultsViewModel @Inject constructor(
                 else -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = "Errore durante il caricamento di tutte le proprietà"
+                        errorMessage = "Error while loading all properties"
                     )
                 }
             }
         }
     }
 
-
     fun setSelectedListing(listing: PropertyListing) {
         _state.update {
             it.copy(selectedListing = listing)
         }
-
     }
 
     fun applyFilters(request: PropertySearchRequest) {
@@ -117,17 +112,16 @@ class ResultsViewModel @Inject constructor(
                 is ApiResult.Unauthorized<*> -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = result.message ?: "Non autorizzato"
+                        errorMessage = result.message ?: "Unauthorized"
                     )
                 }
                 else -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        errorMessage = "Errore durante il filtraggio"
+                        errorMessage = "Error while applying filters"
                     )
                 }
             }
         }
     }
 }
-

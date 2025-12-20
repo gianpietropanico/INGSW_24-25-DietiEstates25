@@ -77,7 +77,7 @@ fun AgentHomeScreen(
             Spacer(modifier = Modifier.height(4.dp))
             Icon(
                 painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Icona personalizzata",
+                contentDescription = "Custom Icon",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(210.dp)
             )
@@ -115,11 +115,11 @@ fun AgentHomeScreen(
                 Button(
                     onClick = { navController.navigate(NavigationItem.AgentAgency.route) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFEFF9FA), // sfondo azzurrino
-                        contentColor = Color(0xFF004C77)    // testo e icona blu
+                        containerColor = Color(0xFFEFF9FA),
+                        contentColor = Color(0xFF004C77)
                     ),
                     shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, Color(0xFF3A7CA5)), // bordo blu
+                    border = BorderStroke(1.dp, Color(0xFF3A7CA5)),
                     modifier = Modifier
                         .height(48.dp)
                         .width(350.dp)
@@ -151,16 +151,16 @@ fun AgentHomeScreen(
 
                 onClick = { navController.navigate(NavigationItem.AgentListings.route) },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFEFF9FA), // sfondo azzurrino
-                    contentColor = Color(0xFF004C77)    // testo e icona blu
+                    containerColor = Color(0xFFEFF9FA),
+                    contentColor = Color(0xFF004C77)
                 ),
                 shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, Color(0xFF3A7CA5)), // bordo blu
+                border = BorderStroke(1.dp, Color(0xFF3A7CA5)),
                 modifier = Modifier
                     .width(350.dp)
                     .height(48.dp)
                     .shadow(
-                        elevation = 8.dp, // più marcata
+                        elevation = 8.dp,
                         shape = RoundedCornerShape(16.dp),
                         clip = true,
                         ambientColor = Color.Black,

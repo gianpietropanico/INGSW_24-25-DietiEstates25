@@ -39,19 +39,19 @@ class AgentRepoImp @Inject constructor(
                 if (body.success && body.data != null) {
                     ApiResult.Success(body.data)
                 } else {
-                    ApiResult.UnknownError(body.message ?: "Errore sconosciuto dal server")
+                    ApiResult.UnknownError(body.message ?: "Unknown server error")
                 }
             } else {
-                ApiResult.UnknownError("Errore HTTP: ${response.status.value}")
+                ApiResult.UnknownError("HTTP Error: ${response.status.value}")
             }
 
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
-                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Access denied")
+                else -> ApiResult.UnknownError("HTTP Error: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic Error: ${e.localizedMessage}")
         }
     }
 
@@ -70,33 +70,33 @@ class AgentRepoImp @Inject constructor(
                     val userId = body["id"]
 
                     if (userId != null) {
-                        ApiResult.Success(userId, "ID recuperato con successo")
+                        ApiResult.Success(userId, "ID successfully retrieved")
                     } else {
-                        ApiResult.UnknownError("Risposta server senza campo 'id'")
+                        ApiResult.UnknownError("Server response without 'id' field")
                     }
                 }
                 HttpStatusCode.NotFound -> {
-                    ApiResult.UnknownError("Nessun utente trovato per l'email $email")
+                    ApiResult.UnknownError("No user found for the email $email")
                 }
                 else -> {
                     val err = response.bodyAsText()
-                    ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                    ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
                 }
             }
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
-                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Access denied")
+                else -> ApiResult.UnknownError("HTTP Error: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic Error: ${e.localizedMessage}")
         }
     }
 
     override suspend fun addUserBySendingEmail(user : User, recipientEmail: String, userEmail: String): ApiResult<Unit> {
 
         if (recipientEmail.isBlank() || userEmail.isBlank()) {
-            return ApiResult.UnknownError("Devi compilare tutti i campi")
+            return ApiResult.UnknownError("You must fill in all the fields")
         }
 
         return try {
@@ -117,16 +117,16 @@ class AgentRepoImp @Inject constructor(
                 ApiResult.Success(Unit, response.bodyAsText())
             } else {
                 val err = response.bodyAsText()
-                ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
             }
 
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
-                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Access denied")
+                else -> ApiResult.UnknownError("HTTP Error: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic Error: ${e.localizedMessage}")
         }
     }
 
@@ -149,16 +149,16 @@ class AgentRepoImp @Inject constructor(
                 ApiResult.Success(Unit, response.bodyAsText())
             } else {
                 val err = response.bodyAsText()
-                ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
             }
 
         } catch (e: ClientRequestException) {
             when (e.response.status) {
-                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Accesso negato")
-                else -> ApiResult.UnknownError("Errore HTTP: ${e.response.status.value}")
+                HttpStatusCode.Forbidden -> ApiResult.Unauthorized("Access denied")
+                else -> ApiResult.UnknownError("HTTP Error: ${e.response.status.value}")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore generico: ${e.localizedMessage}")
+            ApiResult.UnknownError("Generic Error: ${e.localizedMessage}")
         }
     }
 
@@ -175,13 +175,13 @@ class AgentRepoImp @Inject constructor(
             }
 
             if (response.status.isSuccess()) {
-                ApiResult.Success(Unit, "Nome agenzia aggiornato con successo")
+                ApiResult.Success(Unit, "Agency name updated successfully")
             } else {
                 val err = response.bodyAsText()
-                ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
 
     }
@@ -199,13 +199,13 @@ class AgentRepoImp @Inject constructor(
             }
 
             if (response.status.isSuccess()) {
-                ApiResult.Success(Unit, "Immagine profilo aggiornata con successo")
+                ApiResult.Success(Unit, "Profile picture updated successfully")
             } else {
                 val err = response.bodyAsText()
-                ApiResult.UnknownError("Errore HTTP ${response.status.value}: $err")
+                ApiResult.UnknownError("HTTP Error ${response.status.value}: $err")
             }
         } catch (e: Exception) {
-            ApiResult.UnknownError("Errore rete: ${e.localizedMessage}")
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
         }
     }
 }

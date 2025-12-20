@@ -45,11 +45,11 @@ fun GradientButton(
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Color(0xFF5B99C0), // Azzurro chiaro
-                        Color(0xFF1688CF)  // Blu più scuro
+                        Color(0xFF5B99C0),
+                        Color(0xFF1688CF)
                     ),
-                    start = Offset(0f,0f),  // punto di partenza
-                    end = Offset(1000f, 0f)     // punto di arrivo
+                    start = Offset(0f,0f),
+                    end = Offset(1000f, 0f)
                 )
             )
     ) {
@@ -74,13 +74,13 @@ fun GradientButtonWhite(
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.White), // ✅ sfondo bianco
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
         contentPadding = PaddingValues(),
         modifier = Modifier
             .width(320.dp)
             .height(40.dp)
             .clip(RoundedCornerShape(50.dp))
-            .border(2.dp, AscientGradient, RoundedCornerShape(50.dp)) // ✅ bordo con gradiente
+            .border(2.dp, AscientGradient, RoundedCornerShape(50.dp))
     ) {
         Text(
             text = text,

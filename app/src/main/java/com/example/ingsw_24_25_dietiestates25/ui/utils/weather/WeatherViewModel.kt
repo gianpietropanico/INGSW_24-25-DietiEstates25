@@ -55,7 +55,7 @@ class WeatherViewModel @Inject constructor(
             } else {
                 state = state.copy(
                     isLoading = false,
-                    error = "Coordinate non disponibili per questo annuncio."
+                    error = "Coordinates not available for this listing."
                 )
             }
         }
