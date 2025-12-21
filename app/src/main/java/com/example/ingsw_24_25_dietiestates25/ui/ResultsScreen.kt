@@ -179,7 +179,7 @@ fun ResultsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(WindowInsets.systemBars.asPaddingValues())
+            .padding(WindowInsets.navigationBars.asPaddingValues())
     ) { innerPadding ->
 
         Column(

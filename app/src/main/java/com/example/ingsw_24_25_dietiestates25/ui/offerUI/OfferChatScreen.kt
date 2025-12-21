@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.outlined.MailOutline
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -71,6 +72,8 @@ fun OfferChatScreen(
         inboxVm.loadAppointmentsForUser( currentUser!!.id)
     }
 
+
+
     when {
         (state.selectedProperty == null && state.selectedOffer == null) -> {
             Log.d("OFFERCHATSCREEN","Offer is null")
@@ -86,11 +89,9 @@ fun OfferChatScreen(
             var isDisabled: Boolean
             var messages: List<OfferMessage> = emptyList()
             var lastMessage: OfferMessage
-            var selectedOffer: Offer
 
             if( state.selectedOffer != null ){
 
-                selectedOffer = state.selectedOffer!!
 
                 messages = state.selectedOffer!!.messages
 
@@ -265,7 +266,7 @@ fun OfferChatScreen(
                         modifier = Modifier
                             .width(172.dp)
                             .height(48.dp),
-                        shape = RoundedCornerShape(2.dp),
+                        shape = RoundedCornerShape(12.dp),
                         border = if (!isDisabled) BorderStroke(1.dp, AscientGradient)
                         else BorderStroke(1.dp, Color.LightGray),
                         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
@@ -288,7 +289,7 @@ fun OfferChatScreen(
                         modifier = Modifier
                             .width(172.dp)
                             .height(48.dp)
-                            .clip(RoundedCornerShape(2.dp))
+                            .clip(RoundedCornerShape(12.dp))
                             .background(
                                 if (!isDisabled) AscientGradient else Brush.linearGradient(
                                     listOf(
@@ -787,7 +788,6 @@ fun OfferCardMessage(
                                     .clip(buttonShape)
                                     .border(1.dp, AscientGradient, buttonShape)
                                     .clickable {
-
                                         navController.navigate(NavigationItem.MakeOffer.route)
                                    },
 

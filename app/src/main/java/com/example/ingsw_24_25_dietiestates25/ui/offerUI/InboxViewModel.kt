@@ -38,8 +38,7 @@ import kotlin.String
 class InboxViewModel  @Inject constructor (
     private val userSessionManager: UserSessionManager,
     private val offerRepo : OfferRepository,
-    private val appointmentRepo: AppointmentRepository,
-    private val propertyRepo : PropertyListingRepository
+    private val appointmentRepo: AppointmentRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(InboxState())
@@ -55,14 +54,7 @@ class InboxViewModel  @Inject constructor (
         return userSessionManager.getCurrentUser()
     }
 
-    fun returnStatus(status: String): String {
-        return when (status) {
-            "PENDING" -> "In progress"
-            "ACCEPTED" -> "Accepted"
-            "REJECTED" -> "Declined"
-            else -> "UNKNOW STATE"
-        }
-    }
+
     //TETTO MASSIMO 10% che sarebbe 0.1
     fun calculateDiscount(price: Double, discountType: Int): Double {
         val discountPercent = when (discountType) {
@@ -74,10 +66,13 @@ class InboxViewModel  @Inject constructor (
         return price - (price * discountPercent)
     }
 
-    fun checkPrice(price: Double): Boolean {
+    fun checkPrice(price: Double) {
         val discount = calculateDiscount(state.value.selectedProperty!!.price.toDouble(), 10)
-        return price >= discount
+        val result = price >= discount
+
+        _state.update { it.copy(buttonOfferEnabled = result) }
     }
+
 
     fun createOffer (amount : Double){
 
@@ -273,26 +268,17 @@ class InboxViewModel  @Inject constructor (
 
                 is ApiResult.Success -> {
 
-                    val offer = result.data
+                    val historyOffer = offerRepo.getOffersSummary(result.data!!.listing.id)
+                    val offerUser = if ( result.data.buyerUser.username ==  user.value!!.username) result.data.agentUser else result.data.buyerUser
 
-                    println("===== DEBUG OFFER =====")
-                    println("offer           = $offer")
-                    println("offer?.listing  = ${offer?.listing}")
-                    println("offer?.messages = ${offer?.messages}")
-                    println("offer?.buyerUser = ${offer?.buyerUser}")
-                    println("offer?.agentUser = ${offer?.agentUser}")
-                    println("offer?.buyerUser?.username = ${offer?.buyerUser?.username}")
-                    println("offer?.agentUser?.username = ${offer?.agentUser?.username}")
-                    println("user.value?.username = ${user.value?.username}")
-                    println("=========================")
-
-                    val offerUser = if ( result.data!!.buyerUser.username ==  user.value!!.username) result.data.agentUser else result.data.buyerUser
                     _state.update { it.copy(
                         selectedOffer = result.data,
                         selectedProperty = result.data.listing,
                         offerMessages = result.data.messages,
-                        selectedOfferUser = offerUser
-                        ,createOffer = false) }
+                        selectedOfferUser = offerUser,
+                        createOffer = false,
+                        historyOffers = historyOffer.data ?: emptyList()
+                    ) }
 
                 }
 
@@ -320,33 +306,21 @@ class InboxViewModel  @Inject constructor (
             viewModelScope.launch {
 
                 val offerUser = if ( offer.buyerUser.username ==  user.value!!.username) offer.agentUser else offer.buyerUser
+                val historyOffer = offerRepo.getOffersSummary(offer.listing.id)
 
                 _state.update {
                     it.copy(
                         selectedOffer = offer,
                         selectedProperty = offer.listing,
                         offerMessages = offer.messages,
-                        selectedOfferUser = offerUser
+                        selectedOfferUser = offerUser,
+                        historyOffers = historyOffer.data ?: emptyList()
                     )
                 }
 
             }
         }
 
-    }
-
-
-
-
-    fun getUsername( ): String{
-        return user.value!!.username
-    }
-
-
-    fun setSelectedAppointment (appointment: Appointment){
-        _state.update { current ->
-            current.copy(selectedAppointment = appointment)
-        }
     }
 
     fun acceptAppointment(appointmentId: String) {
@@ -438,16 +412,13 @@ class InboxViewModel  @Inject constructor (
             }
         }
     }
-    fun setSelectedListing(listing: PropertyListing) {
 
-        _state.update {
-            it.copy(selectedProperty = listing)
-        }
-
-        Log.d("SETLISTING","${_state.value.selectedProperty}")
-
-    }
     fun clearState (){
         _state.value = InboxState()
     }
+
+    fun resetInboxState() {
+        _state.update { InboxState() }
+    }
+
 }

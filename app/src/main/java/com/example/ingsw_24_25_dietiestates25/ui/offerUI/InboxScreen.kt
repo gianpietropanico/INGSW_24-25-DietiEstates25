@@ -79,6 +79,7 @@ fun InboxScreen(
                 currentRoute = currentRoute ?: Screen.Home.route,
                 onRouteSelected = { newRoute ->
                     navController.navigate(newRoute) {
+                        inboxVm.resetInboxState()
                         launchSingleTop = true
                         restoreState = true
                         popUpTo(navController.graph.startDestinationId) {
