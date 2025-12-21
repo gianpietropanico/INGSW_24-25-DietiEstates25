@@ -10,6 +10,8 @@ import com.example.ingsw_24_25_dietiestates25.data.repository.profileRepo.Profil
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.ui.authUI.AuthState
+import com.example.ingsw_24_25_dietiestates25.validation.ResetPasswordValidation
+import com.example.ingsw_24_25_dietiestates25.validation.SignUpValidation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -97,9 +99,24 @@ class ProfileViewModel @Inject constructor (
         }
     }
 
+    private val validator = ResetPasswordValidation()
     fun sendResetPasswordEmail(newPassword :String, oldPassword: String) {
         clearResultMessage()
 
+        val isValid = validator.validateResetPassword(
+            newPassword = newPassword,
+            oldPassword = oldPassword
+        )
+
+        if (!isValid) {
+            _state.update {
+                it.copy(
+                    resultMessage = "Dati per cambio password non validi",
+                    localError = true
+                )
+            }
+            return
+        }
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
             val result = profileRepo.resetPassword( oldPassword, newPassword)

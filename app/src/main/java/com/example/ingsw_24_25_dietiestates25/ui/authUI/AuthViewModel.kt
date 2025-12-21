@@ -32,6 +32,7 @@ import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.ui.utils.downloadImageAsBase64
+import com.example.ingsw_24_25_dietiestates25.validation.SignUpValidation
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import org.json.JSONObject
@@ -56,10 +57,28 @@ class AuthViewModel @Inject constructor (
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
+    private val validator = SignUpValidation()
     fun signUpUser(email: String, password: String, defaultProfilePic: String) {
         clearResultMessage()
 
-        if ( password == _authState.value.confirmPassword) {
+        val isValid = validator.validateSignUp(
+            email = email,
+            password = password,
+            confirmPassword = _authState.value.confirmPassword
+        )
+
+        if (!isValid) {
+            _authState.update {
+                it.copy(
+                    resultMessage = "Dati di registrazione non validi",
+                    localError = true
+                )
+            }
+            return
+        }
+
+
+
 
             viewModelScope.launch {
                 _authState.update { it.copy(isLoading = true, resultMessage = null) }
@@ -84,9 +103,7 @@ class AuthViewModel @Inject constructor (
                 handleResult(result)
             }
 
-        } else {
-            _authState.update { it.copy(isLoading = false, resultMessage = "The passwords do not match", localError = true) }
-        }
+
     }
 
     fun sendAgencyRequest(agencyName: String , email: String , password: String, defaultProfilePic : String) {

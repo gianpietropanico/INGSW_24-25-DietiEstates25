@@ -65,7 +65,7 @@ dependencies {
     // Pager moderno (ufficiale Jetpack Compose)
     implementation("androidx.compose.foundation:foundation:1.6.0")
 
-    // ✅ Indicatori dei pager (Accompanist)
+    // Indicatori dei pager (Accompanist)
     implementation("com.google.accompanist:accompanist-pager-indicators:0.34.0")
 
     implementation(libs.generativeai)
@@ -182,6 +182,6 @@ dependencies {
 
         }
     }
-    // DA RIMUOVERE: com.intellij:annotations:12.0
+
 
 }
