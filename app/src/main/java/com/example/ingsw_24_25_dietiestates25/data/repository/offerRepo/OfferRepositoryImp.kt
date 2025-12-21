@@ -2,7 +2,9 @@ package com.example.ingsw_24_25_dietiestates25.data.repository.offerRepo
 
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Offer
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.OfferSummary
+import com.example.ingsw_24_25_dietiestates25.data.model.request.AppointmentRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.request.MessageRequest
+import com.example.ingsw_24_25_dietiestates25.data.model.request.OfferAppointmentRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.request.OfferRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
@@ -25,6 +27,36 @@ class OfferRepositoryImp @Inject constructor(
 ) : OfferRepository {
 
     private val baseURL = "http://10.0.2.2:8080"
+
+    override suspend fun createAppointmentOffer(
+        request: OfferAppointmentRequest
+    ): ApiResult<Offer> {
+
+        return try {
+            val response = httpClient.post("$baseURL/offers/makeappointmentoffer") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(request)
+            }
+
+            when (response.status) {
+                HttpStatusCode.Created -> {
+                    val offer: Offer = response.body()
+                    ApiResult.Success(offer, "Offer successfully created")
+                }
+
+                else -> {
+                    val err = response.bodyAsText()
+                    ApiResult.UnknownError(
+                        "HTTP Error ${response.status.value}: $err"
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            ApiResult.UnknownError("Network error: ${e.localizedMessage}")
+        }
+    }
+
 
     override suspend fun createOffer(request: OfferRequest): ApiResult<Offer?> {
 
@@ -145,10 +177,10 @@ class OfferRepositoryImp @Inject constructor(
         }
     }
 
-    override suspend fun getOffersByUser(userName: String): ApiResult<List<Offer>> {
+    override suspend fun getOffersByUser(userId: String): ApiResult<List<Offer>> {
         return try {
             val response = httpClient.get("$baseURL/offers") {
-                url { parameters.append("userName", userName) }
+                url { parameters.append("userId", userId) }
                 accept(ContentType.Application.Json)
             }
 

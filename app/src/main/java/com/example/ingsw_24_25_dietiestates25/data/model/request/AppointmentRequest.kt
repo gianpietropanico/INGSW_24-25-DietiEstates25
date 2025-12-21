@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.data.model.request
 
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Appointment
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.ListingSummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListing
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
@@ -16,9 +17,9 @@ data class AppointmentRequest(
 )
 
 @Serializable
-data class AppointmentMessageRequest(
-    val appointmentId: String,
-    val senderId: String,
-    @Serializable(with = LocalDateSerializer::class)
-    val date: LocalDate
+data class OfferAppointmentRequest(
+    val property: PropertyListing,
+    val buyerUser: User,
+    val agent : User,
+    val appointment: Appointment
 )
