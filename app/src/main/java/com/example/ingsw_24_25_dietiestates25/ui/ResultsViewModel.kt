@@ -7,6 +7,8 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListi
 import com.example.ingsw_24_25_dietiestates25.data.model.request.PropertySearchRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
+import com.example.ingsw_24_25_dietiestates25.validation.SearchValidation
+import com.example.ingsw_24_25_dietiestates25.validation.SignUpValidation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +33,25 @@ class ResultsViewModel @Inject constructor(
     private val _state = MutableStateFlow(ResultsState())
     val state: StateFlow<ResultsState> = _state.asStateFlow()
 
+
+    private val validator = SearchValidation()
     fun searchProperties(type: String, location: String) {
+
+        val isValid = validator.validateSearch(
+            type = type,
+            location = location
+        )
+
+        if (!isValid) {
+            _state.update {
+                it.copy(
+                    errorMessage = "Dati di ricerca non validi",
+                    isLoading = false
+                )
+            }
+            return
+        }
+
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, errorMessage = null)
 
