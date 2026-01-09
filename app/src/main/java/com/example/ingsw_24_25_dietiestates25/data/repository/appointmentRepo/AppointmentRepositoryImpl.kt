@@ -30,7 +30,6 @@ class AppointmentRepositoryImpl @Inject constructor(
     private val baseURL = "http://10.0.2.2:8080"
 
     override suspend fun bookAppointment(request: AppointmentRequest): ApiResult<Appointment> {
-
         return try {
             val response = httpClient.post("$baseURL/appointments/bookappointment") {
                 contentType(ContentType.Application.Json)
@@ -39,7 +38,7 @@ class AppointmentRepositoryImpl @Inject constructor(
             }
 
             when (response.status) {
-                HttpStatusCode.OK -> {
+                HttpStatusCode.OK, HttpStatusCode.Created -> {
                     val body: Appointment = response.body()
                     ApiResult.Success(body, "Appointment request successfully created")
                 }

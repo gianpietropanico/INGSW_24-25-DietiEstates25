@@ -1,5 +1,6 @@
 package com.example.ingsw_24_25_dietiestates25.ui.appointmentUI
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.ListingSummary
@@ -7,8 +8,11 @@ import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertyListi
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.PropertySummary
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
 import com.example.ingsw_24_25_dietiestates25.data.model.request.AppointmentRequest
+import com.example.ingsw_24_25_dietiestates25.data.model.request.OfferAppointmentRequest
+import com.example.ingsw_24_25_dietiestates25.data.model.request.OfferRequest
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.data.repository.appointmentRepo.AppointmentRepository
+import com.example.ingsw_24_25_dietiestates25.data.repository.offerRepo.OfferRepository
 import com.example.ingsw_24_25_dietiestates25.data.repository.weatherRepo.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +26,7 @@ import com.example.ingsw_24_25_dietiestates25.data.session.UserSessionManager
 @HiltViewModel
 class AppointmentViewModel @Inject constructor(
     private val appointmentRepo: AppointmentRepository,
+    private val offerRepository: OfferRepository,
     private val userSessionManager: UserSessionManager
 ) : ViewModel() {
 
@@ -53,6 +58,7 @@ class AppointmentViewModel @Inject constructor(
 
         val result = appointmentRepo.getAppointmentsByUser(user.id)
         when (result) {
+
             is ApiResult.Success -> {
                 val appointments = result.data ?: emptyList()
                 val unavailableDates = appointments.map { it.date }.toSet()
@@ -80,48 +86,82 @@ class AppointmentViewModel @Inject constructor(
         }
     }
 
-    //Prenotazione appuntamento
+
     fun bookAppointment(listing: PropertyListing) = viewModelScope.launch {
+
         val user = _currentUser.value ?: return@launch
         val date = _state.value.selectedDate ?: return@launch
         val agent = listing.agent ?: return@launch
 
-        _state.update { it.copy(isLoading = true, resultMessage = null, success = false) }
-
-        val listingSummary = ListingSummary(
-            id = listing.id,
-            title = listing.title,
-            property = PropertySummary(
-                city = listing.property.city,
-                street = listing.property.street,
-                civicNumber = listing.property.civicNumber,
-                images = listing.property.images
+        _state.update {
+            it.copy(
+                isLoading = true,
+                resultMessage = null,
+                success = false
             )
-        )
+        }
 
         val appointmentRequest = AppointmentRequest(
-            listing = listingSummary,
+            listing = ListingSummary(
+                id = listing.id,
+                title = listing.title,
+                property = PropertySummary(
+                    city = listing.property.city,
+                    street = listing.property.street,
+                    civicNumber = listing.property.civicNumber,
+                    images = listing.property.images
+                )
+            ),
             user = user,
             agent = agent,
             date = date.toString()
         )
 
-        val result = appointmentRepo.bookAppointment(appointmentRequest)
-        if (result is ApiResult.Success) {
-            _state.update {
-                it.copy(isLoading = false, success = true, resultMessage = "Appointment booked!")
-            }
-            loadAppointmentsForUser(user) // aggiorna lista
-        } else {
+        val resultAppointment = appointmentRepo.bookAppointment(appointmentRequest)
+
+        if (resultAppointment !is ApiResult.Success) {
             _state.update {
                 it.copy(
                     isLoading = false,
                     success = false,
-                    resultMessage = result.message ?: "Error during booking"
+                    resultMessage = resultAppointment.message ?: "Error during booking"
                 )
             }
+            return@launch
         }
+
+        if (offerRepository.getOffersByUser(currentUser.value!!.id).data == null) {
+            try {
+                val resultOffer = offerRepository.createAppointmentOffer(
+                    OfferAppointmentRequest(
+                        property = listing,
+                        buyerUser = user,
+                        agent = agent,
+                        appointment = resultAppointment.data!!
+                    )
+                )
+
+                when (resultOffer) {
+                    is ApiResult.Success -> {}
+                    is ApiResult.Created -> {}
+                    is ApiResult.UnknownError -> {}
+                    else -> {}
+                }
+            } catch (_: Exception) {
+            }
+        }
+
+        _state.update {
+            it.copy(
+                isLoading = false,
+                success = true,
+                resultMessage = "Appointment booked successfully!"
+            )
+        }
+
+        loadAppointmentsForUser(user)
     }
+
     fun loadAppointmentsForListing(listingId: String, isForBooking: Boolean) = viewModelScope.launch {
         _state.update { it.copy(isLoading = true) }
 

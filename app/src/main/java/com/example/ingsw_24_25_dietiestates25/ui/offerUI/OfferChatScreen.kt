@@ -701,7 +701,11 @@ fun OfferCardMessage(
                 Row {
 
                     Text(
-                        text = "${message.amount!!.toInt()} €", //importo OFFER
+                        text = if (message?.amount != null) {
+                            "${message.amount.toInt()} €"
+                        } else {
+                            "OFFER NULL"
+                        },
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Black
                         )

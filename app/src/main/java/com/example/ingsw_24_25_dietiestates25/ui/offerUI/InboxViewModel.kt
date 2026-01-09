@@ -193,7 +193,7 @@ class InboxViewModel  @Inject constructor (
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, resultMessage = null) }
 
-            val result: ApiResult<List<Offer>> = offerRepo.getOffersByUser(user.value!!.username)
+            val result: ApiResult<List<Offer>> = offerRepo.getOffersByUser(user.value!!.id)
 
             if (result is ApiResult.Success) {
                 _state.update {
@@ -209,25 +209,6 @@ class InboxViewModel  @Inject constructor (
         }
     }
 
-    fun loadAppointments() {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, resultMessage = null) }
-
-            val result: ApiResult<List<Appointment>> = appointmentRepo.getAppointmentsByUser(user.value!!.id)
-
-            if (result is ApiResult.Success) {
-                _state.update {
-                    it.copy(
-                        appointments = result.data ?: emptyList()
-                    )
-                }
-
-                handleResult(ApiResult.Success(Unit, result.message))
-            } else {
-                handleResult(result = result)
-            }
-        }
-    }
 
     private fun handleResult(result: ApiResult<*>) {
         when (result) {
@@ -268,8 +249,8 @@ class InboxViewModel  @Inject constructor (
 
                 is ApiResult.Success -> {
 
-                    val historyOffer = offerRepo.getOffersSummary(result.data!!.listing.id)
-                    val offerUser = if ( result.data.buyerUser.username ==  user.value!!.username) result.data.agentUser else result.data.buyerUser
+                    val historyOffer = offerRepo.getOffersSummary(property.id)
+                    val offerUser = if ( result.data!!.buyerUser.username ==  user.value!!.username) result.data.agentUser else result.data.buyerUser
 
                     _state.update { it.copy(
                         selectedOffer = result.data,
@@ -283,13 +264,16 @@ class InboxViewModel  @Inject constructor (
                 }
 
                 is ApiResult.UnknownError -> {
-                    _state.update { it.copy(selectedProperty = property, createOffer = true) }
+                    val historyOffer = offerRepo.getOffersSummary(property.id)
+
+                    _state.update { it.copy( historyOffers = historyOffer.data ?: emptyList(),selectedProperty = property, createOffer = true) }
                 }
 
                 is ApiResult.Authorized<*> -> TODO()
                 is ApiResult.Created<*> -> TODO()
                 is ApiResult.Unauthorized<*> -> TODO()
                 is ApiResult.NotFound<*> -> TODO()
+
             }
         }
     }

@@ -217,9 +217,9 @@ fun BookAppointmentScreen(
                 appointmentVM = appointmentVM,
                 isForBooking = true,
                 onConfirm = {
-                    propertyListing?.let { appointmentVM.bookAppointment(it) }
+                    propertyListing.let { appointmentVM.bookAppointment(it) }
                     appointmentVM.selectDate(null)
-                    navController.popBackStack() // torna a OfferChatScreen
+                    navController.popBackStack()
                 },
                 onDismiss = {
                     appointmentVM.selectDate(null)
