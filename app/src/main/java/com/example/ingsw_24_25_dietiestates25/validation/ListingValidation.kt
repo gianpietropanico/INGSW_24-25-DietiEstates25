@@ -1,28 +1,59 @@
 package com.example.ingsw_24_25_dietiestates25.validation
 
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Property
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.Type
-import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingFormState
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.ValidationResult
 
-class ListingValidation {
+class ListingValidator {
 
-    fun validateListing(form: ListingFormState?): Boolean {
+    fun validateListing(
+        title: String?,
+        type: Type?,
+        price: Float?,
+        property: Property?,
+        agent: User?
+    ): ValidationResult {
 
-        if (form == null)
-            throw IllegalArgumentException()
+        if (title == null || type == null || price == null)
+            return ValidationResult(false, "Missing listing data")
 
-        if (form.title.isBlank())
-            return false
+        if (title.isBlank())
+            return ValidationResult(false, "Title is required")
 
-        if (form.type != Type.SELL && form.type != Type.RENT)
-            return false
+        if (type != Type.SELL && type != Type.RENT)
+            return ValidationResult(false, "Invalid listing type")
 
-        val price = form.price.toFloatOrNull()
-        if (price == null || price <= 0)
-            return false
+        if (price.isNaN() || price <= 0)
+            return ValidationResult(false,"Price must be a valid positive number greater than zero")
 
-        if (form.city.isBlank())
-            return false
+        if (property == null)
+            return ValidationResult(false, "Property data is required")
 
-        return true
+        if (agent == null)
+            return ValidationResult(false, "Agent is required")
+
+        return ValidationResult(true)
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -14,6 +14,8 @@ class AgencyRequestValidation {
 
         if (agencyName.isBlank())
             return false
+        if (email.isBlank())
+            return false
 
         // Email
         val emailRegex =
@@ -33,3 +35,11 @@ class AgencyRequestValidation {
         return true
     }
 }
+
+
+
+
+
+
+
+

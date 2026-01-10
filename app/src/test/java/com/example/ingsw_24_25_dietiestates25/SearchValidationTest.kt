@@ -14,36 +14,45 @@ class SearchValidationTest {
         validator = SearchValidation()
     }
 
-    // Caso valido (SELL)
     @Test
-    fun testSearchValidaBuy() {
+    fun searchValidTest() {
         assertTrue(validator.validateSearch("SELL", "Rome"))
     }
 
-    // TYPE
     @Test
-    fun testTypeVuoto() {
+    fun blankTypeTest() {
         assertFalse(validator.validateSearch("", "Rome"))
     }
 
     @Test
-    fun testTypeNonAmmesso() {
+    fun typeNotValidTest() {
         assertFalse(validator.validateSearch("BUY", "Rome"))
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun testTypeNull() {
+    fun nullTypeTest() {
         validator.validateSearch(null, "Rome")
     }
 
-    // LOCATION
     @Test
-    fun testLocationVuota() {
+    fun emptyLocationTest() {
         assertFalse(validator.validateSearch("SELL", ""))
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun testLocationNull() {
+    fun nullLocationTest() {
         validator.validateSearch("SELL", null)
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

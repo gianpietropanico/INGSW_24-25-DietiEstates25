@@ -14,9 +14,9 @@ class AgencyRequestValidationTest {
         validator = AgencyRequestValidation()
     }
 
-    // === CASO VALIDO ===
+
     @Test
-    fun testRichiestaAgenziaValida() {
+    fun validAgencyRequestTest() {
         assertTrue(
             validator.validateAgencyRequest(
                 "Best Houses",
@@ -27,9 +27,50 @@ class AgencyRequestValidationTest {
         )
     }
 
-    // === AGENCY NAME ===
+
+    @Test(expected = IllegalArgumentException::class)
+    fun nullAgencyNameTest() {
+        validator.validateAgencyRequest(
+            null,
+            "agency@test.com",
+            "Password1@",
+            "Password1@"
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun nullEmailTest() {
+        validator.validateAgencyRequest(
+            "Best Houses",
+            null,
+            "Password1@",
+            "Password1@"
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun nullPasswordtest() {
+        validator.validateAgencyRequest(
+            "Best Houses",
+            "agency@test.com",
+            null,
+            "Password1@"
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun nullConfirmPasswordTest() {
+        validator.validateAgencyRequest(
+            "Best Houses",
+            "agency@test.com",
+            "Password1@",
+            null
+        )
+    }
+
+
     @Test
-    fun testAgencyNameVuoto() {
+    fun emptyAgencyNameTest() {
         assertFalse(
             validator.validateAgencyRequest(
                 "",
@@ -40,9 +81,32 @@ class AgencyRequestValidationTest {
         )
     }
 
-    // === EMAIL ===
     @Test
-    fun testEmailFormatoNonValido() {
+    fun blankAgencyNameTest() {
+        assertFalse(
+            validator.validateAgencyRequest(
+                "   ",
+                "agency@test.com",
+                "Password1@",
+                "Password1@"
+            )
+        )
+    }
+
+    @Test
+    fun emptyEmailTest() {
+        assertFalse(
+            validator.validateAgencyRequest(
+                "BEst Houses",
+                "",
+                "Password1@",
+                "Password1@"
+            )
+        )
+    }
+
+    @Test
+    fun emailWithoutAtSymbolTest() {
         assertFalse(
             validator.validateAgencyRequest(
                 "Best Houses",
@@ -53,9 +117,32 @@ class AgencyRequestValidationTest {
         )
     }
 
-    // === PASSWORD ===
     @Test
-    fun testPasswordBreve() {
+    fun emailWithoutDomainTest() {
+        assertFalse(
+            validator.validateAgencyRequest(
+                "Best Houses",
+                "agency@",
+                "Password1@",
+                "Password1@"
+            )
+        )
+    }
+
+    @Test
+    fun emailWithInvalidCharactersTest() {
+        assertFalse(
+            validator.validateAgencyRequest(
+                "Best Houses",
+                "agency@@test.com",
+                "Password1@",
+                "Password1@"
+            )
+        )
+    }
+
+    @Test
+    fun passwordTooShortTest() {
         assertFalse(
             validator.validateAgencyRequest(
                 "Best Houses",
@@ -67,7 +154,44 @@ class AgencyRequestValidationTest {
     }
 
     @Test
-    fun testPasswordNonCoincidenti() {
+    fun passwordWithoutDigitTest() {
+        assertFalse(
+            validator.validateAgencyRequest(
+                "Best Houses",
+                "agency@test.com",
+                "Password@",
+                "Password@"
+            )
+        )
+    }
+
+    @Test
+    fun passwordWithoutUppercaseTest() {
+        assertFalse(
+            validator.validateAgencyRequest(
+                "Best Houses",
+                "agency@test.com",
+                "password1@",
+                "password1@"
+            )
+        )
+    }
+
+    @Test
+    fun passwordWithoutSpecialCharacterTest() {
+        assertFalse(
+            validator.validateAgencyRequest(
+                "Best Houses",
+                "agency@test.com",
+                "Password12",
+                "Password12"
+            )
+        )
+    }
+
+
+    @Test
+    fun passwordsDoNotMatchTest() {
         assertFalse(
             validator.validateAgencyRequest(
                 "Best Houses",
@@ -75,17 +199,6 @@ class AgencyRequestValidationTest {
                 "Password1@",
                 "Password2@"
             )
-        )
-    }
-
-    // === NULL ===
-    @Test(expected = IllegalArgumentException::class)
-    fun testParametriNull() {
-        validator.validateAgencyRequest(
-            null,
-            "agency@test.com",
-            "Password1@",
-            "Password1@"
         )
     }
 }
