@@ -31,7 +31,7 @@ class PropertyListingRepositoryImpl @Inject constructor(
     private val sessionManager: UserSessionManager
 ) : PropertyListingRepository {
 
-    private val baseURL = "http://10.0.2.2:8080"
+    private val baseURL = "http://84.8.252.211:8080/"
 
     override suspend fun getListingAgency(listingId: String): ApiResult<Agency> {
         return try {

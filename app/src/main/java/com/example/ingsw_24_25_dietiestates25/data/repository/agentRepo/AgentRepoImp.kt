@@ -25,7 +25,7 @@ class AgentRepoImp @Inject constructor(
     private val httpClient: HttpClient,
 ) :AgentRepo {
 
-    private val baseURL = "http://10.0.2.2:8080"
+    private val baseURL = "http://84.8.252.211:8080/"
 
     override suspend fun getAllAgent(agencyEmail: String): ApiResult<List<User>> {
         return try {

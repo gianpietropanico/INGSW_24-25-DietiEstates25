@@ -24,7 +24,7 @@ class AdminRepoImp  @Inject constructor(
     private val httpClient: HttpClient
 ) : AdminRepo {
 
-    private val baseURL = "http://10.0.2.2:8080"
+    private val baseURL = "http://84.8.252.211:8080/"
 
     override suspend fun getAllAgencies(): ApiResult<List<Agency>> {
         return try {

@@ -27,7 +27,7 @@ class AppointmentRepositoryImpl @Inject constructor(
     private val sessionManager: UserSessionManager
 ) : AppointmentRepository {
 
-    private val baseURL = "http://10.0.2.2:8080"
+    private val baseURL = "http://84.8.252.211:8080/"
 
     override suspend fun bookAppointment(request: AppointmentRequest): ApiResult<Appointment> {
         return try {
