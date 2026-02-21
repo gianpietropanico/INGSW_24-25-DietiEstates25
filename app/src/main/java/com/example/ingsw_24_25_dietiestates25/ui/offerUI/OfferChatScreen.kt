@@ -368,9 +368,20 @@ fun OfferChatScreen(
                             )
                         }
 
-                        items(state.userAppointments) { appointment ->
+                        items(
+                            state.userAppointments.filter { appointment ->
+                                val matchesListing = appointment.listing.id == listingOffer.id
+                                val matchedBoth = if (currentUser!!.role == Role.AGENT_USER || currentUser!!.role == Role.AGENT_ADMIN) {
+                                    chatUser.id == appointment.user.id && currentUser!!.id == appointment.agent.id
+                                } else {
+                                    chatUser.id == appointment.agent.id && currentUser!!.id == appointment.user.id
+                                }
 
-                            val isAgent = appointment.agent.username == currentUser!!.username
+                                matchesListing && matchedBoth
+                            }
+                        ) { appointment ->
+
+                            val isAgent = appointment.agent.id == currentUser!!.id
 
                             AppointmentSummaryCard(
                                 summary = AppointmentSummary(

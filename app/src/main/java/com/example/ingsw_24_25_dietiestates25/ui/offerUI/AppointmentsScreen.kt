@@ -174,17 +174,18 @@ fun UserAppointmentsScreen(
         }
 
         // Bottom sheet
-//        state.selectedDate?.let { day ->
-//            AppointmentBottomSheet(
-//                day = day,
-//                appointmentsForDay = appointmentsByDate[day] ?: emptyList(),
-//                propertyListing = null,
-//                weatherVM = weatherVM,
-//                appointmentVM = appointmentVM,
-//                isForBooking = false,
-//                onDismiss = { appointmentVM.selectDate(null) }
-//            )
-//        }
+        state.selectedDate?.let { day ->
+            AppointmentBottomSheet(
+                day = day,
+                appointmentsForDay = appointmentsByDate[day] ?: emptyList(),
+                propertyListing = null,
+                weatherVM = weatherVM,
+                appointmentVM = appointmentVM,
+                isForBooking = false,
+                onDismiss = { appointmentVM.selectDate(null) },
+                onConfirm = { }
+            )
+        }
     }
 }
 

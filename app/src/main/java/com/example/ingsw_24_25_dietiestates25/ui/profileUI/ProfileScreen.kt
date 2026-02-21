@@ -20,14 +20,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ingsw_24_25_dietiestates25.HomeViewModel
 import com.example.ingsw_24_25_dietiestates25.R
-import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.User
+import com.example.ingsw_24_25_dietiestates25.ui.appointmentUI.AppointmentViewModel
+import com.example.ingsw_24_25_dietiestates25.ui.listingUI.ListingViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.navigation.NavigationItem
+import com.example.ingsw_24_25_dietiestates25.ui.offerUI.InboxViewModel
 import com.example.ingsw_24_25_dietiestates25.ui.theme.bluPerchEcipiace
 import com.example.ingsw_24_25_dietiestates25.ui.utils.DietiNavBar
 import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
@@ -37,8 +39,12 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.bse64ToImageBitmap
 
 @Composable
 fun ProfileScreen(
-    navController : NavController,
-    pm : ProfileViewModel
+    navController: NavController,
+    pm: ProfileViewModel,
+    appointmentVm: AppointmentViewModel,
+    inboxVm: InboxViewModel,
+    listingVm: ListingViewModel,
+    homeVm: HomeViewModel
 ) {
 
     val user by pm.user.collectAsState()
@@ -46,20 +52,25 @@ fun ProfileScreen(
     val currentRoute = navBackStackEntry?.destination?.route
 
     if (user != null) {
+
+        val isAdmin = user!!.role.name == "SUPER_ADMIN" || user!!.role.name == "SUPPORT_ADMIN"
+
         Scaffold(
             bottomBar = {
-                DietiNavBar(
-                    currentRoute = currentRoute ?: Screen.Home.route,
-                    onRouteSelected = { newRoute ->
-                        navController.navigate(newRoute) {
-                            launchSingleTop = true
-                            restoreState = true
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+                if (!isAdmin) {
+                    DietiNavBar(
+                        currentRoute = currentRoute ?: Screen.Home.route,
+                        onRouteSelected = { newRoute ->
+                            navController.navigate(newRoute) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         ) { paddingValues ->
             Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
@@ -74,13 +85,10 @@ fun ProfileScreen(
                     contentScale = ContentScale.Crop
                 )
 
-                // Contenuto sovrapposto
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -104,7 +112,7 @@ fun ProfileScreen(
                                         .clip(CircleShape),
                                     contentScale = ContentScale.Crop
                                 )
-                            }else{
+                            } else {
                                 Image(
                                     painter = painterResource(id = R.drawable.defaultprofilepic),
                                     contentDescription = "Profile Picture",
@@ -130,14 +138,12 @@ fun ProfileScreen(
                                 fontSize = 30.sp,
                                 style = MaterialTheme.typography.labelMedium
                             )
-
                         }
 
                         Text(user!!.email, fontSize = 14.sp, color = Color.Gray)
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-                        // Voci menu
                         ProfileOption(
                             ImageVector.vectorResource(R.drawable.account_circle),
                             "Edit personal details",
@@ -145,7 +151,8 @@ fun ProfileScreen(
                             onClick = {
                                 pm.clearResultMessage()
                                 navController.navigate(NavigationItem.ProfileDetails.route)
-                            })
+                            }
+                        )
                         ProfileOption(
                             ImageVector.vectorResource(R.drawable.lock),
                             "Security and password",
@@ -158,8 +165,8 @@ fun ProfileScreen(
                                     description = "The password in a real estate app is a confidential credential used to protect " +
                                             "the user's account and ensure secure access to personal data and services."
                                 )
-                            })
-
+                            }
+                        )
                         ProfileOption(
                             Icons.Default.History,
                             "Your activities",
@@ -173,6 +180,11 @@ fun ProfileScreen(
                             "Logout",
                             onClick = {
                                 pm.logout()
+                                appointmentVm.resetState()
+                                inboxVm.clearState()
+                                listingVm.resetForm()
+                                homeVm.resetState()
+
                                 navController.navigate(NavigationItem.Welcome.route) {
                                     popUpTo(0) { inclusive = true }
                                     launchSingleTop = true
@@ -182,12 +194,11 @@ fun ProfileScreen(
 
                         Spacer(modifier = Modifier.height(24.dp))
                     }
-
                 }
             }
         }
 
-    }else{
+    } else {
         LoadingOverlay(isVisible = true)
     }
 }
@@ -204,7 +215,7 @@ fun ProfileOption(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp)
-            .clickable { onClick()}
+            .clickable { onClick() }
     ) {
         Icon(
             imageVector = icon,
@@ -237,5 +248,3 @@ fun ProfileOption(
         )
     }
 }
-
-

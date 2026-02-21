@@ -20,7 +20,9 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
-
+    fun resetState() {
+        _state.value = HomeState()
+    }
     fun onPropertyTypeSelected(type: String) {
         _state.value = _state.value.copy(propertyType = type)
     }

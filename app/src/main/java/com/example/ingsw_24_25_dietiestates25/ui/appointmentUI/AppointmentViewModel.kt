@@ -163,7 +163,7 @@ class AppointmentViewModel @Inject constructor(
     }
 
     fun loadAppointmentsForListing(listingId: String, isForBooking: Boolean) = viewModelScope.launch {
-        _state.update { it.copy(isLoading = true) }
+        _state.update { it.copy(isLoadingForBooking = true) }
 
         val userId = if (!isForBooking) _currentUser.value?.id else null
         val result = appointmentRepo.getAppointmentsByListing(listingId, userId)
@@ -175,7 +175,7 @@ class AppointmentViewModel @Inject constructor(
 
                 _state.update {
                     it.copy(
-                        isLoading = false,
+                        isLoadingForBooking = false,
                         appointments = appointments,
                         unavailableDates = unavailableDates
                     )
@@ -183,11 +183,11 @@ class AppointmentViewModel @Inject constructor(
             }
 
             is ApiResult.UnknownError -> {
-                _state.update { it.copy(isLoading = false, resultMessage = result.message) }
+                _state.update { it.copy(isLoadingForBooking = false, resultMessage = result.message) }
             }
 
             else -> {
-                _state.update { it.copy(isLoading = false, resultMessage = "Error loading") }
+                _state.update { it.copy(isLoadingForBooking = false, resultMessage = "Error loading") }
             }
         }
     }
@@ -197,5 +197,9 @@ class AppointmentViewModel @Inject constructor(
 
     fun clearResult() {
         _state.update { it.copy(resultMessage = null, success = false) }
+    }
+
+    fun resetState() {
+        _state.value = AppointmentScreenState()
     }
 }

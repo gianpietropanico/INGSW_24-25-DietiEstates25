@@ -105,6 +105,12 @@ class ResultsViewModel @Inject constructor(
         }
     }
 
+
+
+    fun resetState() {
+        _state.value = ResultsState()
+    }
+
     fun setSelectedListing(listing: PropertyListing) {
         _state.update {
             it.copy(selectedListing = listing)

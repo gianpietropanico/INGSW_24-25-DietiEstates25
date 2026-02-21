@@ -296,7 +296,12 @@ fun AppNavHost(
         composable(NavigationItem.Profile.route) {
             ProfileScreen(
                 navController = navController,
-                pm = profileViewModel
+                pm = profileViewModel,
+                appointmentVm = appointmentViewModel,
+                inboxVm =  inboxViewModel,
+                listingVm =  listingViewModel,
+                homeVm =  homeViewModel
+
             )
         }
 

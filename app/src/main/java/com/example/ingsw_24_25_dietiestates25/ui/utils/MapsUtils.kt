@@ -2,6 +2,7 @@ package com.example.ingsw_24_25_dietiestates25.ui.utils
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import com.example.ingsw_24_25_dietiestates25.R
 import com.example.ingsw_24_25_dietiestates25.data.model.dataclass.POI
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -37,17 +38,7 @@ object MapUtils {
         "Metro" to R.drawable.ic_metro
     )
 
-    val poiColors = mapOf(
-        "School" to 0xFF6200EE.toInt(),
-        "University" to 0xFF3700B3.toInt(),
-        "Park" to 0xFF03DAC5.toInt(),
-        "Bus Stop" to 0xFFFF5722.toInt(),
-        "Restaurant" to 0xFFFFC107.toInt(),
-        "Hospital" to 0xFFE53935.toInt(),
-        "Stadium" to 0xFF009688.toInt(),
-        "Train Station" to 0xFF795548.toInt(),
-        "Metro" to 0xFF607D8B.toInt()
-    )
+    val poiColors = Color.LightGray
 
 
 }

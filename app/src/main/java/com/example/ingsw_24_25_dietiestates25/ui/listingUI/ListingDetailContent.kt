@@ -125,7 +125,8 @@ fun ListingDetailContent(
     val context = LocalContext.current
     var selectedPoi by remember { mutableStateOf<POI?>(null) }
     val mapHeight = 250.dp
-
+    val currentUser by listingVm.currentUser.collectAsState()
+    val isAgent = currentUser?.role?.name == "AGENT_USER" || currentUser?.role?.name == "AGENT_ADMIN"
     val state by listingVm.state.collectAsState()
 
 
@@ -340,8 +341,7 @@ fun ListingDetailContent(
                                 state = MarkerState(LatLng(poi.lat, poi.lon)),
                                 icon = context.getPoiBitmapDescriptor(
                                     poi.type,
-                                    poiIcons,
-                                    poiColors
+                                    poiIcons
                                 ),
                                 onClick = {
                                     selectedPoi = poi
@@ -402,11 +402,8 @@ fun ListingDetailContent(
                 )
                 .padding(horizontal = 6.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = if (isAgent) Arrangement.Center else Arrangement.SpaceBetween
         ) {
-
-            Spacer(modifier = Modifier.width(1.dp))
-
             Text(
                 text = "€ ${"%,.0f".format(selectedListing.price.toDouble())}",
                 color = bluPerchEcipiace,
@@ -414,33 +411,35 @@ fun ListingDetailContent(
                 fontSize = 24.sp
             )
 
-            Button(
-                onClick = {
-                    inboxVm.setOfferScreen(selectedListing)
-                    navController.navigate(NavigationItem.OfferChat.route)
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 8.dp,
-                    pressedElevation = 2.dp,
-                    hoveredElevation = 10.dp
-                ),
-                modifier = Modifier.height(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Agent Icon",
-                    tint = bluPerchEcipiace,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Contact Agent",
-                    color = bluPerchEcipiace,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp
-                )
+            if (!isAgent) {
+                Button(
+                    onClick = {
+                        inboxVm.setOfferScreen(selectedListing)
+                        navController.navigate(NavigationItem.OfferChat.route)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 8.dp,
+                        pressedElevation = 2.dp,
+                        hoveredElevation = 10.dp
+                    ),
+                    modifier = Modifier.height(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Agent Icon",
+                        tint = bluPerchEcipiace,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Contact Agent",
+                        color = bluPerchEcipiace,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp
+                    )
+                }
             }
         }
 

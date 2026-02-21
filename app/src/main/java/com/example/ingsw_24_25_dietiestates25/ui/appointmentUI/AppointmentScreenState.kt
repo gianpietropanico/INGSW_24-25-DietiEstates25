@@ -9,5 +9,6 @@ data class AppointmentScreenState(
     val selectedDate: LocalDate? = null,
     val isLoading: Boolean = false,
     val success: Boolean = false,
-    val resultMessage: String? = null
+    val resultMessage: String? = null,
+    val isLoadingForBooking: Boolean = false
 )

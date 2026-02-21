@@ -63,13 +63,11 @@ fun InboxScreen(
     navController: NavController,
     inboxVm: InboxViewModel
 ) {
+
     val user by inboxVm.user.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val state by inboxVm.state.collectAsState()
-
-    // Stato per la tab selezionata
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) { inboxVm.loadOffers() }
 
@@ -114,7 +112,7 @@ fun InboxScreen(
                             style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Bold)
                         )
                         Text(
-                            text = "${state.offerMessages.size} messages",
+                            text = "${state.offers.size} messages",
                             style = MaterialTheme.typography.headlineSmall.copy(color = Color.Gray)
                         )
                     }
@@ -358,14 +356,17 @@ fun InboxHeader(
     ) {
 
         Column(modifier = Modifier.weight(1f)) {
+
             Text(
                 text = "Inbox",
                 style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Bold)
             )
+
             Text(
                 text = "12 messages",
                 style = MaterialTheme.typography.headlineSmall.copy(color = Color.Gray)
             )
+
         }
 
         // Pulsante Appointments

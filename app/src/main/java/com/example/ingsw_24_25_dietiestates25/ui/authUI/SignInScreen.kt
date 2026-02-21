@@ -255,6 +255,7 @@ fun  SignInScreen (
 
             GradientButton(
                 text = "Sign In",
+
                 onClick = {
                     am.signInUser(email, password)
                 }

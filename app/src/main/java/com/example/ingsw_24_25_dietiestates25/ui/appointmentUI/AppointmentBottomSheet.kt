@@ -71,165 +71,158 @@ fun AppointmentBottomSheet(
             }
         }
     ) {
+        // ← rimosso fillMaxHeight() e Arrangement.SpaceBetween
         Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 10.dp)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 20.dp)
+                .padding(top = 10.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
 
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            // Titolo
+            Column {
+                Text(
+                    text = "Summary",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 24.sp
+                    )
+                )
+                Text(
+                    text = "${day.dayOfMonth}/${day.monthValue}/${day.year}",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color.Black,
+                        fontSize = 20.sp
+                    )
+                )
+            }
 
-                //Titolo
-                Column {
+            // Immagine e info proprietà
+            if (isForBooking && propertyListing != null) {
+                if (propertyListing.property.images.isNotEmpty()) {
+                    AsyncImage(
+                        model = propertyListing.property.images.first(),
+                        contentDescription = "Property photos",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Column(modifier = Modifier.padding(top = 8.dp)) {
                     Text(
-                        text = "Summary",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 24.sp
+                        text = propertyListing.title,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 22.sp
                         )
                     )
                     Text(
-                        text = "${day.dayOfMonth}/${day.monthValue}/${day.year}",
+                        text = "${propertyListing.property.city}, ${propertyListing.property.street} ${propertyListing.property.civicNumber}",
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = Color.Black,
                             fontSize = 20.sp
                         )
                     )
                 }
+            }
 
-                //Immagine e info proprietà
-                if (isForBooking && propertyListing != null) {
-                    if (propertyListing.property.images.isNotEmpty()) {
-                        AsyncImage(
-                            model = propertyListing.property.images.first(),
-                            contentDescription = "Property photos",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-
-                    Column(modifier = Modifier.padding(top = 8.dp)) {
-                        Text(
-                            text = propertyListing.title,
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 22.sp
-                            )
-                        )
-                        Text(
-                            text = "${propertyListing.property.city}, ${propertyListing.property.street} ${propertyListing.property.civicNumber}",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = Color.Black,
-                                fontSize = 20.sp
-                            )
-                        )
-                    }
-                }
-
-                //Lista appuntamenti
-                if (!isForBooking) {
-                    Text(
-                        "Today's appointments:",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp
-                        )
+            // Lista appuntamenti
+            if (!isForBooking) {
+                Text(
+                    "Today's appointments:",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp
                     )
+                )
 
-                    if (appointmentsForDay.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color(0xFFF3F3F3))
-                                .padding(14.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "No appointments",
-                                color = Color.Gray,
-                                fontSize = 13.sp
-                            )
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(max = 160.dp)
-                        ) {
-                            items(appointmentsForDay) { app ->
-                                AppointmentCard(appointment = app)
-                                Spacer(Modifier.height(8.dp))
-                            }
+                if (appointmentsForDay.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFF3F3F3))
+                            .padding(14.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "No appointments", color = Color.Gray, fontSize = 13.sp)
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 160.dp)
+                    ) {
+                        items(appointmentsForDay) { app ->
+                            AppointmentCard(appointment = app)
+                            Spacer(Modifier.height(8.dp))
                         }
                     }
                 }
+            }
 
-                //Meteo
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    elevation = CardDefaults.cardElevation(2.dp),
-                    colors = CardDefaults.cardColors(containerColor = BlueGray)
-                ) {
-                    Box(modifier = Modifier.padding(10.dp)) {
-                        when {
-                            daysBetween > 8 -> {
-                                Text(
-                                    text = "Weather not available",
-                                    color = Color.White,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    fontSize = 12.sp
+            // Meteo
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                elevation = CardDefaults.cardElevation(2.dp),
+                colors = CardDefaults.cardColors(containerColor = BlueGray)
+            ) {
+                Box(modifier = Modifier.padding(10.dp)) {
+                    when {
+                        daysBetween > 8 -> {
+                            Text(
+                                text = "Weather not available",
+                                color = Color.White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth(),
+                                fontSize = 12.sp
+                            )
+                        }
+                        weatherVM.state.isLoading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center),
+                                color = Color.White,
+                                strokeWidth = 2.dp
+                            )
+                        }
+                        weatherVM.state.error != null -> {
+                            Text(
+                                weatherVM.state.error ?: "",
+                                color = Color.Red,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.align(Alignment.Center),
+                                fontSize = 12.sp
+                            )
+                        }
+                        else -> {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                WeatherCard(
+                                    state = weatherVM.state,
+                                    backgroundColor = BlueGray,
                                 )
-                            }
-                            weatherVM.state.isLoading -> {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.align(Alignment.Center),
-                                    color = Color.White,
-                                    strokeWidth = 2.dp
-                                )
-                            }
-                            weatherVM.state.error != null -> {
-                                Text(
-                                    weatherVM.state.error ?: "",
-                                    color = Color.Red,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.align(Alignment.Center),
-                                    fontSize = 12.sp
-                                )
-                            }
-                            else -> {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    WeatherCard(
-                                        state = weatherVM.state,
-                                        backgroundColor = BlueGray,
-                                    )
-                                }
                             }
                         }
                     }
                 }
             }
 
-            //Pulsante conferma
+            // Pulsante Confirm — ora subito dopo il meteo
             if (isForBooking) {
+                Spacer(Modifier.height(4.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(AscientGradient)
-                        .clickable {
-                            onConfirm()
-                        },
+                        .clickable { onConfirm() },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -245,4 +238,3 @@ fun AppointmentBottomSheet(
         }
     }
 }
-

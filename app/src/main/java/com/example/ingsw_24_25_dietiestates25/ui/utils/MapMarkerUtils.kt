@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import com.example.ingsw_24_25_dietiestates25.R
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -42,7 +43,6 @@ fun Context.drawableToCircleBitmap(
 fun Context.getPoiBitmapDescriptor(
     poiType: String,
     poiIcons: Map<String, Int>,
-    poiColors: Map<String, Int>,
     sizeDp: Int = 24
 ): com.google.android.gms.maps.model.BitmapDescriptor {
     val cache = remember { mutableMapOf<String, Bitmap>() }
@@ -51,7 +51,7 @@ fun Context.getPoiBitmapDescriptor(
         drawableToCircleBitmap(
             drawableRes = poiIcons[poiType] ?: R.drawable.ic_default,
             sizeDp = sizeDp,
-            circleColor = poiColors[poiType] ?: 0xFF03DAC5.toInt()
+            circleColor =  Color.LightGray.value.toInt()
         )
     }
     return BitmapDescriptorFactory.fromBitmap(bitmap)
