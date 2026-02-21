@@ -32,7 +32,7 @@ class AuthRepositoryImpl @Inject constructor (
     private val sessionManager: UserSessionManager
 ): AuthRepository {
 
-    private val baseURL = "http://10.0.2.2:8080"
+    private val baseURL = "http://84.8.252.211:8080/"
     private val userSessionManager = sessionManager
 
     private fun isValidEmail(email: String): Boolean {

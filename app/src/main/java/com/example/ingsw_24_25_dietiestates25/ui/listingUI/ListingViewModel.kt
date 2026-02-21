@@ -18,6 +18,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingF
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingScreenState
 import com.example.ingsw_24_25_dietiestates25.ui.listingUI.listingState.ListingState
 import com.example.ingsw_24_25_dietiestates25.ui.utils.uriToBase64WithSizeLimit
+import com.example.ingsw_24_25_dietiestates25.validation.ListingValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +51,8 @@ class ListingViewModel @Inject constructor(
     val energyClass = MutableStateFlow(EnergyClass.A)
 
 
+    private val listingValidator = ListingValidator()
+
     init {
         viewModelScope.launch {
             userSessionManager.currentUser.collect { user ->
@@ -69,6 +72,31 @@ class ListingViewModel @Inject constructor(
 
     fun addPropertyListing(agent: User?, imageUris: List<Uri>, context: Context) =
         viewModelScope.launch {
+
+            val form = _state.value.formState
+            val property = form.toProperty()
+
+            val listingPrice = form.price.toFloatOrNull()
+
+            val validation = listingValidator.validateListing(
+                title = form.title,
+                type = form.type,
+                price = listingPrice,
+                property = property,
+                agent = agent
+            )
+
+
+            if (!validation.isValid) {
+                _state.update {
+                    it.copy(
+                        uiState = ListingState.Error(
+                            validation.errorMessage ?: "Not valid data"
+                        )
+                    )
+                }
+                return@launch
+            }
             _state.update { it.copy(uiState = ListingState.Loading) }
 
             try {

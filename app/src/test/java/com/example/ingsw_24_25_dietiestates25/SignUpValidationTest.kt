@@ -17,56 +17,131 @@ class SignUpValidationTest {
 
     // Caso valido
     @Test
-    fun testRegistrazioneValida() {
-        assertTrue(validator.validateSignUp(
-            "test@gmail.com",
+    fun validSignUpTest() {
+        assertTrue(
+            validator.validateSignUp(
+                "test@gmail.com",
+                "Prova123@",
+                "Prova123@"
+            )
+        )
+    }
+
+
+    @Test
+    fun blankEmailTest() =
+        assertFalse(validator.validateSignUp(
+            "",
+            "Prova123@",
+            "Prova123@"))
+
+
+    @Test(expected = IllegalArgumentException::class)
+    fun nullEmailTest() {
+        validator.validateSignUp(
+            null,
             "Prova123@",
             "Prova123@"
-        ))
+        )
     }
 
-    // EMAIL
-    @Test fun testEmailVuota() =
-        assertFalse(validator.validateSignUp("", "Prova123@", "Prova123@"))
+    @Test
+    fun invalidEmailFormatTest() =
+        assertFalse(
+            validator.validateSignUp(
+                "testgmail.com",
+                "Prova123@",
+                "Prova123@"
+            )
+        )
 
+    @Test
+    fun emptyPasswordTest() =
+        assertFalse(
+            validator.validateSignUp(
+                "test@gmail.com",
+                "",
+                "Prova123@"
+            )
+        )
 
     @Test(expected = IllegalArgumentException::class)
-    fun testEmailNull() {
-        validator.validateSignUp(null, "Prova123@", "Prova123@")
+    fun nullPasswordTest() {
+        validator.validateSignUp(
+            "test@gmail.com",
+            null,
+            "Prova123@"
+        )
     }
 
-    @Test fun testEmailFormatoNonValido() =
-        assertFalse(validator.validateSignUp("testgmail.com", "Prova123@", "Prova123@"))
+    @Test
+    fun passwordTooShortTest() =
+        assertFalse(
+            validator.validateSignUp(
+                "test@gmail.com",
+                "Pro1@",
+                "Pro1@"
+            )
+        )
 
-    // PASSWORD
-    @Test fun testPasswordVuota() =
-        assertFalse(validator.validateSignUp("test@gmail.com", "", "Prova123@"))
+    @Test
+    fun passwordWithoutDigitTest() =
+        assertFalse(
+            validator.validateSignUp(
+                "test@gmail.com",
+                "ProvaTest@",
+                "ProvaTest@"
+            )
+        )
+
+    @Test
+    fun passwordWithoutUppercaseTest() =
+        assertFalse(
+            validator.validateSignUp(
+                "test@gmail.com",
+                "prova123@",
+                "prova123@"
+            )
+        )
+
+    @Test
+    fun passwordWithoutSpecialCharacterTest() =
+        assertFalse(
+            validator.validateSignUp(
+                "test@gmail.com",
+                "Prova1234",
+                "Prova1234"
+            )
+        )
+
+
+    @Test
+    fun confirmPasswordDoesNotMatchTest() =
+        assertFalse(
+            validator.validateSignUp(
+                "test@gmail.com",
+                "Prova123@",
+                "Prova1234@"
+            )
+        )
+
+    @Test
+    fun emptyConfirmPasswordTest() =
+        assertFalse(
+            validator.validateSignUp(
+                "test@gmail.com",
+                "Prova123@",
+                ""
+            )
+        )
 
     @Test(expected = IllegalArgumentException::class)
-    fun testPasswordNull() {
-        validator.validateSignUp("test@gmail.com", null, "Prova123@")
+    fun nullConfirmPasswordTest() {
+        validator.validateSignUp(
+            "test@gmail.com",
+            "Prova123@",
+            null
+        )
     }
-    @Test fun testPasswordBreve() =
-        assertFalse(validator.validateSignUp("test@gmail.com", "Pro1@", "Pro1@"))
 
-    @Test fun testPasswordSenzaNumeri() =
-        assertFalse(validator.validateSignUp("test@gmail.com", "ProvaTest@", "ProvaTest@"))
-
-    @Test fun testPasswordSenzaMaiuscole() =
-        assertFalse(validator.validateSignUp("test@gmail.com", "prova123@", "prova123@"))
-
-    @Test fun testPasswordSenzaSpeciali() =
-        assertFalse(validator.validateSignUp("test@gmail.com", "Prova1234", "Prova1234"))
-
-    // CONFIRM PASSWORD
-    @Test fun testConfirmPasswordNonCoincidente() =
-        assertFalse(validator.validateSignUp("test@gmail.com", "Prova123@", "Prova1234@"))
-
-    @Test fun testConfirmPasswordVuota() =
-        assertFalse(validator.validateSignUp("test@gmail.com", "Prova123@", ""))
-
-    @Test(expected = IllegalArgumentException::class)
-    fun testConfirmPasswordNull() {
-        validator.validateSignUp("test@gmail.com", "Prova123@", null)
-    }
 }

@@ -55,6 +55,7 @@ import com.example.ingsw_24_25_dietiestates25.ui.utils.LoadingOverlay
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MinimalPasswordField
 import com.example.ingsw_24_25_dietiestates25.ui.utils.MinimalTextField
 import com.example.ingsw_24_25_dietiestates25.ui.utils.drawableToBase64
+import com.example.ingsw_24_25_dietiestates25.validation.AgencyRequestValidation
 
 @Composable
 fun  AgencySignInScreen (
@@ -69,6 +70,8 @@ fun  AgencySignInScreen (
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var agencyName by remember { mutableStateOf("") }
+
+
 
 
     Box(modifier = Modifier.fillMaxSize()) {

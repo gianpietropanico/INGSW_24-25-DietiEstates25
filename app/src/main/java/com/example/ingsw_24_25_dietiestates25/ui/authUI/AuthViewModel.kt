@@ -32,6 +32,7 @@ import androidx.credentials.GetCredentialRequest
 import com.example.ingsw_24_25_dietiestates25.data.repository.imageRepo.ImageRepository
 import com.example.ingsw_24_25_dietiestates25.data.model.result.ApiResult
 import com.example.ingsw_24_25_dietiestates25.ui.utils.downloadImageAsBase64
+import com.example.ingsw_24_25_dietiestates25.validation.AgencyRequestValidation
 import com.example.ingsw_24_25_dietiestates25.validation.SignUpValidation
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -106,31 +107,53 @@ class AuthViewModel @Inject constructor (
 
     }
 
+    val agencyValidator = AgencyRequestValidation()
     fun sendAgencyRequest(agencyName: String , email: String , password: String, defaultProfilePic : String) {
 
         clearResultMessage()
 
-        if ( password == _authState.value.confirmPassword) {
+        val isValid = try {
+            agencyValidator.validateAgencyRequest(
+                agencyName = agencyName,
+                email = email,
+                password = password,
+                confirmPassword = _authState.value.confirmPassword
+            )
+        } catch (e: IllegalArgumentException) {
+            false
+        }
 
-            viewModelScope.launch {
-                Log.d("sendAgencyRequest", "Start request with email=$email, agencyName=$agencyName")
-
-                _authState.update { it.copy(isLoading = true, resultMessage = null) }
-                val result = authRepository.sendAgencyRequest(email, password, agencyName)
-
-                if ( result is ApiResult.Success ){
-                    val data = result.data
-
-                    imageRepository.insertProfilePicture(data!!.userId, defaultProfilePic, "user")
-                    imageRepository.insertProfilePicture(data.agencyId, defaultProfilePic, "agency")
-
-                }
-
-                handleResult(result)
+        if (!isValid) {
+            _authState.update {
+                it.copy(
+                    isLoading = false,
+                    resultMessage = "Invalid agency registration data",
+                    localError = true
+                )
             }
-        } else {
-            Log.d("sendAgencyRequest", "Password and confirmation do NOT match")
-            _authState.update { it.copy(isLoading = false, resultMessage = "The passwords do not match", localError = true) }
+            return
+        }
+        viewModelScope.launch {
+            Log.d("sendAgencyRequest", "Start request with email=$email, agencyName=$agencyName")
+
+            _authState.update { it.copy(isLoading = true, resultMessage = null) }
+
+            val result = authRepository.sendAgencyRequest(email, password, agencyName)
+
+            if (result is ApiResult.Success && result.data != null) {
+                imageRepository.insertProfilePicture(
+                    result.data.userId,
+                    defaultProfilePic,
+                    "user"
+                )
+                imageRepository.insertProfilePicture(
+                    result.data.agencyId,
+                    defaultProfilePic,
+                    "agency"
+                )
+            }
+
+            handleResult(result)
         }
     }
 

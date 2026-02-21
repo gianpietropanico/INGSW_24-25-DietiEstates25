@@ -32,7 +32,7 @@ class ImageRepositoryImpl @Inject constructor(
     private val sessionManager: UserSessionManager
 ) : ImageRepository {
 
-    private val baseURL = "http://10.0.2.2:8080"
+    private val baseURL = "http://84.8.252.211:8080/"
     private val userSessionManager = sessionManager
 
     override suspend fun insertProfilePicture(ownerIdentifier: String, profilePicture: String, type: String): ApiResult<Unit> {
